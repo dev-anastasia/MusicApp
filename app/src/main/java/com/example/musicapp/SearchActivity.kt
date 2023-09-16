@@ -99,7 +99,6 @@ class SearchActivity : AppCompatActivity() {
                     showSomeSearchProblem()
                 }
             })
-
             loadingImage.visibility = GONE
         }
 
@@ -120,6 +119,10 @@ class SearchActivity : AppCompatActivity() {
                 }
             }
         )
+
+        findViewById<ImageView>(R.id.search_activity_btn_go_back).setOnClickListener {
+            finish()
+        }
     }
 
     companion object {
