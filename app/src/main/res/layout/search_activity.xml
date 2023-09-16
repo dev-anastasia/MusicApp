@@ -59,6 +59,7 @@
             android:layout_gravity="top|center">
 
             <ImageView
+                android:src="@drawable/lion"
                 android:id="@+id/search_activity_iv_error"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
@@ -72,7 +73,7 @@
                 android:layout_gravity="center|top"
                 android:layout_marginTop="185dp"
                 android:gravity="center"
-                tools:text="ERROR" />
+                tools:text="SOME_PROBLEM" />
 
         </FrameLayout>
 

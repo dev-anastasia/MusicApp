@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.adapter.MusicAdapter
 import com.example.musicapp.data.Music
 import com.example.musicapp.network.MusicService
-import com.squareup.picasso.Picasso
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -29,41 +28,37 @@ class SearchActivity : AppCompatActivity() {
     var currentQueryText: String? = ""
     private lateinit var musicAdapter: MusicAdapter
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.search_activity)
 
         val uiHandler = Handler(Looper.getMainLooper())
         val errorText: TextView = findViewById(R.id.search_activity_tv_error)
-        val errorImage: ImageView = findViewById(R.id.search_activity_iv_error)
         val loadingImage: ImageView = findViewById(R.id.search_activity_iv_loading)
         loadingImage.visibility = GONE
+        val errorLayout: FrameLayout = findViewById(R.id.search_activity_fl_error)
+        errorLayout.visibility = GONE
 
         fun showNoSuchResult() {
-            findViewById<FrameLayout>(R.id.search_activity_fl_error).visibility = VISIBLE
+            errorLayout.visibility = VISIBLE
             loadingImage.visibility = GONE
-            Picasso.get()
-                .load(R.drawable.lion)
-                .into(errorImage)
             errorText.text = "Ничего не найдено :("
         }
 
         fun showSomeSearchProblem() {
-            findViewById<FrameLayout>(R.id.search_activity_fl_error).visibility = VISIBLE
+            errorLayout.visibility = VISIBLE
             loadingImage.visibility = GONE
-            Picasso.get()
-                .load(R.drawable.lion)
-                .into(errorImage)
-            errorText.text = "Возникла какая-то проблема"
+            errorText.text = "Непредвиденная ошибка"
         }
 
         fun showLoading() {
             loadingImage.visibility = VISIBLE
+            errorLayout.visibility = GONE
         }
 
         // Retrofit + Перехватчик (Interceptor)
-        val interceptor = HttpLoggingInterceptor() // logs request and response information
+        val interceptor =
+            HttpLoggingInterceptor()             // logs request and response information
         interceptor.level = HttpLoggingInterceptor.Level.BODY
         val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
         // it's best to use a single OkHttpClient instance and reuse it for all HTTP calls
@@ -76,30 +71,27 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
         // SearchView
-        val searchQuery = Runnable {
-
-            findViewById<FrameLayout>(R.id.search_activity_fl_error).visibility = GONE
+        val searchQueryRunnable = Runnable {
+            errorLayout.visibility = GONE
             showLoading()
 
-            val searchObject: Call<Music> = (
-                    if (currentQueryText != null)
-                        musicService.getSearchResult(currentQueryText!!)
-                    else
-                        musicService.getSearchResult("")
-                    )
+            if (currentQueryText == null)
+                currentQueryText = ""
+            val searchObject: Call<Music> = musicService.getSearchResult(currentQueryText!!)
 
             searchObject.enqueue(object : Callback<Music> {
+
                 override fun onResponse(call: Call<Music>, response: Response<Music>) {
                     if (response.isSuccessful) {
                         if (response.body()!!.resultCount != 0) {
                             val list = response.body()!!.results
                             musicAdapter = MusicAdapter(list)
                             recyclerView.adapter = musicAdapter
-                        } else {
-                            if (currentQueryText != null)
+                        } else {                                   // если 0 результатов поиска
+                            if (currentQueryText?.isEmpty()!!.not()) // Чтобы не выводил картинку при пустом поисковике
                                 showNoSuchResult()
                         }
-                    } else
+                    } else                                         // если Response.isSuccessful.not()
                         showSomeSearchProblem()
                 }
 
@@ -112,18 +104,18 @@ class SearchActivity : AppCompatActivity() {
         }
 
         findViewById<SearchView>(R.id.search_activity_search_view).setOnQueryTextListener( // требует listener'а
-            object : SearchView.OnQueryTextListener { // тот самый требуемый listener
+            object : SearchView.OnQueryTextListener {               // тот самый требуемый listener
 
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    uiHandler.removeCallbacks(searchQuery)
-                    uiHandler.post(searchQuery)
+                    uiHandler.removeCallbacks(searchQueryRunnable)
+                    uiHandler.post(searchQueryRunnable)
                     return true
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    uiHandler.removeCallbacks(searchQuery)
+                    uiHandler.removeCallbacks(searchQueryRunnable)
                     currentQueryText = newText
-                    uiHandler.postDelayed(searchQuery, TIMER)
+                    uiHandler.postDelayed(searchQueryRunnable, TIMER)
                     return true
                 }
             }
