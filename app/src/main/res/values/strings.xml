@@ -3,4 +3,5 @@
     <string name="fl_search_text">Поиск</string>
     <string name="fl_text_media">Медиатека</string>
     <string name="fl_settings_text">Настройки</string>
+    <string name="player_activity_top_info_text">Играет сейчас</string>
 </resources>
