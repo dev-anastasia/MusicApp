@@ -4,4 +4,5 @@
     <string name="fl_text_media">Медиатека</string>
     <string name="fl_settings_text">Настройки</string>
     <string name="player_activity_top_info_text">Играет сейчас</string>
+    <string name="activity_player_tv_top_info">Играет сейчас</string>
 </resources>
