@@ -53,7 +53,7 @@ class SearchActivity : AppCompatActivity() {
         )
         val emptyList = emptyList<MusicPiece>()
         musicAdapter =
-            MusicAdapter(emptyList) // изначально список пустой для корректной работы DiffUtil
+            MusicAdapter(emptyList, this@SearchActivity) // изначально список пустой для корректной работы DiffUtil
         recyclerView.adapter = musicAdapter
 
         // Retrofit + Перехватчик (Interceptor)
@@ -91,7 +91,7 @@ class SearchActivity : AppCompatActivity() {
 
         fun calculateDiff(newList: List<MusicPiece>) {
             val diffUtil = DiffUtil.calculateDiff(ItemDiffUtilCallback(musicAdapter.list, newList))
-            musicAdapter = MusicAdapter(newList)
+            musicAdapter = MusicAdapter(newList, this@SearchActivity)
             diffUtil.dispatchUpdatesTo(musicAdapter)
             recyclerView.adapter = musicAdapter
         }
@@ -159,7 +159,7 @@ class SearchActivity : AppCompatActivity() {
             }
         )
 
-        findViewById<ImageView>(R.id.search_activity_btn_go_back).setOnClickListener {
+        findViewById<ImageView>(R.id.player_activity_btn_go_back).setOnClickListener {
             finish()
         }
     }
@@ -168,5 +168,10 @@ class SearchActivity : AppCompatActivity() {
         const val BASE_URL = "https://itunes.apple.com/"
         const val ENTITY = "musicTrack"   // для поиска только музыкальных треков
         const val TIMER = 2000L
+        const val TRACK_COVER_KEY = "track cover key"
+        const val SONG_NAME_KEY = "song name key"
+        const val ARTIST_NAME_KEY = "artist name key"
+        const val DURATION_KEY = "duration key"
+        const val TRACK_LINK_KEY = "track link key"
     }
 }

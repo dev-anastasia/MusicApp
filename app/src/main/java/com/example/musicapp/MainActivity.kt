@@ -13,8 +13,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val search = findViewById<FrameLayout>(R.id.activity_main_fl_search)
-        search.setOnClickListener {
+        findViewById<FrameLayout>(R.id.activity_main_fl_search).setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
         }

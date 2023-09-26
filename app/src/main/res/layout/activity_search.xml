@@ -13,7 +13,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/search_activity_btn_go_back"
+            android:id="@+id/player_activity_btn_go_back"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_marginStart="16dp"
