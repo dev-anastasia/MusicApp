@@ -8,6 +8,7 @@
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="8dp"
+    android:background="@color/white"
     android:orientation="horizontal">
 
     <ImageView
@@ -33,24 +34,20 @@
 
         <TextView
             android:id="@+id/tv_song_name"
+            style="@style/ItemViewText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textAllCaps="false"
             android:textColor="@color/black"
             android:textSize="14sp"
             tools:text="Название" />
 
         <TextView
             android:id="@+id/tv_author"
+            style="@style/ItemViewText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textAllCaps="false"
             android:textColor="@color/dark_grey"
             android:textSize="12sp"
             tools:text="Исполнитель" />

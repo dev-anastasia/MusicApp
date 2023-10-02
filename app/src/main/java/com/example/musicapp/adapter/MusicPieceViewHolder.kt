@@ -1,14 +1,10 @@
 package com.example.musicapp.adapter
 
-import android.content.Intent
-import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.PlayerActivity
 import com.example.musicapp.R
-import com.example.musicapp.SearchActivity
 import com.squareup.picasso.Picasso
 
 class MusicPieceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -27,6 +23,7 @@ class MusicPieceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun updateCoverImage(link: String) {
         Picasso.get()
             .load(link)
+            .placeholder(R.drawable.note_placeholder)
             .into(cover)
     }
 }

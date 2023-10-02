@@ -13,6 +13,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="light_grey">#DEDEDE</color>
     <color name="dark_grey">#7D7D7D</color>
+    <color name="dark_theme_bg">#393636</color>
 
 
 </resources>

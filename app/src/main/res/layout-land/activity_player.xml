@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <FrameLayout
@@ -53,32 +54,29 @@
                 android:background="@drawable/image_cover_bg"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/note_placeholder" />
 
             <TextView
+                android:layout_marginTop="16dp"
                 android:id="@+id/player_activity_tv_song_name"
+                style="@style/PlayerActivityText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:maxLines="2"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:textStyle="bold"
+                android:textAllCaps="false"
                 app:layout_constraintStart_toEndOf="@+id/player_activity_iv_cover"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Billie Jean" />
 
             <TextView
-                android:id="@+id/player_activity_tv_author_name"
+                android:id="@+id/player_activity_tv_artist_name"
+                style="@style/PlayerActivityText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="6dp"
-                android:maxLines="2"
                 android:textAllCaps="true"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@+id/player_activity_iv_cover"
                 app:layout_constraintTop_toBottomOf="@+id/player_activity_tv_song_name"
                 tools:text="Michael Jackson" />
@@ -98,33 +96,35 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="32dp"
-                android:src="@drawable/icon_media_empty" />
+                tools:src="@drawable/icon_media_empty" />
 
             <TextView
                 android:id="@+id/player_activity_tv_current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/start_time" />
+                android:text="@string/zero_time" />
 
             <SeekBar
                 android:id="@+id/player_activity_seekbar"
                 android:layout_width="295dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:progressTint="@color/search_bg"
                 android:thumb="@drawable/icon_circle" />
 
             <TextView
                 android:id="@+id/player_activity_tv_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="4:37" />
+                android:text="@string/zero_time" />
 
             <ImageView
                 android:id="@+id/player_activity_iv_icon_fav"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginStart="32dp"
-                android:src="@drawable/icon_fav_empty" />
+                tools:src="@drawable/icon_fav_empty" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -138,23 +138,24 @@
 
             <ImageView
                 android:id="@+id/player_activity_iv_icon_prev"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
                 android:layout_marginEnd="34dp"
-                android:src="@drawable/icon_prev" />
+                tools:src="@drawable/icon_prev_disabled" />
 
             <ImageView
                 android:id="@+id/player_activity_iv_icon_play"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
                 android:layout_marginEnd="34dp"
-                android:src="@drawable/icon_play" />
+                android:clickable="false"
+                android:src="@drawable/icon_play_disabled" />
 
             <ImageView
                 android:id="@+id/player_activity_iv_icon_next"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/icon_next" />
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                tools:src="@drawable/icon_next_disabled" />
 
         </LinearLayout>
 

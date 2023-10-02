@@ -1,5 +1,6 @@
 package com.example.musicapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,56 +16,50 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.musicapp.RetrofitUtils.musicService
 import com.example.musicapp.adapter.ItemDiffUtilCallback
 import com.example.musicapp.adapter.MusicAdapter
+import com.example.musicapp.adapter.OnItemClickListener
 import com.example.musicapp.data.Music
 import com.example.musicapp.data.MusicPiece
-import com.example.musicapp.network.MusicService
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity(), OnItemClickListener {
 
-    var currentQueryText: String? = ""  // текущий текст запроса
+    private var currentQueryText: String? = ""  // текущий текст запроса
     private lateinit var musicAdapter: MusicAdapter
+    private lateinit var searchQueryRunnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val uiHandler = Handler(Looper.getMainLooper())
+
         val errorText: TextView = findViewById(R.id.search_activity_tv_error)
-        val loadingImage: ImageView =
-            findViewById(R.id.search_activity_iv_loading) // Иконка загрузки
+        // Иконка загрузки
+        val loadingImage: ImageView = findViewById(R.id.search_activity_iv_loading)
         loadingImage.visibility = GONE
-        val errorLayout: FrameLayout =
-            findViewById(R.id.search_activity_fl_error) // Картинка + сообщение о проблеме
+        // Картинка + сообщение о проблеме:
+        val errorLayout: FrameLayout = findViewById(R.id.search_activity_fl_error)
         errorLayout.visibility = GONE
 
         // RecyclerView
         val recyclerView = findViewById<RecyclerView>(R.id.search_activity_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
-            this, LinearLayoutManager.VERTICAL, false
+            this,
+            LinearLayoutManager.VERTICAL,
+            false
         )
+
         val emptyList = emptyList<MusicPiece>()
-        musicAdapter =
-            MusicAdapter(emptyList, this@SearchActivity) // изначально список пустой для корректной работы DiffUtil
+        musicAdapter = MusicAdapter(
+            emptyList,   // изначально список пустой для корректной работы DiffUtil
+            this
+        )
         recyclerView.adapter = musicAdapter
-
-        // Retrofit + Перехватчик (Interceptor)
-        val interceptor = HttpLoggingInterceptor()         // logs request and response information
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
-        // it's best to use a single OkHttpClient instance and reuse it for all HTTP calls
-        val retrofit = Retrofit.Builder().baseUrl(BASE_URL).client(client)
-            .addConverterFactory(GsonConverterFactory.create()).build()
-        val musicService = retrofit.create(MusicService::class.java)
-
 
         fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
             errorLayout.visibility = VISIBLE
@@ -83,7 +78,7 @@ class SearchActivity : AppCompatActivity() {
             errorLayout.visibility = GONE
         }
 
-        fun hideKeyboard() {    // При общении с сервером убирает клавиатуру
+        fun hideKeyboard() {    // При работе с сервером убирает клавиатуру
             val view: View? = this.currentFocus
             val inputMethodManager = getSystemService(InputMethodManager::class.java)
             inputMethodManager.hideSoftInputFromWindow(view?.windowToken, 0)
@@ -91,13 +86,13 @@ class SearchActivity : AppCompatActivity() {
 
         fun calculateDiff(newList: List<MusicPiece>) {
             val diffUtil = DiffUtil.calculateDiff(ItemDiffUtilCallback(musicAdapter.list, newList))
-            musicAdapter = MusicAdapter(newList, this@SearchActivity)
+            musicAdapter = MusicAdapter(newList, this)
             diffUtil.dispatchUpdatesTo(musicAdapter)
             recyclerView.adapter = musicAdapter
         }
 
         // запрос SearchView
-        val searchQueryRunnable = Runnable {
+        searchQueryRunnable = Runnable {
 
             showLoading() // Не отображает, не могу понять почему...
 
@@ -109,7 +104,7 @@ class SearchActivity : AppCompatActivity() {
 
                 override fun onResponse(call: Call<Music>, response: Response<Music>) {
                     if (response.isSuccessful) {
-                        if (response.body()!!.resultCount != 0) {  // если не 0 результатов поиска
+                        if (response.body()!!.resultCount != 0) {  // если есть результаты поиска
                             val newList = response.body()!!.results
                             calculateDiff(newList)
                         } else {
@@ -120,8 +115,7 @@ class SearchActivity : AppCompatActivity() {
                             if (currentQueryText?.isEmpty()!!.not())
                                 showNoSuchResult()
                         }
-
-                    } else {               // если Response не был Successful
+                    } else {         // если Response не был Successful
                         // Очистка списка для корректного отображения сообщения об ошибке:
                         val newList = emptyList<MusicPiece>()
                         calculateDiff(newList)
@@ -138,15 +132,18 @@ class SearchActivity : AppCompatActivity() {
             })
 
             loadingImage.visibility = GONE // Если убрать эту строку, иконка отображается когда надо
-            hideKeyboard()
+            if (currentQueryText?.isEmpty()!!.not())
+                hideKeyboard()
         }
 
-        findViewById<SearchView>(R.id.search_activity_search_view).setOnQueryTextListener( // требует listener'а
+        findViewById<SearchView>(R.id.search_activity_search_view).setOnQueryTextListener( // требует listener
             object : SearchView.OnQueryTextListener {               // тот самый требуемый listener
 
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    uiHandler.removeCallbacks(searchQueryRunnable)
-                    uiHandler.post(searchQueryRunnable)
+                    uiHandler.apply {
+                        removeCallbacks(searchQueryRunnable)
+                        post(searchQueryRunnable)
+                    }
                     return true
                 }
 
@@ -164,14 +161,16 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    override fun onItemClick(id: Long) {
+        val intent = Intent(this, SearchPlayerActivity::class.java)
+        intent.putExtra(TRACK_ID, id)
+        this.startActivity(intent)
+    }
+
     companion object {
         const val BASE_URL = "https://itunes.apple.com/"
-        const val ENTITY = "musicTrack"   // для поиска только музыкальных треков
-        const val TIMER = 2000L
-        const val TRACK_COVER_KEY = "track cover key"
-        const val SONG_NAME_KEY = "song name key"
-        const val ARTIST_NAME_KEY = "artist name key"
-        const val DURATION_KEY = "duration key"
-        const val TRACK_LINK_KEY = "track link key"
+        const val TRACK_ID = "track id key"
+        private const val ENTITY = "musicTrack"   // для поиска только музыкальных треков
+        private const val TIMER = 2000L
     }
 }
