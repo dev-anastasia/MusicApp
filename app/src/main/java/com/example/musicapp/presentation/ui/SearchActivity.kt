@@ -1,4 +1,4 @@
-package com.example.musicapp
+package com.example.musicapp.presentation.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -16,12 +16,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.RetrofitUtils.musicService
-import com.example.musicapp.adapter.ItemDiffUtilCallback
-import com.example.musicapp.adapter.MusicAdapter
-import com.example.musicapp.adapter.OnItemClickListener
-import com.example.musicapp.data.Music
-import com.example.musicapp.data.MusicPiece
+import com.example.musicapp.domain.ItemDiffUtilCallback
+import com.example.musicapp.domain.MusicAdapter
+import com.example.musicapp.domain.OnItemClickListener
+import com.example.musicapp.R
+import com.example.musicapp.data.network.RetrofitUtils.musicService
+import com.example.musicapp.domain.entities.Music
+import com.example.musicapp.domain.entities.MusicPiece
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

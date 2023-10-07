@@ -1,11 +1,11 @@
-package com.example.musicapp.adapter
+package com.example.musicapp.domain
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.data.MusicPiece
+import com.example.musicapp.domain.entities.MusicPiece
 import com.squareup.picasso.Picasso
 
 class MusicAdapter(

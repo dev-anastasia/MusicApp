@@ -1,4 +1,4 @@
-package com.example.musicapp.adapter
+package com.example.musicapp.domain
 
 import android.view.View
 import android.widget.ImageView

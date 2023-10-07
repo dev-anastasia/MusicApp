@@ -1,4 +1,4 @@
-package com.example.musicapp
+package com.example.musicapp.presentation.ui
 
 import android.media.MediaPlayer
 import android.net.Uri
@@ -11,9 +11,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.musicapp.SearchActivity.Companion.TRACK_ID
-import com.example.musicapp.data.PlayerViewModel
-import com.example.musicapp.data.Tracks
+import com.example.musicapp.presentation.PlayerViewModel
+import com.example.musicapp.R
+import com.example.musicapp.presentation.ui.SearchActivity.Companion.TRACK_ID
+import com.example.musicapp.domain.entities.Tracks
 import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback

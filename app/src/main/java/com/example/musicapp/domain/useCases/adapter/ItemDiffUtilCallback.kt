@@ -1,8 +1,8 @@
-package com.example.musicapp.adapter
+package com.example.musicapp.domain
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.data.MusicPiece
+import com.example.musicapp.domain.entities.MusicPiece
 
 class ItemDiffUtilCallback(private val oldList: List<MusicPiece>, private val newList: List<MusicPiece>)
     : DiffUtil.Callback() {

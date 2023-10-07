@@ -1,9 +1,10 @@
-package com.example.musicapp
+package com.example.musicapp.presentation.ui
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.example.musicapp.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

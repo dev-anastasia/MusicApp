@@ -1,4 +1,4 @@
-package com.example.musicapp.data
+package com.example.musicapp.domain.entities
 
 data class TrackInfo(
     val artistName: String,

@@ -1,7 +1,7 @@
-package com.example.musicapp.network
+package com.example.musicapp.data.network
 
-import com.example.musicapp.data.Music
-import com.example.musicapp.data.Tracks
+import com.example.musicapp.domain.entities.Music
+import com.example.musicapp.domain.entities.Tracks
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
