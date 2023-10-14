@@ -1,11 +1,13 @@
-package com.example.musicapp.domain
+package com.example.musicapp.presentation.ui.adapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.example.musicapp.domain.entities.MusicPiece
 
-class ItemDiffUtilCallback(private val oldList: List<MusicPiece>, private val newList: List<MusicPiece>)
-    : DiffUtil.Callback() {
+class ItemDiffUtilCallback(
+    private val oldList: List<MusicPiece>,
+    private val newList: List<MusicPiece>) : DiffUtil.Callback() {
+
     override fun getOldListSize(): Int = oldList.size
 
     override fun getNewListSize(): Int = newList.size
@@ -22,7 +24,7 @@ class ItemDiffUtilCallback(private val oldList: List<MusicPiece>, private val ne
                 oldList[oldItemPosition].artworkUrl60 == newList[newItemPosition].artworkUrl60)
     }
 
-    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
         val bundle = Bundle()
         if (oldList[oldItemPosition].artistName != newList[newItemPosition].artistName)
             bundle.putString(NAME, newList[newItemPosition].artistName)

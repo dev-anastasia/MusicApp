@@ -58,12 +58,12 @@
                 tools:src="@drawable/note_placeholder" />
 
             <TextView
-                android:layout_marginTop="16dp"
                 android:id="@+id/player_activity_tv_song_name"
                 style="@style/PlayerActivityText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
                 android:textAllCaps="false"
                 app:layout_constraintStart_toEndOf="@+id/player_activity_iv_cover"
                 app:layout_constraintTop_toTopOf="parent"
@@ -96,6 +96,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="32dp"
+                android:clickable="false"
                 tools:src="@drawable/icon_media_empty" />
 
             <TextView
@@ -123,6 +124,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginStart="32dp"
+                android:clickable="false"
                 tools:src="@drawable/icon_fav_empty" />
 
         </LinearLayout>
@@ -141,6 +143,7 @@
                 android:layout_width="46dp"
                 android:layout_height="46dp"
                 android:layout_marginEnd="34dp"
+                android:clickable="false"
                 tools:src="@drawable/icon_prev_disabled" />
 
             <ImageView
@@ -155,6 +158,7 @@
                 android:id="@+id/player_activity_iv_icon_next"
                 android:layout_width="46dp"
                 android:layout_height="46dp"
+                android:clickable="false"
                 tools:src="@drawable/icon_next_disabled" />
 
         </LinearLayout>

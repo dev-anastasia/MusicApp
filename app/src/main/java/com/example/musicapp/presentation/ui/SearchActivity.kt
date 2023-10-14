@@ -12,32 +12,31 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.domain.ItemDiffUtilCallback
-import com.example.musicapp.domain.MusicAdapter
-import com.example.musicapp.domain.OnItemClickListener
 import com.example.musicapp.R
-import com.example.musicapp.data.network.RetrofitUtils.musicService
-import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicPiece
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.musicapp.interfaces.OnItemClickListener
+import com.example.musicapp.presentation.SearchViewModel
+import com.example.musicapp.presentation.ui.adapter.ItemDiffUtilCallback
+import com.example.musicapp.presentation.ui.adapter.MusicAdapter
 
 class SearchActivity : AppCompatActivity(), OnItemClickListener {
 
-    private var currentQueryText: String? = ""  // текущий текст запроса
-    private lateinit var musicAdapter: MusicAdapter
     private lateinit var searchQueryRunnable: Runnable
+    private lateinit var musicAdapter: MusicAdapter
+    private val searchViewModel: SearchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val uiHandler = Handler(Looper.getMainLooper())
+        var currentQueryText: String? = ""  // текущий текст запроса
 
         val errorText: TextView = findViewById(R.id.search_activity_tv_error)
         // Иконка загрузки
@@ -54,14 +53,16 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
             LinearLayoutManager.VERTICAL,
             false
         )
-
-        val emptyList = emptyList<MusicPiece>()
+        // Адаптер
+        //searchViewModel.initList()
         musicAdapter = MusicAdapter(
-            emptyList,   // изначально список пустой для корректной работы DiffUtil
             this
         )
+        searchViewModel.newListLiveData.observe(this)  { listLD ->
+            musicAdapter.update(listLD)}
         recyclerView.adapter = musicAdapter
 
+        // Методы активити
         fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
             errorLayout.visibility = VISIBLE
             loadingImage.visibility = GONE
@@ -85,9 +86,14 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
             inputMethodManager.hideSoftInputFromWindow(view?.windowToken, 0)
         }
 
-        fun calculateDiff(newList: List<MusicPiece>) {
-            val diffUtil = DiffUtil.calculateDiff(ItemDiffUtilCallback(musicAdapter.list, newList))
-            musicAdapter = MusicAdapter(newList, this)
+        fun calculateDiff() {
+            val diffUtil = DiffUtil.calculateDiff(
+                ItemDiffUtilCallback(
+                    musicAdapter.list,
+                    searchViewModel.newListLiveData.value!!
+                )
+            )
+            musicAdapter = MusicAdapter(searchViewModel.newListLiveData.value!!, this)
             diffUtil.dispatchUpdatesTo(musicAdapter)
             recyclerView.adapter = musicAdapter
         }
@@ -95,49 +101,23 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
         // запрос SearchView
         searchQueryRunnable = Runnable {
 
-            showLoading() // Не отображает, не могу понять почему...
+            showLoading()
 
             if (currentQueryText == null)
                 currentQueryText = ""
-            val searchObject: Call<Music> = musicService.getSearchResult(currentQueryText!!, ENTITY)
 
-            searchObject.enqueue(object : Callback<Music> {
+            // Оповещаем посредника о клике
+            searchViewModel.onGetTrackListClicked(this, currentQueryText!!, ENTITY)
+            calculateDiff()
 
-                override fun onResponse(call: Call<Music>, response: Response<Music>) {
-                    if (response.isSuccessful) {
-                        if (response.body()!!.resultCount != 0) {  // если есть результаты поиска
-                            val newList = response.body()!!.results
-                            calculateDiff(newList)
-                        } else {
-                            // Очистка списка для корректного отображения "Ничего не найдено":
-                            val newList = emptyList<MusicPiece>()
-                            calculateDiff(newList)
-                            // Чтобы не выдавал "Ничего не найдено" при пустом поисковике:
-                            if (currentQueryText?.isEmpty()!!.not())
-                                showNoSuchResult()
-                        }
-                    } else {         // если Response не был Successful
-                        // Очистка списка для корректного отображения сообщения об ошибке:
-                        val newList = emptyList<MusicPiece>()
-                        calculateDiff(newList)
-                        showSomeSearchProblem()
-                    }
-                }
+            loadingImage.visibility = GONE
 
-                override fun onFailure(call: Call<Music>, t: Throwable) {
-                    // Очистка списка для корректного отображения сообщения об ошибке:
-                    val newList = emptyList<MusicPiece>()
-                    calculateDiff(newList)
-                    showSomeSearchProblem()
-                }
-            })
-
-            loadingImage.visibility = GONE // Если убрать эту строку, иконка отображается когда надо
             if (currentQueryText?.isEmpty()!!.not())
                 hideKeyboard()
         }
 
         findViewById<SearchView>(R.id.search_activity_search_view).setOnQueryTextListener( // требует listener
+
             object : SearchView.OnQueryTextListener {               // тот самый требуемый listener
 
                 override fun onQueryTextSubmit(query: String?): Boolean {
@@ -163,7 +143,7 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     override fun onItemClick(id: Long) {
-        val intent = Intent(this, SearchPlayerActivity::class.java)
+        val intent = Intent(this, PlayerActivity::class.java)
         intent.putExtra(TRACK_ID, id)
         this.startActivity(intent)
     }
@@ -171,7 +151,7 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
     companion object {
         const val BASE_URL = "https://itunes.apple.com/"
         const val TRACK_ID = "track id key"
-        private const val ENTITY = "musicTrack"   // для поиска только музыкальных треков
-        private const val TIMER = 2000L
+        const val ENTITY = "musicTrack"   // для поиска только музыкальных треков
+        const val TIMER = 2000L
     }
 }

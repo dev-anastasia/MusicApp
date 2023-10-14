@@ -1,17 +1,19 @@
-package com.example.musicapp.domain
+package com.example.musicapp.presentation.ui.adapter
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
+import com.example.musicapp.interfaces.OnItemClickListener
 import com.example.musicapp.domain.entities.MusicPiece
 import com.squareup.picasso.Picasso
 
 class MusicAdapter(
-    var list: List<MusicPiece>,
     private val itemIdListener: OnItemClickListener    // Интерфейс для выбора item'а из RV
 ) : Adapter<MusicPieceViewHolder>() {
+
+    private var list: List<MusicPiece> = emptyList()
 
     private fun onClick(id: Long) {
         itemIdListener.onItemClick(id)

@@ -57,6 +57,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginStart="48dp"
+                android:clickable="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -91,6 +92,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="48dp"
+                android:clickable="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -130,6 +132,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="46dp"
+            android:clickable="false"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -138,6 +141,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginEnd="34dp"
+                android:clickable="false"
                 tools:src="@drawable/icon_prev_disabled" />
 
             <ImageView
@@ -145,6 +149,7 @@
                 android:layout_width="52dp"
                 android:layout_height="52dp"
                 android:layout_marginEnd="34dp"
+                android:clickable="false"
                 android:src="@drawable/icon_play_disabled" />
 
             <ImageView

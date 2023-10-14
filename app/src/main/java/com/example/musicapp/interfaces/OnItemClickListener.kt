@@ -1,4 +1,4 @@
-package com.example.musicapp.domain
+package com.example.musicapp.interfaces
 
 interface OnItemClickListener {
 
