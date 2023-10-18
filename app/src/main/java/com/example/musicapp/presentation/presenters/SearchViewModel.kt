@@ -21,6 +21,11 @@ class SearchViewModel : ViewModel(), SearchResultsListener {
         searchUseCase.getSearchResult(queryText, entity)
     }
 
+    fun initList() {
+        if (newList.value == null)
+            newList.value = emptyList()
+    }
+
     override fun update(newList: List<MusicPiece>) {
         this.newList.value = newList
     }

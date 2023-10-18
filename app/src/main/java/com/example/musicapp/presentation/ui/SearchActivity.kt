@@ -15,27 +15,25 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnItemClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
-import com.example.musicapp.presentation.ui.adapter.ItemDiffUtilCallback
 import com.example.musicapp.presentation.ui.adapter.MusicAdapter
 
 class SearchActivity : AppCompatActivity(), OnItemClickListener {
 
     private lateinit var searchQueryRunnable: Runnable
     private lateinit var musicAdapter: MusicAdapter
-    private val searchViewModel: SearchViewModel by viewModels()
+    private val viewModel: SearchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        Creator.searchVM = searchViewModel
+        Creator.searchVM = viewModel
 
         val uiHandler = Handler(Looper.getMainLooper())
         var currentQueryText: String? = ""  // текущий текст запроса
@@ -56,14 +54,13 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
             false
         )
         // Адаптер
-        // searchViewModel.initAdapter(this)
         musicAdapter = MusicAdapter(this)
-        searchViewModel.newList.observe(this) { list ->
+        viewModel.initList() // Создает пустой список, если в нем null
+
+        viewModel.newList.observe(this) { list ->
             musicAdapter.updateList(list)
             recyclerView.adapter = musicAdapter
-            Toast.makeText(this, "updated", Toast.LENGTH_SHORT).show()
         }
-        //recyclerView.adapter = musicAdapter
 
         // Методы активити
         fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
@@ -114,7 +111,7 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
                 currentQueryText = ""
 
             // Оповещаем посредника о клике
-            searchViewModel.onGetTrackListClicked(currentQueryText!!, ENTITY)
+            viewModel.onGetTrackListClicked(currentQueryText!!, ENTITY)
 
             //calculateDiff()
 
