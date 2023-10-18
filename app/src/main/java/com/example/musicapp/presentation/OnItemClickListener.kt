@@ -1,4 +1,4 @@
-package com.example.musicapp.interfaces
+package com.example.musicapp.presentation
 
 interface OnItemClickListener {
 

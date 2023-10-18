@@ -1,17 +1,16 @@
-package com.example.musicapp.presentation
+package com.example.musicapp.presentation.presenters
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.musicapp.data.repos.TrackInfoRepos
-import com.example.musicapp.domain.useCases.GetTrackInfoUseCase
+import com.example.musicapp.Creator
+import com.example.musicapp.presentation.OnItemClickListener
+import com.example.musicapp.presentation.ui.adapter.MusicAdapter
 
 class PlayerViewModel : ViewModel() {
 
-    private val repos = TrackInfoRepos()
-
-    val songNameLiveData: LiveData<String> = MutableLiveData()
-
+    val songNameLiveData: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
     val artistNameLiveData: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
@@ -32,7 +31,7 @@ class PlayerViewModel : ViewModel() {
     }
 
     fun getTrackInfoClicked(currentId: Long) {
-        val specsMap = GetTrackInfoUseCase(repos).getTrackInfo(currentId)
+        val specsMap = Creator.trackInfoUseCase.getTrackInfo(currentId)
         if (specsMap.isEmpty().not()) {
             songNameLiveData.value
             artistNameLiveData.value = specsMap["artistName"]

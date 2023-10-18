@@ -12,7 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.musicapp.R
-import com.example.musicapp.presentation.PlayerViewModel
+import com.example.musicapp.presentation.presenters.PlayerViewModel
 import com.example.musicapp.presentation.ui.SearchActivity.Companion.TRACK_ID
 import com.squareup.picasso.Picasso
 

@@ -1,6 +1,6 @@
-package com.example.musicapp.interfaces
+package com.example.musicapp.domain
 
-interface OnGetTrackInfo {
+interface TrackInfoRepo {
 
     fun getTrackInfo(currentId: Long) : HashMap<String, String>
 }

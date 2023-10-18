@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.interfaces.OnItemClickListener
 import com.example.musicapp.domain.entities.MusicPiece
+import com.example.musicapp.presentation.OnItemClickListener
 import com.squareup.picasso.Picasso
 
 class MusicAdapter(
@@ -14,6 +14,14 @@ class MusicAdapter(
 ) : Adapter<MusicPieceViewHolder>() {
 
     private var list: List<MusicPiece> = emptyList()
+
+    fun updateList(newList: List<MusicPiece>) {
+        list = newList
+    }
+
+//    fun getList(): List<MusicPiece> {
+//        return list
+//    }
 
     private fun onClick(id: Long) {
         itemIdListener.onItemClick(id)

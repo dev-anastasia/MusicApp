@@ -4,5 +4,9 @@ import com.example.musicapp.domain.entities.MusicPiece
 
 interface SearchRepo {
 
-    fun getData(queryText: String, entity: String) : List<MusicPiece>
+    fun getSearchResult(
+        queryText: String,
+        entity: String,
+        dataListener: (List<MusicPiece>) -> Unit
+    )
 }

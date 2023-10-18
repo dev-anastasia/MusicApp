@@ -12,16 +12,16 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.musicapp.Creator
 import com.example.musicapp.R
-import com.example.musicapp.domain.entities.MusicPiece
-import com.example.musicapp.interfaces.OnItemClickListener
-import com.example.musicapp.presentation.SearchViewModel
+import com.example.musicapp.presentation.OnItemClickListener
+import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.adapter.ItemDiffUtilCallback
 import com.example.musicapp.presentation.ui.adapter.MusicAdapter
 
@@ -34,6 +34,8 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        Creator.searchVM = searchViewModel
 
         val uiHandler = Handler(Looper.getMainLooper())
         var currentQueryText: String? = ""  // текущий текст запроса
@@ -54,13 +56,14 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
             false
         )
         // Адаптер
-        //searchViewModel.initList()
-        musicAdapter = MusicAdapter(
-            this
-        )
-        searchViewModel.newListLiveData.observe(this)  { listLD ->
-            musicAdapter.update(listLD)}
-        recyclerView.adapter = musicAdapter
+        // searchViewModel.initAdapter(this)
+        musicAdapter = MusicAdapter(this)
+        searchViewModel.newList.observe(this) { list ->
+            musicAdapter.updateList(list)
+            recyclerView.adapter = musicAdapter
+            Toast.makeText(this, "updated", Toast.LENGTH_SHORT).show()
+        }
+        //recyclerView.adapter = musicAdapter
 
         // Методы активити
         fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
@@ -86,17 +89,21 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
             inputMethodManager.hideSoftInputFromWindow(view?.windowToken, 0)
         }
 
-        fun calculateDiff() {
-            val diffUtil = DiffUtil.calculateDiff(
-                ItemDiffUtilCallback(
-                    musicAdapter.list,
-                    searchViewModel.newListLiveData.value!!
-                )
-            )
-            musicAdapter = MusicAdapter(searchViewModel.newListLiveData.value!!, this)
-            diffUtil.dispatchUpdatesTo(musicAdapter)
-            recyclerView.adapter = musicAdapter
-        }
+        //fun calculateDiff() {
+//            if (searchViewModel.newListLiveData.value == null)
+//                searchViewModel.newListLiveData.value = emptyList()
+//
+//            val diffUtil = DiffUtil.calculateDiff(
+//                ItemDiffUtilCallback(
+//                    searchViewModel.oldList,
+//                    searchViewModel.newListLiveData.value!!
+//                )
+//            )
+//            musicAdapter = MusicAdapter(this)
+//            diffUtil.dispatchUpdatesTo(musicAdapter)
+
+//            recyclerView.adapter = musicAdapter
+        //}
 
         // запрос SearchView
         searchQueryRunnable = Runnable {
@@ -107,11 +114,11 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
                 currentQueryText = ""
 
             // Оповещаем посредника о клике
-            searchViewModel.onGetTrackListClicked(this, currentQueryText!!, ENTITY)
-            calculateDiff()
+            searchViewModel.onGetTrackListClicked(currentQueryText!!, ENTITY)
+
+            //calculateDiff()
 
             loadingImage.visibility = GONE
-
             if (currentQueryText?.isEmpty()!!.not())
                 hideKeyboard()
         }

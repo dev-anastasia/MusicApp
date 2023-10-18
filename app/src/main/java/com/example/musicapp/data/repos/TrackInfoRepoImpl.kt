@@ -2,12 +2,12 @@ package com.example.musicapp.data.repos
 
 import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.entities.Tracks
-import com.example.musicapp.interfaces.OnGetTrackInfo
+import com.example.musicapp.domain.TrackInfoRepo
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class TrackInfoRepos : OnGetTrackInfo {
+class TrackInfoRepoImpl : TrackInfoRepo {
 
     override fun getTrackInfo(currentId: Long) : HashMap<String, String> {
 
