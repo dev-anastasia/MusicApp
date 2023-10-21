@@ -27,13 +27,11 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
 
     private lateinit var searchQueryRunnable: Runnable
     private lateinit var musicAdapter: MusicAdapter
-    private val viewModel: SearchViewModel by viewModels()
+    private val viewModel: SearchViewModel by viewModels<SearchViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-
-        Creator.searchVM = viewModel
 
         val uiHandler = Handler(Looper.getMainLooper())
         var currentQueryText: String? = ""  // текущий текст запроса
@@ -55,11 +53,14 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
         )
         // Адаптер
         musicAdapter = MusicAdapter(this)
+        recyclerView.adapter = musicAdapter
+
+        Creator.updateUseCase(viewModel)
+
         viewModel.initList() // Создает пустой список, если в нем null
 
         viewModel.newList.observe(this) { list ->
             musicAdapter.updateList(list)
-            recyclerView.adapter = musicAdapter
         }
 
         // Методы активити

@@ -13,10 +13,13 @@ class MusicAdapter(
     private val itemIdListener: OnItemClickListener    // Интерфейс для выбора item'а из RV
 ) : Adapter<MusicPieceViewHolder>() {
 
-    private var list: List<MusicPiece> = emptyList()
+    private val list: MutableList<MusicPiece> = mutableListOf()
 
     fun updateList(newList: List<MusicPiece>) {
-        list = newList
+        list.clear()
+        list.addAll(newList)
+
+        notifyDataSetChanged()
     }
 
 //    fun getList(): List<MusicPiece> {

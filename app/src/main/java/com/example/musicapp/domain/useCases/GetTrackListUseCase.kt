@@ -6,14 +6,18 @@ import com.example.musicapp.domain.entities.MusicPiece
 
 class GetTrackListUseCase(
     private val repo: SearchRepo,
-    private val vm: SearchResultsListener
+    private var vm: SearchResultsListener? = null
 ) {
 
     private val queryResponseList: (List<MusicPiece>) -> Unit = {
-        vm.update(it)
+        vm?.update(it)
     }
 
     fun getSearchResult(queryText: String, entity: String) {
         repo.getSearchResult(queryText, entity, queryResponseList)
+    }
+
+    fun setVM(vm: SearchResultsListener) {
+        this.vm = vm
     }
 }
