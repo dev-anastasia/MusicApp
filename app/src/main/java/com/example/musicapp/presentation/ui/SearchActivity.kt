@@ -22,6 +22,7 @@ import com.example.musicapp.R
 import com.example.musicapp.presentation.OnItemClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.adapter.MusicAdapter
+import com.example.musicapp.presentation.ui.adapter.MusicListAdapter
 
 class SearchActivity : AppCompatActivity(), OnItemClickListener {
 
@@ -86,22 +87,6 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
             val inputMethodManager = getSystemService(InputMethodManager::class.java)
             inputMethodManager.hideSoftInputFromWindow(view?.windowToken, 0)
         }
-
-        //fun calculateDiff() {
-//            if (searchViewModel.newListLiveData.value == null)
-//                searchViewModel.newListLiveData.value = emptyList()
-//
-//            val diffUtil = DiffUtil.calculateDiff(
-//                ItemDiffUtilCallback(
-//                    searchViewModel.oldList,
-//                    searchViewModel.newListLiveData.value!!
-//                )
-//            )
-//            musicAdapter = MusicAdapter(this)
-//            diffUtil.dispatchUpdatesTo(musicAdapter)
-
-//            recyclerView.adapter = musicAdapter
-        //}
 
         // запрос SearchView
         searchQueryRunnable = Runnable {
