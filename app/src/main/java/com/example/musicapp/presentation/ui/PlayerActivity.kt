@@ -21,7 +21,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var setCurrentTimeRunnable: Runnable
     private lateinit var setCurrentSeekBarPosition: Runnable
     private lateinit var uiHandler: Handler
-    private val playerViewModel: PlayerViewModel by viewModels()
+    private val vm: PlayerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +46,7 @@ class PlayerActivity : AppCompatActivity() {
         val currentId: Long = intent.getLongExtra(TRACK_ID, 0L)
 
         if (savedInstanceState == null) {  // К сети обращаемся 1 раз - при первом создании активити:
-            playerViewModel.getTrackInfoClicked(currentId)
+            vm.getTrackInfoClicked(currentId)
         }
 
         // Для автопрокрутки текста:
@@ -61,10 +61,9 @@ class PlayerActivity : AppCompatActivity() {
 
         // Остальные вьюшки:
         Picasso.get()
-            .load(Uri.parse(playerViewModel.coverImageLinkLiveData.value))
+            .load(Uri.parse(vm.coverImageLinkLiveData.value))
             .placeholder(R.drawable.note_placeholder)
             .into(coverImage)
-
 
         val trackNameObserver = Observer<String> { track ->
             songName.text = track
@@ -83,11 +82,11 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         mediaPlayer.apply {
-            setDataSource(playerViewModel.previewLiveData.value)
+            setDataSource(vm.previewLiveData.value)
             prepareAsync()
         }
 
-        playerViewModel.apply {
+        vm.apply {
             songNameLiveData.observe(this@PlayerActivity, trackNameObserver)
             artistNameLiveData.observe(this@PlayerActivity, artistNameObserver)
             durationLiveData.observe(this@PlayerActivity, durationObserver)
@@ -111,10 +110,10 @@ class PlayerActivity : AppCompatActivity() {
 
         favIcon.setOnClickListener {
             if (isLiked) {
-                playerViewModel.isLikedLiveData.value = false
+                vm.isLikedLiveData.value = false
                 favIcon.setImageResource(R.drawable.icon_fav_empty)
             } else {
-                playerViewModel.isLikedLiveData.value = true
+                vm.isLikedLiveData.value = true
                 favIcon.setImageResource(R.drawable.icon_fav_liked)
             }
         }
@@ -127,10 +126,10 @@ class PlayerActivity : AppCompatActivity() {
 
         mediaIcon.setOnClickListener {
             if (isAdded) {
-                playerViewModel.isAddedLiveData.value = false
+                vm.isAddedLiveData.value = false
                 mediaIcon.setImageResource(R.drawable.icon_media_empty)
             } else {
-                playerViewModel.isAddedLiveData.value = true
+                vm.isAddedLiveData.value = true
                 mediaIcon.setImageResource(R.drawable.icon_media_added)
             }
         }
@@ -232,6 +231,7 @@ class PlayerActivity : AppCompatActivity() {
 
     // Системная кнопка "назад"
     override fun onBackPressed() {
+        super.onBackPressed()
         uiHandler.apply {
             removeCallbacks(setCurrentSeekBarPosition)
             removeCallbacks(setCurrentTimeRunnable)

@@ -14,7 +14,8 @@ class GetTrackListUseCase(
     }
 
     fun getSearchResult(queryText: String, entity: String) {
-        repo.getSearchResult(queryText, entity, queryResponseList)
+        val list = repo.getSearchResult(queryText, entity)
+        queryResponseList(list)
     }
 
     fun setVM(vm: SearchResultsListener) {

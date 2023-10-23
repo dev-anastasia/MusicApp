@@ -7,32 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicPiece
 import com.example.musicapp.presentation.OnItemClickListener
 import com.squareup.picasso.Picasso
-
-class DiffUtilItemCallback: DiffUtil.ItemCallback<MusicPiece>(){
-    override fun areItemsTheSame(oldItem: MusicPiece, newItem: MusicPiece): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun areContentsTheSame(oldItem: MusicPiece, newItem: MusicPiece): Boolean {
-        TODO("Not yet implemented")
-    }
-
-}
-
-class MusicListAdapter(): ListAdapter<MusicPiece, MusicPieceViewHolder>(DiffUtilItemCallback()) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicPieceViewHolder {
-        TODO("Not yet implemented")
-    }
-
-    override fun onBindViewHolder(holder: MusicPieceViewHolder, position: Int) {
-        TODO("Not yet implemented")
-    }
-
-}
 
 class MusicAdapter(
     private val itemIdListener: OnItemClickListener    // Интерфейс для выбора item'а из RV
@@ -51,10 +28,6 @@ class MusicAdapter(
         list.addAll(newList)
         diffUtil.dispatchUpdatesTo(this)
     }
-
-//    fun getList(): List<MusicPiece> {
-//        return list
-//    }
 
     private fun onClick(id: Long) {
         itemIdListener.onItemClick(id)

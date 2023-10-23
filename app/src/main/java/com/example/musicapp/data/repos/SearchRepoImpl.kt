@@ -1,37 +1,52 @@
 package com.example.musicapp.data.repos
 
 import com.example.musicapp.data.network.RetrofitUtils
+import com.example.musicapp.data.network.WorkerThread
 import com.example.musicapp.domain.SearchRepo
 import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicPiece
 import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SearchRepoImpl : SearchRepo {
 
+    //private val workerThread = WorkerThread()
+
     override fun getSearchResult(
         queryText: String,
-        entity: String,
-        dataListener: (List<MusicPiece>) -> Unit
-    ) {
-        val searchObject: Call<Music> = RetrofitUtils.musicService.getSearchResult(
-            queryText,
-            entity
-        )
+        entity: String
+    ): List<MusicPiece> {
 
-        searchObject.enqueue(object : Callback<Music> {
+        lateinit var responseBody: Music
 
-            override fun onResponse(call: Call<Music>, response: Response<Music>) {
-                if (response.isSuccessful) {
-                    if (response.body()!!.resultCount != 0) {  // если есть результаты поиска
-                        dataListener(response.body()!!.results)
-                    }
-                }
-            }
+        val thread = Thread {
+            val searchObject: Call<Music> = RetrofitUtils.musicService.getSearchResult(
+                queryText,
+                entity
+            )
+            responseBody = searchObject.execute().body()!!
+        }
+        thread.apply {
+            start()
+            join()
+        }
 
-            override fun onFailure(call: Call<Music>, t: Throwable) {
-            }
-        })
+        return if (responseBody.resultCount != 0)
+            responseBody.results
+        else
+            emptyList()
+
+//        searchObject.enqueue(object : Callback<Music> {
+//
+//            override fun onResponse(call: Call<Music>, response: Response<Music>) {
+//                if (response.isSuccessful) {
+//                    if (response.body()!!.resultCount != 0) {  // если есть результаты поиска
+//                        dataListener(response.body()!!.results)
+//                    }
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<Music>, t: Throwable) {
+//            }
+//        })
     }
 }

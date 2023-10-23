@@ -6,7 +6,6 @@ interface SearchRepo {
 
     fun getSearchResult(
         queryText: String,
-        entity: String,
-        dataListener: (List<MusicPiece>) -> Unit
-    )
+        entity: String
+    ) : List<MusicPiece>
 }

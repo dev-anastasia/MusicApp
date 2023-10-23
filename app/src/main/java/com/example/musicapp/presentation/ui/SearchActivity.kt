@@ -12,7 +12,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,13 +21,12 @@ import com.example.musicapp.R
 import com.example.musicapp.presentation.OnItemClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.adapter.MusicAdapter
-import com.example.musicapp.presentation.ui.adapter.MusicListAdapter
 
 class SearchActivity : AppCompatActivity(), OnItemClickListener {
 
     private lateinit var searchQueryRunnable: Runnable
     private lateinit var musicAdapter: MusicAdapter
-    private val viewModel: SearchViewModel by viewModels<SearchViewModel>()
+    private val vm: SearchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,11 +54,9 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
         musicAdapter = MusicAdapter(this)
         recyclerView.adapter = musicAdapter
 
-        Creator.updateUseCase(viewModel)
-
-        viewModel.initList() // Создает пустой список, если в нем null
-
-        viewModel.newList.observe(this) { list ->
+        Creator.updateUseCase(vm)
+        vm.initList() // Создает пустой список, если в нем null
+        vm.newList.observe(this) { list ->
             musicAdapter.updateList(list)
         }
 
@@ -97,9 +93,7 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
                 currentQueryText = ""
 
             // Оповещаем посредника о клике
-            viewModel.onGetTrackListClicked(currentQueryText!!, ENTITY)
-
-            //calculateDiff()
+            vm.onGetTrackListClicked(currentQueryText!!, ENTITY)
 
             loadingImage.visibility = GONE
             if (currentQueryText?.isEmpty()!!.not())

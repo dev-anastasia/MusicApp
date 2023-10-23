@@ -5,10 +5,13 @@ import android.os.Looper
 
 class WorkerThread : Thread() {
 
-    var mHandler: Handler = Handler(Looper.myLooper()!!)
+    var mHandler: Handler? = null
 
     override fun run() {
-        Looper.prepare()
+        if (Looper.myLooper() == null) {
+            Looper.prepare()
+        }
+        mHandler = Handler(Looper.myLooper()!!)
         Looper.loop()
     }
 }
