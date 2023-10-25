@@ -54,7 +54,7 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
         musicAdapter = MusicAdapter(this)
         recyclerView.adapter = musicAdapter
 
-        Creator.updateUseCase(vm)
+        Creator.updateSearchUseCase(vm)
         vm.initList() // Создает пустой список, если в нем null
         vm.newList.observe(this) { list ->
             musicAdapter.updateList(list)

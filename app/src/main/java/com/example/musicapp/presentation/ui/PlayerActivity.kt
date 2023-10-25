@@ -10,7 +10,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.presenters.PlayerViewModel
 import com.example.musicapp.presentation.ui.SearchActivity.Companion.TRACK_ID
@@ -27,7 +27,7 @@ class PlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
-        val songName = findViewById<TextView>(R.id.player_activity_tv_song_name)
+        val trackName = findViewById<TextView>(R.id.player_activity_tv_song_name)
         val artistName = findViewById<TextView>(R.id.player_activity_tv_artist_name)
         val duration = findViewById<TextView>(R.id.player_activity_tv_duration)
         val currentTime = findViewById<TextView>(R.id.player_activity_tv_current_time)
@@ -36,21 +36,14 @@ class PlayerActivity : AppCompatActivity() {
         val mediaIcon = findViewById<ImageView>(R.id.player_activity_iv_icon_media)
         val seekbar = findViewById<SeekBar>(R.id.player_activity_seekbar)
         val coverImage = findViewById<ImageView>(R.id.player_activity_iv_cover)
-        var isLiked = false
-        var isAdded = false
+
 
         uiHandler = Handler(Looper.getMainLooper())
+        Creator.updatePlayerUseCase(vm)
 
-        // Получение и сохранение данных из сети + заполнение вьюшек:
-
-        val currentId: Long = intent.getLongExtra(TRACK_ID, 0L)
-
-        if (savedInstanceState == null) {  // К сети обращаемся 1 раз - при первом создании активити:
-            vm.getTrackInfoClicked(currentId)
-        }
 
         // Для автопрокрутки текста:
-        songName.isSelected = true
+        trackName.isSelected = true
         artistName.isSelected = true
 
         // В плеере после результатов поиска кнопки previous/next не активны:
@@ -59,39 +52,49 @@ class PlayerActivity : AppCompatActivity() {
         findViewById<ImageView>(R.id.player_activity_iv_icon_prev)
             .setImageResource(R.drawable.icon_prev_disabled)
 
+        // Получение и сохранение данных из сети + заполнение вьюшек:
+        val currentId: Long = intent.getLongExtra(TRACK_ID, 0L)
+
+        // К сети обращаемся 1 раз - при первом создании активити:
+        if (savedInstanceState == null) {
+            vm.apply {
+                initUserPrefsLD() // Инициализация статусов isLiked и isAddedToMedia
+                onGetTrackInfoClicked(currentId)
+            }
+        }
+
+        var isLiked = vm.isLikedLiveData.value
+        var isAdded = vm.isAddedLiveData.value
+
         // Остальные вьюшки:
-        Picasso.get()
-            .load(Uri.parse(vm.coverImageLinkLiveData.value))
-            .placeholder(R.drawable.note_placeholder)
-            .into(coverImage)
-
-        val trackNameObserver = Observer<String> { track ->
-            songName.text = track
-        }
-        val artistNameObserver = Observer<String> { name ->
-            artistName.text = name
-        }
-        val durationObserver = Observer<String> { dur ->
-            duration.text = dur
-        }
-        val isLikedObserver = Observer<Boolean> { liked ->
-            isLiked = liked
-        }
-        val isAddedObserver = Observer<Boolean> { added ->
-            isAdded = added
-        }
-
-        mediaPlayer.apply {
-            setDataSource(vm.previewLiveData.value)
-            prepareAsync()
+        if (vm.coverImageLinkLiveData.value != null) {
+            vm.coverImageLinkLiveData.observe(this) { cover ->
+                Picasso.get()
+                    .load(Uri.parse(cover))
+                    .placeholder(R.drawable.note_placeholder)
+                    .into(coverImage)
+            }
         }
 
         vm.apply {
-            songNameLiveData.observe(this@PlayerActivity, trackNameObserver)
-            artistNameLiveData.observe(this@PlayerActivity, artistNameObserver)
-            durationLiveData.observe(this@PlayerActivity, durationObserver)
-            isLikedLiveData.observe(this@PlayerActivity, isLikedObserver)
-            isAddedLiveData.observe(this@PlayerActivity, isAddedObserver)
+            trackNameLiveData.observe(this@PlayerActivity) { name ->
+                trackName.text = name
+            }
+            artistNameLiveData.observe(this@PlayerActivity) { name ->
+                artistName.text = name
+            }
+            durationLiveData.observe(this@PlayerActivity) { dur ->
+                duration.text = dur
+            }
+        }
+
+        if (savedInstanceState == null) {
+            mediaPlayer.apply {
+                if (vm.previewLiveData.value != null) {
+                    setDataSource(vm.previewLiveData.value)
+                    prepareAsync()
+                }
+            }
         }
 
         // Кнопка play
@@ -103,38 +106,39 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         // Иконка "Избранное/Нравится"
-        if (isLiked)
+        if (isLiked == true)
             favIcon.setImageResource(R.drawable.icon_fav_liked)
         else
             favIcon.setImageResource(R.drawable.icon_fav_empty)
 
         favIcon.setOnClickListener {
-            if (isLiked) {
-                vm.isLikedLiveData.value = false
+            if (isLiked == true) {
+                vm.updateIsLikedLD(false)
                 favIcon.setImageResource(R.drawable.icon_fav_empty)
             } else {
-                vm.isLikedLiveData.value = true
+                vm.updateIsLikedLD(true)
                 favIcon.setImageResource(R.drawable.icon_fav_liked)
             }
         }
 
         // Иконка "Медиатека"
-        if (isAdded)
+        if (isAdded == true)
             mediaIcon.setImageResource(R.drawable.icon_media_added)
         else
             mediaIcon.setImageResource(R.drawable.icon_media_empty)
 
         mediaIcon.setOnClickListener {
-            if (isAdded) {
-                vm.isAddedLiveData.value = false
+            if (isAdded == true) {
+                vm.updateIsAddedLD(false)
                 mediaIcon.setImageResource(R.drawable.icon_media_empty)
             } else {
-                vm.isAddedLiveData.value = true
+                vm.updateIsAddedLD(true)
                 mediaIcon.setImageResource(R.drawable.icon_media_added)
             }
         }
 
-        // Runnable для установки текущего времени (запуск ниже):
+
+        // Runnable для установки текущего времени:
         setCurrentTimeRunnable = Runnable {
             val currentInMinutes: String =
                 (mediaPlayer.currentPosition / 1000 / 60).toString()

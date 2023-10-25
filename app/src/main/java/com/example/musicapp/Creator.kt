@@ -6,10 +6,17 @@ import com.example.musicapp.domain.SearchRepo
 import com.example.musicapp.domain.TrackInfoRepo
 import com.example.musicapp.domain.useCases.GetTrackInfoUseCase
 import com.example.musicapp.domain.useCases.GetTrackListUseCase
+import com.example.musicapp.presentation.presenters.PlayerViewModel
 import com.example.musicapp.presentation.presenters.SearchViewModel
 
 
 object Creator {
+
+    const val ARTIST_NAME = "artistName"
+    const val TRACK_NAME = "trackName"
+    const val DURATION = "duration"
+    const val PREVIEW = "preview"
+    const val COVER_IMAGE = "coverImage"
 
     private val searchRepo: SearchRepo = SearchRepoImpl() // Приводим к типу интерфейса
     val searchUseCase = GetTrackListUseCase(searchRepo)
@@ -18,7 +25,11 @@ object Creator {
     val trackInfoUseCase = GetTrackInfoUseCase(trackInfoRepo)
 
 
-    fun updateUseCase(vm: SearchViewModel){
+    fun updateSearchUseCase(vm: SearchViewModel) {
         searchUseCase.setVM(vm)
+    }
+
+    fun updatePlayerUseCase(vm: PlayerViewModel) {
+        trackInfoUseCase.setVM(vm)
     }
 }

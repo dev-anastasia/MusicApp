@@ -14,16 +14,13 @@ class SearchViewModel : ViewModel(), SearchResultsListener {
 
     val newList = MutableLiveData<List<MusicPiece>>()
 
-    override fun onGetTrackListClicked(
-        queryText: String,
-        entity: String
-    ) {
-        searchUseCase.getSearchResult(queryText, entity)
-    }
-
     fun initList() {
         if (newList.value == null)
             newList.value = emptyList()
+    }
+
+    override fun onGetTrackListClicked(queryText: String, entity: String) {
+        searchUseCase.getSearchResult(queryText, entity)
     }
 
     override fun update(newList: List<MusicPiece>) {
