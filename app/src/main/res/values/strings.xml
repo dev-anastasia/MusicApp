@@ -6,4 +6,6 @@
     <string name="player_activity_top_info_text">Играет сейчас</string>
     <string name="activity_player_tv_top_info">Играет сейчас</string>
     <string name="zero_time">0:00</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

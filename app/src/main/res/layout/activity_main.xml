@@ -32,7 +32,9 @@
             style="@style/MainActivityText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/fl_search_text" />
+            android:text="@string/fl_search_text"
+            android:textAllCaps="true"
+            android:textSize="24sp" />
 
     </FrameLayout>
 
@@ -50,7 +52,9 @@
             style="@style/MainActivityText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/fl_text_media" />
+            android:text="@string/fl_text_media"
+            android:textAllCaps="true"
+            android:textSize="24sp" />
 
     </FrameLayout>
 
@@ -68,7 +72,9 @@
             style="@style/MainActivityText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/fl_settings_text" />
+            android:text="@string/fl_settings_text"
+            android:textAllCaps="true"
+            android:textSize="24sp" />
 
     </FrameLayout>
 

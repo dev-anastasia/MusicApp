@@ -20,7 +20,7 @@ class SearchViewModel : ViewModel(), SearchResultsListener {
     }
 
     override fun showMessage() {
-        TODO()
+        println("")
     }
 
     override fun onGetTrackListClicked(queryText: String, entity: String) {
