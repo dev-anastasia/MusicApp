@@ -23,6 +23,7 @@
 
         <SearchView
             android:id="@+id/search_activity_search_view"
+            android:imeOptions="flagNoExtractUi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"

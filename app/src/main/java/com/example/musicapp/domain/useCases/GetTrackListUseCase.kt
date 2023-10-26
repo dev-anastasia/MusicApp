@@ -15,7 +15,10 @@ class GetTrackListUseCase(
 
     fun getSearchResult(queryText: String, entity: String) {
         val list = repo.getSearchResult(queryText, entity)
-        queryResponseList(list)
+        if (list.isEmpty().not())
+            queryResponseList(list)
+        else
+            vm?.showMessage()
     }
 
     fun setVM(vm: SearchResultsListener) {

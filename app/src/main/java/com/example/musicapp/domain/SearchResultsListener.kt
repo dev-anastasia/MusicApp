@@ -7,4 +7,6 @@ interface SearchResultsListener {
     fun onGetTrackListClicked(queryText: String, entity: String)
 
     fun update(newList: List<MusicPiece>)
+
+    fun showMessage()
 }

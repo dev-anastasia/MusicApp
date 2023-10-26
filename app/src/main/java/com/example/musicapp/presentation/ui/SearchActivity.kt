@@ -87,17 +87,21 @@ class SearchActivity : AppCompatActivity(), OnItemClickListener {
         // запрос SearchView
         searchQueryRunnable = Runnable {
 
-            showLoading()
-
             if (currentQueryText == null)
                 currentQueryText = ""
 
-            // Оповещаем посредника о клике
-            vm.onGetTrackListClicked(currentQueryText!!, ENTITY)
+            if (currentQueryText!!.isEmpty().not()) {
 
-            loadingImage.visibility = GONE
-            if (currentQueryText?.isEmpty()!!.not())
-                hideKeyboard()
+                showLoading()   // У меня он показывается на долю секунды, даже не заметен
+
+                // Оповещаем посредника о клике
+                vm.onGetTrackListClicked(currentQueryText!!, ENTITY)
+
+                loadingImage.visibility = GONE
+                if (currentQueryText?.isEmpty()!!.not()) {
+                    hideKeyboard()
+                }
+            }
         }
 
         findViewById<SearchView>(R.id.search_activity_search_view).setOnQueryTextListener( // требует listener

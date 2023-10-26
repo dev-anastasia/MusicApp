@@ -1,52 +1,38 @@
 package com.example.musicapp.data.repos
 
 import com.example.musicapp.data.network.RetrofitUtils
-import com.example.musicapp.data.network.WorkerThread
 import com.example.musicapp.domain.SearchRepo
 import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicPiece
 import retrofit2.Call
+import retrofit2.Response
 
 class SearchRepoImpl : SearchRepo {
-
-    //private val workerThread = WorkerThread()
 
     override fun getSearchResult(
         queryText: String,
         entity: String
     ): List<MusicPiece> {
 
-        lateinit var responseBody: Music
+        lateinit var response: Response<Music>
+        lateinit var body: Music
 
         val thread = Thread {
             val searchObject: Call<Music> = RetrofitUtils.musicService.getSearchResult(
                 queryText,
                 entity
             )
-            responseBody = searchObject.execute().body()!!
+            response = searchObject.execute()
+            body = response.body()!!
         }
         thread.apply {
             start()
             join()
         }
 
-        return if (responseBody.resultCount != 0)
-            responseBody.results
+        return if (body.resultCount != 0)
+            body.results
         else
             emptyList()
-
-//        searchObject.enqueue(object : Callback<Music> {
-//
-//            override fun onResponse(call: Call<Music>, response: Response<Music>) {
-//                if (response.isSuccessful) {
-//                    if (response.body()!!.resultCount != 0) {  // если есть результаты поиска
-//                        dataListener(response.body()!!.results)
-//                    }
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<Music>, t: Throwable) {
-//            }
-//        })
     }
 }

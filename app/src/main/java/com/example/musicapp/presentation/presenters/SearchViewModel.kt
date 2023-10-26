@@ -19,6 +19,10 @@ class SearchViewModel : ViewModel(), SearchResultsListener {
             newList.value = emptyList()
     }
 
+    override fun showMessage() {
+        TODO()
+    }
+
     override fun onGetTrackListClicked(queryText: String, entity: String) {
         searchUseCase.getSearchResult(queryText, entity)
     }
