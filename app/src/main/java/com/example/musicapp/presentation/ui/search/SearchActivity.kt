@@ -1,9 +1,8 @@
-package com.example.musicapp.presentation.ui
+package com.example.musicapp.presentation.ui.search
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.musicapp.R
-import com.example.musicapp.SearchFragment
 
 class SearchActivity : AppCompatActivity() {
 

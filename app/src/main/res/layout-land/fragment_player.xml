@@ -15,12 +15,12 @@
         android:layout_marginEnd="32dp"
         android:orientation="horizontal">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/player_fragment_btn_go_back"
             android:layout_width="wrap_content"
             android:layout_height="26dp"
             android:layout_marginStart="16dp"
-            android:src="@drawable/icon_go_back" />
+            android:background="@drawable/icon_go_back" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -91,13 +91,13 @@
             android:layout_marginEnd="32dp"
             android:gravity="center">
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_media"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="32dp"
-                android:clickable="false"
-                tools:src="@drawable/icon_media_empty" />
+                android:background="@drawable/icon_media_empty"
+                android:clickable="false" />
 
             <TextView
                 android:id="@+id/player_fragment_tv_current_time"
@@ -119,13 +119,13 @@
                 android:layout_height="wrap_content"
                 android:text="@string/zero_time" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_fav"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginStart="32dp"
-                android:clickable="false"
-                tools:src="@drawable/icon_fav_empty" />
+                android:background="@drawable/icon_fav_empty"
+                android:clickable="false" />
 
         </LinearLayout>
 
@@ -138,28 +138,28 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_prev"
                 android:layout_width="46dp"
                 android:layout_height="46dp"
                 android:layout_marginEnd="34dp"
-                android:clickable="false"
-                tools:src="@drawable/icon_prev_disabled" />
+                android:background="@drawable/icon_prev_disabled"
+                android:clickable="false" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_play"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_marginEnd="34dp"
-                android:clickable="false"
-                android:src="@drawable/icon_play_disabled" />
+                android:background="@drawable/icon_play_disabled"
+                android:clickable="false" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_next"
                 android:layout_width="46dp"
                 android:layout_height="46dp"
-                android:clickable="false"
-                tools:src="@drawable/icon_next_disabled" />
+                android:background="@drawable/icon_next_disabled"
+                android:clickable="false" />
 
         </LinearLayout>
 

@@ -1,4 +1,4 @@
-package com.example.musicapp
+package com.example.musicapp.presentation.ui.search
 
 import android.os.Bundle
 import android.os.Handler
@@ -13,8 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.musicapp.Creator
+import com.example.musicapp.R
 import com.example.musicapp.presentation.OnItemClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
+import com.example.musicapp.presentation.ui.PlayerFragment
 import com.example.musicapp.presentation.ui.adapter.MusicAdapter
 
 class SearchFragment : Fragment(R.layout.fragment_search), OnItemClickListener {

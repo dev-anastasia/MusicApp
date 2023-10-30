@@ -1,4 +1,4 @@
-package com.example.musicapp
+package com.example.musicapp.presentation.ui
 
 import android.media.MediaPlayer
 import android.net.Uri
@@ -9,10 +9,13 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.musicapp.SearchFragment.Companion.TRACK_ID
+import com.example.musicapp.Creator
+import com.example.musicapp.R
 import com.example.musicapp.presentation.presenters.PlayerViewModel
+import com.example.musicapp.presentation.ui.search.SearchFragment.Companion.TRACK_ID
 import com.squareup.picasso.Picasso
 
 class PlayerFragment : Fragment(R.layout.fragment_player) {
@@ -36,18 +39,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         val goBackBtn = view.findViewById<ImageView>(R.id.player_fragment_btn_go_back)
         val coverImage = view.findViewById<ImageView>(R.id.player_fragment_iv_cover)
 
+        var isLiked: Boolean? = null
+        var isAdded: Boolean? = null
+
         uiHandler = Handler(Looper.getMainLooper())
         Creator.updatePlayerUseCase(vm)
 
         // Для автопрокрутки текста:
         trackName.isSelected = true
         artistName.isSelected = true
-
-        // В плеере после результатов поиска кнопки previous/next не активны:
-        view.findViewById<ImageView>(R.id.player_fragment_iv_icon_next)
-            .setImageResource(R.drawable.icon_next_disabled)
-        view.findViewById<ImageView>(R.id.player_fragment_iv_icon_prev)
-            .setImageResource(R.drawable.icon_prev_disabled)
 
         // Получение и сохранение данных из сети + заполнение вьюшек:
         val currentId: Long = this.requireArguments().getLong(TRACK_ID)
@@ -58,26 +58,35 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 initUserPrefsLD() // Инициализация статусов isLiked и isAddedToMedia
                 onGetTrackInfoClicked(currentId)
             }
-            // Плеер тоже создаём только при первом создании фрагмента
-            if (vm.previewLiveData.value != null) {
-                mediaPlayer.apply {
-                    setDataSource(vm.previewLiveData.value)
-                    prepareAsync()
-                }
+
+            mediaPlayer.apply {
+                setDataSource(vm.previewLiveData.value)
+                prepare()
             }
         }
 
-        val isLiked = vm.isLikedLiveData.value
-        val isAdded = vm.isAddedLiveData.value
+        // Если успешно загрузили данные из сети:
+        if (vm.serverReplied) {
+            isLiked = vm.isLikedLiveData.value
+            isAdded = vm.isAddedLiveData.value
 
-        // Остальные вьюшки:
-        if (vm.coverImageLinkLiveData.value != null) {
+            favIcon.isClickable = true
+            mediaIcon.isClickable = true
+            playIcon.isClickable = true
+
+            // Остальные вьюшки:
             vm.coverImageLinkLiveData.observe(viewLifecycleOwner) { cover ->
                 Picasso.get()
                     .load(Uri.parse(cover))
                     .placeholder(R.drawable.note_placeholder)
                     .into(coverImage)
             }
+        } else {
+            Toast.makeText(
+                activity,
+                "Ошибка: не удалось связаться с сервером",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         vm.apply {
@@ -95,40 +104,40 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         // Кнопка play
         playIcon.apply {
             if (mediaPlayer.isPlaying)
-                setImageResource(R.drawable.icon_pause)
+                setBackgroundResource(R.drawable.icon_pause)
             else
-                setImageResource(R.drawable.icon_play_active)
+                setBackgroundResource(R.drawable.icon_play_active)
         }
 
         // Иконка "Избранное/Нравится"
         if (isLiked == true)
-            favIcon.setImageResource(R.drawable.icon_fav_liked)
+            favIcon.setBackgroundResource(R.drawable.icon_fav_liked)
         else
-            favIcon.setImageResource(R.drawable.icon_fav_empty)
+            favIcon.setBackgroundResource(R.drawable.icon_fav_empty)
 
         favIcon.setOnClickListener {
             if (isLiked == true) {
                 vm.updateIsLikedLD(false)
-                favIcon.setImageResource(R.drawable.icon_fav_empty)
+                favIcon.setBackgroundResource(R.drawable.icon_fav_empty)
             } else {
                 vm.updateIsLikedLD(true)
-                favIcon.setImageResource(R.drawable.icon_fav_liked)
+                favIcon.setBackgroundResource(R.drawable.icon_fav_liked)
             }
         }
 
         // Иконка "Медиатека"
         if (isAdded == true)
-            mediaIcon.setImageResource(R.drawable.icon_media_added)
+            mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
         else
-            mediaIcon.setImageResource(R.drawable.icon_media_empty)
+            mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
 
         mediaIcon.setOnClickListener {
             if (isAdded == true) {
                 vm.updateIsAddedLD(false)
-                mediaIcon.setImageResource(R.drawable.icon_media_empty)
+                mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
             } else {
                 vm.updateIsAddedLD(true)
-                mediaIcon.setImageResource(R.drawable.icon_media_added)
+                mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
             }
         }
 
@@ -162,16 +171,16 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
         fun play() {
             mediaPlayer.start()
-            playIcon.setImageResource(R.drawable.icon_pause)
+            playIcon.setBackgroundResource(R.drawable.icon_pause)
             // По завершении трека:
             mediaPlayer.setOnCompletionListener {
-                playIcon.setImageResource(R.drawable.icon_play_active)
+                playIcon.setBackgroundResource(R.drawable.icon_play_active)
             }
         }
 
         fun pause() {
             mediaPlayer.pause()
-            playIcon.setImageResource(R.drawable.icon_play_active)
+            playIcon.setBackgroundResource(R.drawable.icon_play_active)
         }
 
         playIcon.setOnClickListener {
@@ -221,7 +230,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             mediaPlayer = MediaPlayer()
             parentFragmentManager.popBackStack()
         }
-
     }
 
     private companion object {

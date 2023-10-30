@@ -21,6 +21,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     val previewLiveData = MutableLiveData<String>()
     val isLikedLiveData = MutableLiveData<Boolean>()
     val isAddedLiveData = MutableLiveData<Boolean>()
+    var serverReplied = false
 
     fun onGetTrackInfoClicked(currentId: Long) {
         trackInfoUseCase.getTrackInfo(currentId)
@@ -47,6 +48,8 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         coverImageLinkLiveData.value = hashmap[COVER_IMAGE]
         previewLiveData.value = hashmap[PREVIEW]
         durationLiveData.value = hashmap[DURATION]
+
+        serverReplied = true
     }
 
     fun updateIsLikedLD(status: Boolean) {

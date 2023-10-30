@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".presentation.ui.SearchActivity"
+        <activity android:name=".presentation.ui.search.SearchActivity"
             android:exported="true"/>
 
         <activity

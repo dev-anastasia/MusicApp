@@ -12,12 +12,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="33dp">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/player_fragment_btn_go_back"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_marginStart="16dp"
-            android:src="@drawable/icon_go_back" />
+            android:background="@drawable/icon_go_back" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -52,16 +52,16 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_media"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginStart="48dp"
+                android:background="@drawable/icon_media_empty"
                 android:clickable="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/icon_media_empty" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/player_fragment_tv_song_name"
@@ -87,16 +87,16 @@
                 app:layout_constraintTop_toBottomOf="@+id/player_fragment_tv_song_name"
                 tools:text="Michael Jackson" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_fav"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="48dp"
+                android:background="@drawable/icon_fav_empty"
                 android:clickable="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/icon_fav_empty" />
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -136,27 +136,28 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_prev"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginEnd="34dp"
                 android:clickable="false"
-                tools:src="@drawable/icon_prev_disabled" />
+                android:background="@drawable/icon_prev_disabled" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_play"
                 android:layout_width="52dp"
                 android:layout_height="52dp"
                 android:layout_marginEnd="34dp"
-                android:clickable="false"
-                android:src="@drawable/icon_play_disabled" />
+                android:background="@drawable/icon_play_disabled"
+                android:clickable="false" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/player_fragment_iv_icon_next"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                tools:src="@drawable/icon_next_disabled" />
+                android:background="@drawable/icon_next_disabled"
+                android:clickable="false" />
 
         </LinearLayout>
 
