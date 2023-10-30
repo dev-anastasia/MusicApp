@@ -1,84 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.fragment.app.FragmentContainerView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/search_fragment_container_view"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:name="com.example.musicapp.SearchFragment" />
+    android:layout_height="match_parent">
 
-    <!--
-    <LinearLayout
-        android:id="@+id/search_activity_ll_top_bar"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/search_container"
+        android:name="com.example.musicapp.SearchFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent" />
 
-        <ImageView
-            android:id="@+id/player_activity_btn_go_back"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="33dp"
-            android:background="@drawable/icon_go_back" />
-
-        <SearchView
-            android:id="@+id/search_activity_search_view"
-            android:imeOptions="flagNoExtractUi"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/search_view_bg"
-            android:iconifiedByDefault="false"
-            android:queryHint="Название песни, имя исполнителя, альбом..." />
-
-    </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/search_activity_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            tools:listitem="@layout/item_view" />
-
-        <ImageView
-            android:id="@+id/search_activity_iv_loading"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="top|center"
-            android:layout_marginTop="140dp"
-            android:src="@drawable/loading" />
-
-        <FrameLayout
-            android:id="@+id/search_activity_fl_error"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|center">
-
-            <ImageView
-                android:id="@+id/search_activity_iv_error"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center|top"
-                android:layout_marginTop="80dp"
-                android:src="@drawable/sad" />
-
-            <TextView
-                android:id="@+id/search_activity_tv_error"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|top"
-                android:layout_marginTop="185dp"
-                android:gravity="center"
-                tools:text="SOME_PROBLEM" />
-
-        </FrameLayout>
-
-    </FrameLayout>
-
-</LinearLayout>-->
+</FrameLayout>

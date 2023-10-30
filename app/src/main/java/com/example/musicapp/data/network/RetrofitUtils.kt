@@ -1,5 +1,6 @@
 package com.example.musicapp.data.network
 
+import com.example.musicapp.SearchFragment
 import com.example.musicapp.presentation.ui.SearchActivity
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -9,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitUtils {
 
     val musicService: MusicService = Retrofit.Builder()
-        .baseUrl(SearchActivity.BASE_URL)
+        .baseUrl(SearchFragment.BASE_URL)
         .client(
             OkHttpClient.Builder()
                 .addInterceptor(interceptor = HttpLoggingInterceptor().apply {
