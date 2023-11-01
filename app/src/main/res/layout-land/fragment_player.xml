@@ -110,7 +110,8 @@
                 android:layout_width="295dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:progressTint="@color/search_bg"
+                android:progressBackgroundTint="@color/dark_grey"
+                android:progressTint="@color/yellow"
                 android:thumb="@drawable/icon_circle" />
 
             <TextView

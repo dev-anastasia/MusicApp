@@ -114,10 +114,10 @@
 
             <SeekBar
                 android:id="@+id/player_fragment_seekbar"
-                android:progressBackgroundTint="@color/dark_grey"
                 android:layout_width="295dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:progressBackgroundTint="@color/dark_grey"
                 android:progressTint="@color/yellow"
                 android:thumb="@drawable/icon_circle" />
 
@@ -142,8 +142,8 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginEnd="34dp"
-                android:clickable="false"
-                android:background="@drawable/icon_prev_disabled" />
+                android:background="@drawable/icon_prev_disabled"
+                android:clickable="false" />
 
             <ImageButton
                 android:id="@+id/player_fragment_iv_icon_play"
