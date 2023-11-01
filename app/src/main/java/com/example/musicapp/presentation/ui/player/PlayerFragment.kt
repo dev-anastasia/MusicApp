@@ -10,10 +10,12 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.musicapp.Creator
 import com.example.musicapp.R
+import com.example.musicapp.presentation.OnBackPressed
 import com.example.musicapp.presentation.presenters.PlayerViewModel
 import com.example.musicapp.presentation.ui.search.SearchFragment.Companion.TRACK_ID
 import com.squareup.picasso.Picasso
@@ -217,24 +219,35 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             }
         )
 
-        // Иконка "назад" в приложении
+        // Кнопки "назад" - в приложении и системная
         goBackBtn.setOnClickListener {
-            uiHandler.apply {
-                removeCallbacks(setCurrentSeekBarPosition)
-                removeCallbacks(setCurrentTimeRunnable)
-            }
-            mediaPlayer.apply {
-                stop()
-                release()
-            }
-            mediaPlayer = MediaPlayer()
-            parentFragmentManager.popBackStack()
+            onBackPressed()
+        }
+
+        activity?.onBackPressedDispatcher?.addCallback {
+            onBackPressed()
         }
     }
 
+    private fun onBackPressed() {
+        uiHandler.apply {
+            removeCallbacks(setCurrentSeekBarPosition)
+            removeCallbacks(setCurrentTimeRunnable)
+        }
+        mediaPlayer.apply {
+            stop()
+            release()
+        }
+        mediaPlayer = MediaPlayer()
+        if (parentFragmentManager.backStackEntryCount > 0)
+            parentFragmentManager.popBackStack()
+        else
+            activity?.onBackPressedDispatcher?.onBackPressed()
+    }
+
     private companion object {
-        var mediaPlayer = MediaPlayer()
         const val CURRENT_TIME_CHECK_TIMER = 1000L
         const val CURRENT_SEEKBAR_CHECK_TIMER = 600L
+        var mediaPlayer = MediaPlayer()
     }
 }

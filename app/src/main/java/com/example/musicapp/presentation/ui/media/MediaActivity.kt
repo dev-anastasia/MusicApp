@@ -16,7 +16,6 @@ class MediaActivity : AppCompatActivity() {
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.media_container, mediaFragment)
-                .addToBackStack("MediaPlaylistsFragment")
                 .setReorderingAllowed(true)
                 .commit()
         }

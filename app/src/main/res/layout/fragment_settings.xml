@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:background="@color/theme_background">
+
+    <ImageButton
+        android:id="@+id/settings_fragment_btn_go_back"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="33dp"
+        android:background="@drawable/icon_go_back" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="top|center"
         android:layout_margin="32dp"
         android:gravity="center"
         android:orientation="horizontal">
@@ -23,9 +29,7 @@
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/theme_switch"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:thumbTint="@color/purple_200"
-            android:backgroundTint="@color/blue"/>
+            android:layout_height="wrap_content" />
 
         <ImageView
             android:id="@+id/iv_moon"
@@ -35,5 +39,4 @@
 
     </LinearLayout>
 
-
-</LinearLayout>
+</FrameLayout>

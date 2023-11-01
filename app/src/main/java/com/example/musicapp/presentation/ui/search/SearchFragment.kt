@@ -20,7 +20,9 @@ import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.adapter.MusicAdapter
 import com.example.musicapp.presentation.ui.player.PlayerFragment
 
-class SearchFragment : Fragment(R.layout.fragment_search), OnItemClickListener {
+class SearchFragment :
+    Fragment(R.layout.fragment_search),
+    OnItemClickListener {
 
     private lateinit var searchQueryRunnable: Runnable
     private lateinit var musicAdapter: MusicAdapter
@@ -120,13 +122,9 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnItemClickListener {
         )
 
         goBackBtn.setOnClickListener {
-            if (parentFragmentManager.backStackEntryCount > 0)
-                parentFragmentManager.popBackStack()
-            else
-                activity?.onBackPressed()       // На что заменить этот deprecated-метод?
+            onBackPressed()
         }
     }
-
 
     override fun onItemClick(id: Long) {
 
@@ -136,12 +134,18 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnItemClickListener {
         playerFragment.arguments = bundle
 
         parentFragmentManager.beginTransaction()
-            .add(R.id.search_container, playerFragment)
+            .replace(R.id.search_container, playerFragment)
             .addToBackStack("PlayerFragment")
             .setReorderingAllowed(true)
             .commit()
     }
 
+    private fun onBackPressed() {
+        if (parentFragmentManager.backStackEntryCount > 0)
+            parentFragmentManager.popBackStack()
+        else
+            activity?.onBackPressed()
+    }
 
     companion object {
         const val BASE_URL = "https://itunes.apple.com/"
@@ -149,4 +153,5 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnItemClickListener {
         const val ENTITY = "musicTrack"   // для поиска только музыкальных треков
         const val TIMER = 2000L
     }
+
 }

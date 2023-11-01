@@ -16,7 +16,6 @@ class SettingsActivity : AppCompatActivity() {
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.settings_container, settingsFragment)
-                .addToBackStack("SearchFragment")
                 .setReorderingAllowed(true)
                 .commit()
         }
