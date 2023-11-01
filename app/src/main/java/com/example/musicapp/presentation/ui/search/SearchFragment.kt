@@ -17,23 +17,14 @@ import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnItemClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
-import com.example.musicapp.presentation.ui.PlayerFragment
 import com.example.musicapp.presentation.ui.adapter.MusicAdapter
+import com.example.musicapp.presentation.ui.player.PlayerFragment
 
 class SearchFragment : Fragment(R.layout.fragment_search), OnItemClickListener {
 
     private lateinit var searchQueryRunnable: Runnable
     private lateinit var musicAdapter: MusicAdapter
     private val vm: SearchViewModel by viewModels()
-
-//    override fun onCreateView(
-//        inflater: LayoutInflater,
-//        container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View? {
-//        return LayoutInflater.from(context)
-//            .inflate(R.layout.fragment_search, container, false)
-//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

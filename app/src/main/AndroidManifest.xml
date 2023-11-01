@@ -26,8 +26,10 @@
         <activity android:name=".presentation.ui.search.SearchActivity"
             android:exported="true"/>
 
-        <activity
-            android:name=".presentation.ui.PlayerActivity"
+        <activity android:name=".presentation.ui.settings.SettingsActivity"
+            android:exported="true"/>
+
+        <activity android:name=".presentation.ui.media.MediaActivity"
             android:exported="true"/>
 
     </application>

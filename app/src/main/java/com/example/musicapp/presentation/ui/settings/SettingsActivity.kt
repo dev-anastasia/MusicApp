@@ -1,21 +1,21 @@
-package com.example.musicapp.presentation.ui.search
+package com.example.musicapp.presentation.ui.settings
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
 import com.example.musicapp.R
-import com.example.musicapp.presentation.ui.search.SearchFragment
 
-class SearchActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+        setContentView(R.layout.activity_settings)
 
-        val searchFragment = SearchFragment()
+        val settingsFragment = SettingsFragment()
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.search_container, searchFragment)
+                .replace(R.id.settings_container, settingsFragment)
                 .addToBackStack("SearchFragment")
                 .setReorderingAllowed(true)
                 .commit()

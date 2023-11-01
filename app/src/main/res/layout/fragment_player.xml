@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/theme_background"
     android:orientation="vertical">
 
     <FrameLayout
@@ -114,10 +114,11 @@
 
             <SeekBar
                 android:id="@+id/player_fragment_seekbar"
+                android:progressBackgroundTint="@color/dark_grey"
                 android:layout_width="295dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:progressTint="@color/search_bg"
+                android:progressTint="@color/yellow"
                 android:thumb="@drawable/icon_circle" />
 
             <TextView

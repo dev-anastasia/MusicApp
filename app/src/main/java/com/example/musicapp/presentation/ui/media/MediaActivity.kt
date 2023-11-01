@@ -1,22 +1,22 @@
-package com.example.musicapp.presentation.ui.search
+package com.example.musicapp.presentation.ui.media
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.musicapp.R
-import com.example.musicapp.presentation.ui.search.SearchFragment
+import com.example.musicapp.presentation.ui.media.MediaPlaylistsFragment
 
-class SearchActivity : AppCompatActivity() {
+class MediaActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+        setContentView(R.layout.activity_media)
 
-        val searchFragment = SearchFragment()
+        val mediaFragment = MediaPlaylistsFragment()
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.search_container, searchFragment)
-                .addToBackStack("SearchFragment")
+                .replace(R.id.media_container, mediaFragment)
+                .addToBackStack("MediaPlaylistsFragment")
                 .setReorderingAllowed(true)
                 .commit()
         }

@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui
+package com.example.musicapp.presentation.ui.player
 
 import android.media.MediaPlayer
 import android.net.Uri
@@ -61,7 +61,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
             mediaPlayer.apply {
                 setDataSource(vm.previewLiveData.value)
-                prepare()
+                prepareAsync()
             }
         }
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
 import com.example.musicapp.domain.entities.MusicPiece
@@ -37,7 +36,7 @@ class MusicAdapter(
         // Создаём по макету из layout'а холдер для наших вьюшек
         val itemView = LayoutInflater
             .from(parent.context)
-            .inflate(R.layout.item_view, parent, false)
+            .inflate(R.layout.search_item_view, parent, false)
         return MusicPieceViewHolder(itemView)
     }
 
