@@ -2,9 +2,7 @@ package com.example.musicapp.presentation.ui.search
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
 import com.example.musicapp.R
-import com.example.musicapp.presentation.OnBackPressed
 
 class SearchActivity : AppCompatActivity() {
 

@@ -15,8 +15,8 @@
 
     <color name="black">#FFFFFF</color>
     <color name="white">#353232</color>
-    <color name="light_grey">#6D6F77</color>
-    <color name="dark_grey">#7D7D7D</color>
+    <color name="grey_light">#6D6F77</color>
+    <color name="grey_dark">#7D7D7D</color>
     <color name="disabled">#615D5D</color>
     <color name="blue">#5E8BFF</color>
 

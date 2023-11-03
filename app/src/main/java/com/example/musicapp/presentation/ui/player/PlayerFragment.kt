@@ -10,12 +10,10 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.musicapp.Creator
 import com.example.musicapp.R
-import com.example.musicapp.presentation.OnBackPressed
 import com.example.musicapp.presentation.presenters.PlayerViewModel
 import com.example.musicapp.presentation.ui.search.SearchFragment.Companion.TRACK_ID
 import com.squareup.picasso.Picasso
@@ -223,13 +221,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         goBackBtn.setOnClickListener {
             onBackPressed()
         }
-
-        activity?.onBackPressedDispatcher?.addCallback {
-            onBackPressed()
-        }
     }
 
-    private fun onBackPressed() {
+    private fun onBackPressed() {   // Вызывается из SearchActivity!!
         uiHandler.apply {
             removeCallbacks(setCurrentSeekBarPosition)
             removeCallbacks(setCurrentTimeRunnable)
@@ -239,10 +233,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             release()
         }
         mediaPlayer = MediaPlayer()
-        if (parentFragmentManager.backStackEntryCount > 0)
-            parentFragmentManager.popBackStack()
-        else
-            activity?.onBackPressedDispatcher?.onBackPressed()
+        requireActivity().supportFragmentManager.popBackStack()
     }
 
     private companion object {

@@ -1,9 +1,11 @@
-package com.example.musicapp.presentation.ui.adapter
+package com.example.musicapp.presentation.ui.search.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.musicapp.domain.entities.MusicPiece
+
+// (Пока что) не используется
 
 class DiffUtilItemCallback : DiffUtil.ItemCallback<MusicPiece>() {
     override fun areItemsTheSame(oldItem: MusicPiece, newItem: MusicPiece): Boolean {

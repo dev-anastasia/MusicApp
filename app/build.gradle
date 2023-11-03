@@ -59,9 +59,5 @@ dependencies {
     // ViewModel
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
     implementation 'androidx.activity:activity-ktx:1.8.0'
-    implementation 'androidx.fragment:fragment-ktx:1.6.1'
-    // Dagger
-    def dagger_version = "2.40"
-    implementation "com.google.dagger:dagger:$dagger_version"
-    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+    implementation 'androidx.fragment:fragment-ktx:1.6.2'
 }

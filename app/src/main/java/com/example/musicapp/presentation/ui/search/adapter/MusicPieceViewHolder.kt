@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.adapter
+package com.example.musicapp.presentation.ui.search.adapter
 
 import android.view.View
 import android.widget.ImageView
@@ -8,9 +8,9 @@ import com.example.musicapp.R
 import com.squareup.picasso.Picasso
 
 class MusicPieceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val cover: ImageView = itemView.findViewById(R.id.item_view_iv_cover)
-    val songName: TextView = itemView.findViewById(R.id.tv_song_name)
-    val author: TextView = itemView.findViewById(R.id.tv_author)
+    val cover: ImageView = itemView.findViewById(R.id.search_track_item_view_iv_cover)
+    val songName: TextView = itemView.findViewById(R.id.search_track_tv_song_name)
+    val author: TextView = itemView.findViewById(R.id.search_track_tv_author)
 
     fun updateAuthorName(name: String) {
         author.text = name

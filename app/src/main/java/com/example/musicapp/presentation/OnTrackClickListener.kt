@@ -1,6 +1,6 @@
 package com.example.musicapp.presentation
 
-interface OnItemClickListener {
+interface OnTrackClickListener {
 
     fun onItemClick(id: Long)
 }

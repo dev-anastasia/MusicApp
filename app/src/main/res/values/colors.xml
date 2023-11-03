@@ -15,11 +15,15 @@
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="light_grey">#AB9C9A9A</color>
-    <color name="dark_grey">#7D7D7D</color>
+    <color name="grey_light">#AB9C9A9A</color>
+    <color name="grey_dark">#7D7D7D</color>
     <color name="dark_theme_bg">#393636</color>
     <color name="disabled">#615D5D</color>
     <color name="blue">#1840A8</color>
     <color name="yellow">#C57703</color>
+    <color name="red">#615D5D</color>
+    <color name="red_light">#C55757</color>
+    <color name="green_light">#75B364</color>
+
 
 </resources>

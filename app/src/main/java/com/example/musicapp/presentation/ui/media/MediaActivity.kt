@@ -3,7 +3,6 @@ package com.example.musicapp.presentation.ui.media
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.musicapp.R
-import com.example.musicapp.presentation.ui.media.MediaPlaylistsFragment
 
 class MediaActivity : AppCompatActivity() {
 
@@ -11,7 +10,7 @@ class MediaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
 
-        val mediaFragment = MediaPlaylistsFragment()
+        val mediaFragment = MediaFragment()
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()

@@ -22,10 +22,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         val pref = activity?.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE)
         val editor = pref?.edit()
-//        editor?.apply()
-
-//        switch.isChecked =
-//            pref?.getString(UI_MODE, LIGHT) != LIGHT // "выкл" если тема светлая, "вкл" если темная
 
         if (pref?.getString(UI_MODE, LIGHT) == LIGHT) {
             moonIcon.setBackgroundResource(R.drawable.icon_moon_disabled)

@@ -110,7 +110,7 @@
                 android:layout_width="295dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:progressBackgroundTint="@color/dark_grey"
+                android:progressBackgroundTint="@color/grey_dark"
                 android:progressTint="@color/yellow"
                 android:thumb="@drawable/icon_circle" />
 

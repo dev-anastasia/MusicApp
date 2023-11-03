@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.adapter
+package com.example.musicapp.presentation.ui.search.adapter
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,18 +7,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
 import com.example.musicapp.domain.entities.MusicPiece
-import com.example.musicapp.presentation.OnItemClickListener
+import com.example.musicapp.presentation.OnTrackClickListener
 import com.squareup.picasso.Picasso
 
-class MusicAdapter(
-    private val itemIdListener: OnItemClickListener    // Интерфейс для выбора item'а из RV
+class TracksAdapter(
+    private val itemIdListener: OnTrackClickListener    // Интерфейс для выбора item'а из RV
 ) : Adapter<MusicPieceViewHolder>() {
 
     private val list: MutableList<MusicPiece> = mutableListOf()
 
     fun updateList(newList: List<MusicPiece>) {
         val diffUtil = DiffUtil.calculateDiff(
-            ItemDiffUtilCallback(
+            TrackDiffUtilCallback(
                 list,
                 newList
             )
@@ -65,13 +65,13 @@ class MusicAdapter(
             val bundle = payloads.first() as Bundle
             for (key in bundle.keySet()) {
                 when (key) {
-                    (ItemDiffUtilCallback.NAME) ->
+                    (TrackDiffUtilCallback.NAME) ->
                         holder.updateAuthorName(bundle.getString(key)!!)
 
-                    (ItemDiffUtilCallback.TRACK) ->
+                    (TrackDiffUtilCallback.TRACK) ->
                         holder.updateTrackName(bundle.getString(key)!!)
 
-                    (ItemDiffUtilCallback.COVER) ->
+                    (TrackDiffUtilCallback.COVER) ->
                         holder.updateCoverImage(bundle.getString(key)!!)
                 }
             }

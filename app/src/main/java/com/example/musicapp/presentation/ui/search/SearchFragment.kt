@@ -15,17 +15,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.Creator
 import com.example.musicapp.R
-import com.example.musicapp.presentation.OnItemClickListener
+import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
-import com.example.musicapp.presentation.ui.adapter.MusicAdapter
+import com.example.musicapp.presentation.ui.search.adapter.TracksAdapter
 import com.example.musicapp.presentation.ui.player.PlayerFragment
 
-class SearchFragment :
-    Fragment(R.layout.fragment_search),
-    OnItemClickListener {
+class SearchFragment : Fragment(R.layout.fragment_search),
+    OnTrackClickListener {
 
     private lateinit var searchQueryRunnable: Runnable
-    private lateinit var musicAdapter: MusicAdapter
+    private lateinit var tracksAdapter: TracksAdapter
     private val vm: SearchViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,13 +46,13 @@ class SearchFragment :
             false
         )
         // Адаптер
-        musicAdapter = MusicAdapter(this)
-        recyclerView.adapter = musicAdapter
+        tracksAdapter = TracksAdapter(this)
+        recyclerView.adapter = tracksAdapter
 
         Creator.updateSearchUseCase(vm)
         vm.initList() // Создает пустой список, если в нем null
         vm.newList.observe(viewLifecycleOwner) { list ->
-            musicAdapter.updateList(list)
+            tracksAdapter.updateList(list)
         }
 
         // Методы активити
@@ -133,18 +132,15 @@ class SearchFragment :
         bundle.putLong(TRACK_ID, id)
         playerFragment.arguments = bundle
 
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.search_container, playerFragment)
-            .addToBackStack("PlayerFragment")
+        activity?.supportFragmentManager!!.beginTransaction()
+            .add(R.id.search_container, playerFragment)
+            .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)
             .commit()
     }
 
     private fun onBackPressed() {
-        if (parentFragmentManager.backStackEntryCount > 0)
-            parentFragmentManager.popBackStack()
-        else
-            activity?.onBackPressed()
+        activity?.onBackPressedDispatcher?.onBackPressed()
     }
 
     companion object {
@@ -153,5 +149,4 @@ class SearchFragment :
         const val ENTITY = "musicTrack"   // для поиска только музыкальных треков
         const val TIMER = 2000L
     }
-
 }
