@@ -2,7 +2,7 @@ package com.example.musicapp.presentation.ui.media.adapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.domain.entities.Playlist
+import com.example.musicapp.domain.entities.room.Playlist
 
 class PlaylistDiffUtilCallback(
     private val oldList: List<Playlist>,

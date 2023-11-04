@@ -17,8 +17,8 @@ import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
-import com.example.musicapp.presentation.ui.search.adapter.TracksAdapter
 import com.example.musicapp.presentation.ui.player.PlayerFragment
+import com.example.musicapp.presentation.ui.search.adapter.TracksAdapter
 
 class SearchFragment : Fragment(R.layout.fragment_search),
     OnTrackClickListener {
@@ -81,7 +81,6 @@ class SearchFragment : Fragment(R.layout.fragment_search),
 
         // запрос SearchView
         searchQueryRunnable = Runnable {
-
             if (currentQueryText == null)
                 currentQueryText = ""
 
@@ -133,7 +132,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         playerFragment.arguments = bundle
 
         activity?.supportFragmentManager!!.beginTransaction()
-            .add(R.id.search_container, playerFragment)
+            .replace(R.id.search_container, playerFragment)
             .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)
             .commit()

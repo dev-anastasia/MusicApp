@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.domain.entities.Playlist
+import com.example.musicapp.domain.entities.room.Playlist
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.squareup.picasso.Picasso
 

@@ -2,7 +2,7 @@ package com.example.musicapp.presentation.presenters
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.musicapp.domain.entities.Playlist
+import com.example.musicapp.domain.entities.room.Playlist
 
 class MediaViewModel : ViewModel() {
 
