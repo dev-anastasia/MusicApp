@@ -15,14 +15,6 @@ class MediaViewModel : ViewModel() {
 
         testList.add(
             Playlist(
-                -1,
-                "",
-                "Избранное",
-                1
-            )
-        )
-        testList.add(
-            Playlist(
                 -2,
                 "",
                 "Создать новый плейлист...",
@@ -33,7 +25,7 @@ class MediaViewModel : ViewModel() {
             Playlist(
                 3,
                 "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/0c/30/5f/0c305f8e-01ba-615b-5790-4c40a32ffa7b/13UABIM59453.rgb.jpg/100x100bb.jpg",
-                "My Playlist",
+                "My Playlist 1",
                 318
             )
         )
@@ -41,7 +33,7 @@ class MediaViewModel : ViewModel() {
             Playlist(
                 4,
                 "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/0c/30/5f/0c305f8e-01ba-615b-5790-4c40a32ffa7b/13UABIM59453.rgb.jpg/100x100bb.jpg",
-                "My Playlist",
+                "My Playlist 2",
                 5
             )
         )
@@ -49,7 +41,7 @@ class MediaViewModel : ViewModel() {
             Playlist(
                 5,
                 "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/0c/30/5f/0c305f8e-01ba-615b-5790-4c40a32ffa7b/13UABIM59453.rgb.jpg/100x100bb.jpg",
-                "My Playlist",
+                "My Playlist 3",
                 42
             )
         )
@@ -57,8 +49,24 @@ class MediaViewModel : ViewModel() {
             Playlist(
                 6,
                 "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/0c/30/5f/0c305f8e-01ba-615b-5790-4c40a32ffa7b/13UABIM59453.rgb.jpg/100x100bb.jpg",
-                "My Playlist",
+                "My Playlist 4",
                 6
+            )
+        )
+        testList.add(
+            Playlist(
+                6,
+                "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/0c/30/5f/0c305f8e-01ba-615b-5790-4c40a32ffa7b/13UABIM59453.rgb.jpg/100x100bb.jpg",
+                "My Playlist 5",
+                77
+            )
+        )
+        testList.add(
+            Playlist(
+                6,
+                "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/0c/30/5f/0c305f8e-01ba-615b-5790-4c40a32ffa7b/13UABIM59453.rgb.jpg/100x100bb.jpg",
+                "My Playlist 6",
+                14
             )
         )
         update(testList)

@@ -2,12 +2,10 @@ package com.example.musicapp.presentation.ui.media
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.PlaylistViewModel
@@ -21,12 +19,6 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val goBackBtn: ImageButton = view.findViewById(R.id.single_playlist_btn_go_back)
-
-        goBackBtn.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
-        }
 
         // Адаптер - используется тот же, что в поисковике
         val recyclerView = view.findViewById<RecyclerView>(R.id.media_fragment_recycler_view)
@@ -45,6 +37,7 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     }
 
     override fun onItemClick(id: Long) {
+        // Открытие PlayerFragment'а
         TODO("Not yet implemented")
     }
 }

@@ -44,18 +44,12 @@ class MediaPlaylistsAdapter(
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
 
-        if (list[position].id == -1 || list[position].id == -2)
-            bindSpecialPlaylists(holder, position)
-
         holder.name.text = list[position].name
         holder.count.text = list[position].songCount.toString()
 
-        if (list[position].id == -1 || list[position].id == -2)
-            bindSpecialPlaylists(holder, position)
-        else
-            Picasso.get()
-                .load(list[position].cover)
-                .into(holder.cover)
+        Picasso.get()
+            .load(list[position].cover)
+            .into(holder.cover)
 
         holder.itemView.setOnClickListener {
             onClick(list[position].id)
@@ -83,14 +77,6 @@ class MediaPlaylistsAdapter(
                         holder.updatePlaylistCoverImage(bundle.getString(key)!!)
                 }
             }
-        }
-    }
-
-    private fun bindSpecialPlaylists(holder: PlaylistViewHolder, position: Int) {
-        if (list[position].id == -1) {  // Избранное
-            holder.cover.setImageResource(R.drawable.icon_fav_playlist)
-        } else {    // Добавить новый плейлист
-            holder.cover.setImageResource(R.drawable.add_new_playlist)
         }
     }
 }

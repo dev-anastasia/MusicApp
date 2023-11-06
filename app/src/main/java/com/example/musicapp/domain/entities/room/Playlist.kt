@@ -3,7 +3,7 @@ package com.example.musicapp.domain.entities.room
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity()
+@Entity(tableName = "playlists")
 data class Playlist(
     @PrimaryKey(autoGenerate = false)
     val id: Int,    // val id: Int? = null
