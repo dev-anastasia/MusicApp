@@ -1,6 +1,6 @@
 package com.example.musicapp.domain.useCases
 
-import com.example.musicapp.domain.entities.room.Playlist
+import com.example.musicapp.domain.entities.Playlist
 
 sealed interface PlaylistEvent {
 

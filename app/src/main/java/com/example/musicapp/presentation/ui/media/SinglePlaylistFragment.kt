@@ -8,14 +8,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
-import com.example.musicapp.presentation.presenters.PlaylistViewModel
+import com.example.musicapp.presentation.presenters.PlaylistsViewModel
 import com.example.musicapp.presentation.ui.search.adapter.TracksAdapter
 
 class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     OnTrackClickListener {
 
     private lateinit var tracksAdapter: TracksAdapter
-    private val vm: PlaylistViewModel by viewModels()
+    private val vm: PlaylistsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,9 +31,9 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         tracksAdapter = TracksAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        vm.newList.observe(viewLifecycleOwner) { list ->
-            tracksAdapter.updateList(list)
-        }
+//        vm.newList.observe(viewLifecycleOwner) { list ->
+//            tracksAdapter.updateList(list)
+//        }
     }
 
     override fun onItemClick(id: Long) {

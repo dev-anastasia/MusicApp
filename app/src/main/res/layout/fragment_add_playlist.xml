@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="320dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:background="@color/white"
+    android:gravity="center"
+    android:background="@drawable/add_new_fr_backgr"
     android:orientation="vertical"
-    tools:context=".presentation.ui.media.AddPlaylistFragment">
+    tools:context=".presentation.ui.media.viewpager.AddPlaylistFragment">
 
     <TextView
+        android:layout_marginTop="10dp"
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:gravity="center"
@@ -35,14 +37,16 @@
             android:layout_height="50dp"
             android:layout_gravity="center"
             android:layout_marginEnd="24dp"
-            android:background="@drawable/icon_check" />
+            android:background="@drawable/icon_check"
+            android:layout_marginBottom="10dp"/>
 
         <ImageButton
             android:id="@+id/btn_cancel_adding"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:background="@drawable/icon_cancel" />
+            android:background="@drawable/icon_cancel"
+            android:layout_marginBottom="10dp"/>
 
     </LinearLayout>
 

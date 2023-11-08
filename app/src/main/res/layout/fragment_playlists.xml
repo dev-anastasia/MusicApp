@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/single_playlist_fragment_layout"
     android:layout_width="match_parent"
@@ -14,4 +15,14 @@
         android:orientation="vertical"
         tools:listitem="@layout/media_playlists_item_view" />
 
-</LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_playlist"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@drawable/add_new_playlist"
+        app:fabCustomSize="64dp"
+        app:maxImageSize="40dp" />
+
+</FrameLayout>

@@ -5,5 +5,4 @@ import com.example.musicapp.R
 
 class FavsFragment : Fragment(R.layout.single_playlist_fragment) {
 
-
 }

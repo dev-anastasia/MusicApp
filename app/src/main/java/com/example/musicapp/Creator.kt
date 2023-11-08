@@ -18,6 +18,8 @@ object Creator {
     const val PREVIEW = "preview"
     const val COVER_IMAGE = "coverImage"
 
+    val app = MyApp()
+
     private val searchRepo: SearchRepo = SearchRepoImpl() // Приводим к типу интерфейса
     val searchUseCase = GetTrackListUseCase(searchRepo)
 

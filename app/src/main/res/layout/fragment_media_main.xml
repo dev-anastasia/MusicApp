@@ -2,11 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/theme_background"
     android:orientation="vertical">
+
+    <ImageButton
+        android:id="@+id/media_main_fragment_btn_go_back"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="33dp"
+        android:background="@drawable/icon_go_back" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/fragment_media_tab_layout"
+        app:tabTextColor="@color/black"
+        app:tabRippleColor="@color/red_light"
+        app:tabIndicatorColor="@color/red_light"
         android:layout_width="match_parent"
+        android:background="@color/theme_background"
         android:layout_height="wrap_content" />
 
     <androidx.viewpager2.widget.ViewPager2
