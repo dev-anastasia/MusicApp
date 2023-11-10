@@ -2,6 +2,8 @@ package com.example.musicapp.presentation.ui.media
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +23,8 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         super.onViewCreated(view, savedInstanceState)
 
         // Адаптер - используется тот же, что в поисковике
-        val recyclerView = view.findViewById<RecyclerView>(R.id.media_fragment_recycler_view)
+        val recyclerView =
+            view.findViewById<RecyclerView>(R.id.single_playlist_fragment_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
@@ -31,6 +34,19 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         tracksAdapter = TracksAdapter(this)
         recyclerView.adapter = tracksAdapter
 
+        val id = this@SinglePlaylistFragment.arguments?.getInt(ID_KEY)
+        if (id == null) {
+            view.findViewById<LinearLayout>(R.id.ll_single_playlist_fragment_empty_playlist)
+                .visibility = View.VISIBLE
+        } else {
+
+        }
+
+        view.findViewById<ImageButton>(R.id.single_playlist_fragment_btn_go_back)
+            .setOnClickListener {
+                onBackPressed()
+            }
+
 //        vm.newList.observe(viewLifecycleOwner) { list ->
 //            tracksAdapter.updateList(list)
 //        }
@@ -39,5 +55,13 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     override fun onItemClick(id: Long) {
         // Открытие PlayerFragment'а
         TODO("Not yet implemented")
+    }
+
+    private fun onBackPressed() {
+        activity?.onBackPressedDispatcher?.onBackPressed()
+    }
+
+    private companion object {
+        const val ID_KEY = "id key"
     }
 }

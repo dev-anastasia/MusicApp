@@ -1,11 +1,11 @@
-package com.example.musicapp.domain.entities.room
+package com.example.musicapp.domain.entities.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "playlists_table")
-data class PlaylistDBObject(
+data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo val cover: String?,
     @ColumnInfo val name: String,

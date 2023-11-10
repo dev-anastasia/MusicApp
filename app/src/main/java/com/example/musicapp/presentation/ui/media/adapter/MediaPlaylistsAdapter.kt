@@ -2,35 +2,24 @@ package com.example.musicapp.presentation.ui.media.adapter
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.domain.entities.room.PlaylistDBObject
+import com.example.musicapp.domain.entities.database.PlaylistEntity
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.squareup.picasso.Picasso
 
 class MediaPlaylistsAdapter(
     private val itemIdListener: OnPlaylistClickListener    // Интерфейс для выбора item'а из RV
-) : Adapter<PlaylistViewHolder>() {
+) : Adapter<PlaylistViewHolder>(),
+    PopupMenu.OnMenuItemClickListener {
 
-    private val list: MutableList<PlaylistDBObject> = mutableListOf()
+    private val list: MutableList<PlaylistEntity> = mutableListOf()
 
-    fun updateList(newList: List<PlaylistDBObject>) {
-        val diffUtil = DiffUtil.calculateDiff(
-            PlaylistDiffUtilCallback(
-                list,
-                newList
-            )
-        )
-        list.clear()
-        list.addAll(newList)
-        diffUtil.dispatchUpdatesTo(this)
-    }
-
-    private fun onClick(id: Int) {
-        itemIdListener.onPlaylistClick(id)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
         // Создаём по макету из layout'а холдер для наших вьюшек
@@ -53,7 +42,12 @@ class MediaPlaylistsAdapter(
             .into(holder.cover)
 
         holder.itemView.setOnClickListener {
-            onClick(list[position].id)
+            onPlaylistClick(list[position].id)
+        }
+
+        holder.menu.setOnClickListener {
+            itemIdListener.currId = position
+            showMenu(holder.menu)
         }
     }
 
@@ -79,5 +73,38 @@ class MediaPlaylistsAdapter(
                 }
             }
         }
+    }
+
+    fun updateList(newList: List<PlaylistEntity>) {
+        val diffUtil = DiffUtil.calculateDiff(
+            PlaylistDiffUtilCallback(
+                list,
+                newList
+            )
+        )
+        list.clear()
+        list.addAll(newList)
+        diffUtil.dispatchUpdatesTo(this)
+        notifyItemInserted(0)
+    }
+
+    private fun onPlaylistClick(id: Int) {
+        itemIdListener.openPlaylistClicked(id)
+    }
+
+    // Ниже - методы для PopupMenu
+
+    private fun showMenu(view: View) {
+        val pMenu = PopupMenu(view.context, view)
+        pMenu.apply {
+            inflate(R.menu.menu)
+            setOnMenuItemClickListener(this@MediaPlaylistsAdapter)
+            show()
+        }
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        itemIdListener.deletePlaylistClicked()
+        return true
     }
 }

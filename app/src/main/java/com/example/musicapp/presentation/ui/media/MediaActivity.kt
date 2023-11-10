@@ -1,10 +1,14 @@
 package com.example.musicapp.presentation.ui.media
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.musicapp.R
+import com.example.musicapp.presentation.presenters.PlaylistsViewModel
 
 class MediaActivity : AppCompatActivity() {
+
+    val vm: PlaylistsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -2,12 +2,11 @@ package com.example.musicapp.presentation.ui.media.adapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.domain.entities.Playlist
-import com.example.musicapp.domain.entities.room.PlaylistDBObject
+import com.example.musicapp.domain.entities.database.PlaylistEntity
 
 class PlaylistDiffUtilCallback(
-    private val oldList: MutableList<PlaylistDBObject>,
-    private val newList: List<PlaylistDBObject>
+    private val oldList: MutableList<PlaylistEntity>,
+    private val newList: List<PlaylistEntity>
 ) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int = oldList.size
@@ -15,15 +14,13 @@ class PlaylistDiffUtilCallback(
     override fun getNewListSize(): Int = newList.size
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return (oldList[oldItemPosition].id == newList[newItemPosition].id)
+        val du = DiffUtilPlaylistItemCallback()
+        return du.areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return (oldList[oldItemPosition].cover == newList[newItemPosition].cover
-                &&
-                oldList[oldItemPosition].name == newList[newItemPosition].name
-                &&
-                oldList[oldItemPosition].songCount == newList[newItemPosition].songCount)
+        val du = DiffUtilPlaylistItemCallback()
+        return du.areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
     }
 
     override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
@@ -34,6 +31,8 @@ class PlaylistDiffUtilCallback(
             bundle.putString(COVER, newList[newItemPosition].cover)
         if (oldList[oldItemPosition].songCount != newList[newItemPosition].songCount)
             bundle.putInt(COUNT, newList[newItemPosition].songCount)
+        if (oldList[oldItemPosition].timeMillis != newList[newItemPosition].timeMillis)
+            bundle.putLong(TIME, newList[newItemPosition].timeMillis)
 
         return bundle
     }
@@ -42,5 +41,6 @@ class PlaylistDiffUtilCallback(
         const val NAME = "playlist name"
         const val COUNT = "tracks count"
         const val COVER = "playlist cover"
+        const val TIME = "time millis"
     }
 }

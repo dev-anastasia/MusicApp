@@ -62,6 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|center"
+            android:layout_marginTop="80dp"
             android:visibility="gone">
 
             <ImageView
@@ -69,7 +70,6 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center|top"
-                android:layout_marginTop="80dp"
                 android:src="@drawable/sad" />
 
             <TextView

@@ -14,9 +14,8 @@ class SearchViewModel : ViewModel(), SearchResultsListener {
 
     val newList = MutableLiveData<List<MusicPiece>>()
 
-    fun initList() {
-        if (newList.value == null)
-            newList.value = emptyList()
+    init {
+        newList.value = emptyList()
     }
 
     override fun showMessage() {

@@ -10,7 +10,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="33dp">
+        android:layout_marginTop="24dp">
 
         <ImageButton
             android:id="@+id/player_fragment_btn_go_back"

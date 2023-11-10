@@ -10,5 +10,8 @@
     <string name="add_playlist">Название нового плейлиста:</string>
     <string name="favs_playlist_name">Избранное</string>
     <string name="add_new_playlist">Добавить новый плейлист…</string>
+    <string name="empty_playlist_message">Плейлист пока пуст...</string>
+    <string name="context_menu_delete">Удалить</string>
+    <string name="menu_delete_text">Delete</string>
 
 </resources>

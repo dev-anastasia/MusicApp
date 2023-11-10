@@ -2,5 +2,10 @@ package com.example.musicapp.presentation
 
 interface OnPlaylistClickListener {
 
-    fun onPlaylistClick(id: Int)
+    var currId: Int
+
+    fun openPlaylistClicked(id: Int)
+
+    fun deletePlaylistClicked()
+
 }

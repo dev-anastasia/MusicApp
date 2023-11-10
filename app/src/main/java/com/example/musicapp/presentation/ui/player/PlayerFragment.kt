@@ -43,7 +43,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         var isAdded: Boolean? = null
 
         uiHandler = Handler(Looper.getMainLooper())
-        Creator.updatePlayerUseCase(vm)
+        Creator.setPlayerUseCaseVM(vm)
 
         // Для автопрокрутки текста:
         trackName.isSelected = true
@@ -211,7 +211,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                         }
                     }
                 }
-
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             }
@@ -221,6 +220,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         goBackBtn.setOnClickListener {
             onBackPressed()
         }
+    }
+
+    override fun onDestroy() {
+        onBackPressed()
+        super.onDestroy()
     }
 
     private fun onBackPressed() {   // Вызывается из SearchActivity!!

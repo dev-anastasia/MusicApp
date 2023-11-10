@@ -49,8 +49,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         tracksAdapter = TracksAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        Creator.updateSearchUseCase(vm)
-        vm.initList() // Создает пустой список, если в нем null
+        Creator.setSearchUseCaseVM(vm)
         vm.newList.observe(viewLifecycleOwner) { list ->
             tracksAdapter.updateList(list)
         }
@@ -76,7 +75,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         fun hideKeyboard() {    // При работе с сервером убирает клавиатуру
             val v: View? = activity?.currentFocus
             val inputMethodManager = activity?.getSystemService(InputMethodManager::class.java)
-            inputMethodManager?.hideSoftInputFromWindow(v?.windowToken, 0)
+            inputMethodManager?.hideSoftInputFromWindow(v?.windowToken, InputMethodManager.HIDE_IMPLICIT_ONLY)
         }
 
         // запрос SearchView

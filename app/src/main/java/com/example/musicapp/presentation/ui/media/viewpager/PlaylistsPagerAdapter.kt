@@ -11,7 +11,7 @@ class PlaylistsPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             (0) -> PlaylistsFragment()
-            else -> SinglePlaylistFragment()
+            else -> FavsFragment()
         }
     }
 }

@@ -12,7 +12,7 @@ import com.example.musicapp.domain.TrackInfoListener
 
 class PlayerViewModel : ViewModel(), TrackInfoListener {
 
-    private val trackInfoUseCase = Creator.trackInfoUseCase
+    private val useCase = Creator.trackInfoUseCase
 
     val trackNameLiveData = MutableLiveData<String>()
     val artistNameLiveData = MutableLiveData<String>()
@@ -24,9 +24,11 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     var serverReplied = false
 
     fun onGetTrackInfoClicked(currentId: Long) {
-        trackInfoUseCase.getTrackInfo(currentId)
+        useCase.getTrackInfo(currentId)
         countDuration()
     }
+
+
 
     private fun countDuration() {
         if (durationLiveData.value != null) {
@@ -57,6 +59,8 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     }
 
     fun updateIsAddedLD(status: Boolean) {
+
+
         isAddedLiveData.value = status
     }
 
@@ -65,5 +69,9 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
             isLikedLiveData.value = false
         if (isAddedLiveData.value == null)
             isAddedLiveData.value = false
+    }
+
+    fun onMediaClicked() {
+
     }
 }

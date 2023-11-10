@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.ui.media.viewpager.PlaylistsPagerAdapter
 import com.google.android.material.tabs.TabLayout
@@ -18,6 +19,7 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
     private lateinit var viewPager: ViewPager2
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         // ниже - отдельный адаптер для ViewPager'а!
         adapter = PlaylistsPagerAdapter(this)
         viewPager = view.findViewById(R.id.fragment_media_pager)
@@ -31,9 +33,7 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
                 tab.text = "Избранное"
         }.attach() // так мы соединяем tabLayout и viewPager
 
-        val btnGoBack = view.findViewById<ImageButton>(R.id.media_main_fragment_btn_go_back)
-
-        btnGoBack.setOnClickListener {
+        view.findViewById<ImageButton>(R.id.media_main_fragment_btn_go_back).setOnClickListener {
             onBackPressed()
         }
     }

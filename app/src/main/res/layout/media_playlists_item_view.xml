@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/playlist_item_view"
     android:layout_width="match_parent"
@@ -14,36 +15,45 @@
         android:id="@+id/playlist_item_view_iv_cover"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_margin="8dp" />
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/ll_playlist_item_view_media_playlists"
+    <TextView
+        android:id="@+id/playlist_item_view_tv_album_name"
+        style="@style/ItemViewText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:orientation="vertical">
+        android:maxLines="2"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/playlist_item_view_iv_cover"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Название плейлиста" />
 
-        <TextView
-            android:id="@+id/playlist_item_view_tv_album_name"
-            style="@style/ItemViewText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:maxLines="2"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            tools:text="Название плейлиста" />
+    <TextView
+        android:id="@+id/playlist_item_view_tv_tracks_count"
+        style="@style/ItemViewText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:textColor="@color/grey_dark"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/playlist_item_view_iv_cover"
+        app:layout_constraintTop_toBottomOf="@+id/playlist_item_view_tv_album_name"
+        tools:text="42 трека" />
 
-        <TextView
-            android:id="@+id/playlist_item_view_tv_tracks_count"
-            style="@style/ItemViewText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:textColor="@color/grey_dark"
-            android:textSize="12sp"
-            tools:text="42 трека" />
+    <ImageButton
+        android:id="@+id/playlists_item_view_context_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/icon_context_menu"
+        android:background="@color/theme_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

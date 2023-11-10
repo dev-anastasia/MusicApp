@@ -6,7 +6,7 @@
     android:background="@color/theme_background">
 
     <LinearLayout
-        android:id="@+id/ll_single_playlist_fragment_empty_playlist"
+        android:id="@+id/ll_favs_playlist_fragment_empty_playlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="80dp"
@@ -30,29 +30,13 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/single_playlist_fragment_layout"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favs_fragment_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ImageButton
-            android:id="@+id/single_playlist_fragment_btn_go_back"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/icon_go_back" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/single_playlist_fragment_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:background="@color/theme_background"
-            android:orientation="vertical"
-            tools:listitem="@layout/search_item_view" />
-
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@color/theme_background"
+        android:orientation="vertical"
+        tools:listitem="@layout/search_item_view" />
 
 </FrameLayout>

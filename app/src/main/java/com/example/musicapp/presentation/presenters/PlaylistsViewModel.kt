@@ -1,42 +1,56 @@
 package com.example.musicapp.presentation.presenters
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import com.example.musicapp.data.repos.PlaylistsRepo
-import com.example.musicapp.domain.entities.Playlist
-import com.example.musicapp.domain.entities.room.PlaylistDBObject
-import com.example.musicapp.domain.entities.room.PlaylistDatabase
+import androidx.lifecycle.ViewModel
+import com.example.musicapp.Creator
+import com.example.musicapp.domain.PlaylistsResultListener
+import com.example.musicapp.domain.entities.database.PlaylistEntity
 
-class PlaylistsViewModel(app: Application) : AndroidViewModel(app) {
+class PlaylistsViewModel : ViewModel(), PlaylistsResultListener {
 
-    private val repo: PlaylistsRepo // Позднее - добавить интерфейс!!
-    val allPlaylists: LiveData<List<PlaylistDBObject>> // Список объектов типа "плейлист" в БД
+    private val useCase = Creator.playlistsUseCase
+    val allPlaylists = MutableLiveData<List<PlaylistEntity>>() // Список плейлистов в БД
 
     init {
-        val playlistDao = PlaylistDatabase.getPlaylistDatabase(app).playlistsDao()
-        repo = PlaylistsRepo(playlistDao)
-        allPlaylists = repo.allPlaylists
+        Creator.setPlaylistUseCaseVM(this)
     }
 
-    fun addPlaylist(playlist: PlaylistDBObject) {
+    fun addPlaylist(context: Context, playlist: PlaylistEntity) {
         val thread = Thread {
-            repo.addPlaylist(playlist)
+            useCase.addPlaylist(context, playlist)
         }
-        thread.start()
-        //thread.join()
+        thread.apply {
+            start()
+            join()
+        }
+        getList(context)
     }
 
-    fun deletePlaylist(playlist: PlaylistDBObject) {
+    fun deletePlaylist(context: Context, id: Int) {
         val thread = Thread {
-            repo.deletePlaylist(playlist)
+            useCase.deletePlaylist(context, id)
         }
-        thread.start()
-        //thread.join()
+        thread.apply {
+            start()
+            join()
+        }
+        getList(context)
     }
 
-    private fun update(newList: List<Playlist>) {
-        //this.newList.value = newList
+    fun getList(context: Context) {
+        var list = emptyList<PlaylistEntity>()
+        val thread = Thread {
+            list = useCase.getAllPlaylists(context)
+        }
+        thread.apply {
+            start()
+            join()
+        }
+        updateList(list)
+    }
+
+    override fun updateList(list: List<PlaylistEntity>) {
+        this.allPlaylists.value = list
     }
 }
