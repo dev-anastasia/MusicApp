@@ -5,7 +5,7 @@ import com.example.musicapp.data.database.FavTrackEntity
 
 interface TrackInfoRepo {
 
-    fun getTrackInfo(currentId: Long, context: Context) : HashMap<String, String>
+    fun getTrackInfo(currentId: Long, context: Context, callback: (HashMap<String, String>) -> Unit)
 
     fun addTrackToFavourites(context: Context, track: FavTrackEntity)
 

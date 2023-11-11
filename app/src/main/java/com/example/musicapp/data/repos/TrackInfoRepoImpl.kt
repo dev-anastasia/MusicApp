@@ -16,31 +16,25 @@ import retrofit2.Call
 
 class TrackInfoRepoImpl : TrackInfoRepo {
 
-    override fun getTrackInfo(currentId: Long, context: Context): HashMap<String, String> {
+    override fun getTrackInfo(currentId: Long, context: Context, callback: (HashMap<String, String>) -> Unit) {
 
         val mapOfSpecs = HashMap<String, String>()
         lateinit var responseBody: Tracks
-        var mediaStatus = false
 
         val thread = Thread {
             val searchObject: Call<Tracks> = RetrofitUtils.musicService.getTrackInfoById(currentId)
             responseBody = searchObject.execute().body()!!
 
-            //mediaStatus = getMediaStatusFromDatabase(currentId, context)
-        }
-        thread.apply {
-            start()
-            join()
-        }
+            val body = responseBody.results[0]
+            mapOfSpecs[ARTIST_NAME] = body.artistName
+            mapOfSpecs[TRACK_NAME] = body.trackName
+            mapOfSpecs[DURATION] = body.trackTimeMillis.toString()
+            mapOfSpecs[PREVIEW] = body.previewUrl
+            mapOfSpecs[COVER_IMAGE] = body.artworkUrl100
 
-        val body = responseBody.results[0]
-        mapOfSpecs[ARTIST_NAME] = body.artistName
-        mapOfSpecs[TRACK_NAME] = body.trackName
-        mapOfSpecs[DURATION] = body.trackTimeMillis.toString()
-        mapOfSpecs[PREVIEW] = body.previewUrl
-        mapOfSpecs[COVER_IMAGE] = body.artworkUrl100
-
-        return mapOfSpecs
+            callback(mapOfSpecs)
+        }
+        thread.start()
     }
 
     // Ниже - неудачная попытка работать со статусами "Избранное" и "Добавлено в Медиа"

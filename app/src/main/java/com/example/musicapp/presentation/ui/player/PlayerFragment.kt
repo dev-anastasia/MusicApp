@@ -25,6 +25,16 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private lateinit var uiHandler: Handler
     private val vm: PlayerViewModel by viewModels()
 
+    private val currentId: Long
+        get() {
+            if (_currentId == null) {
+                _currentId = this.requireArguments().getLong(FavsFragment.TRACK_ID)
+            }
+            return _currentId!!
+        }
+
+    private var _currentId: Long? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -49,44 +59,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         trackName.isSelected = true
         artistName.isSelected = true
 
-        // Получение и сохранение данных из сети + заполнение вьюшек:
-        val currentId: Long = this.requireArguments().getLong(FavsFragment.TRACK_ID)
-
-        // К сети обращаемся 1 раз - при первом создании фрагмента:
-        if (savedInstanceState == null) {
-            vm.apply {
-                getTrackInfoFromServer(currentId, requireContext())
-            }
-
-            mediaPlayer.apply {
-                setDataSource(vm.previewLiveData.value)
-                prepareAsync()
-            }
+        mediaPlayer.apply {
+            setDataSource(vm.previewLiveData.value)
+            prepareAsync()
         }
 
-        // Если успешно загрузили данные из сети:
-        if (vm.serverReplied.value == true) {
-            isLiked = vm.isLikedLiveData.value
-            isAdded = vm.isAddedLiveData.value
+        /* vm.uiState.observe(viewLifecycleOwner) { uiState ->
+            render(uiState)
+        }*/
 
-            favIcon.isClickable = true
-            mediaIcon.isClickable = true
-            playIcon.isClickable = true
-
-            // Остальные вьюшки:
-            vm.coverImageLinkLiveData.observe(viewLifecycleOwner) { cover ->
-                Picasso.get()
-                    .load(Uri.parse(cover))
-                    .placeholder(R.drawable.note_placeholder)
-                    .into(coverImage)
-            }
-        } else {
-            Toast.makeText(
-                activity,
-                "Ошибка: не удалось связаться с сервером",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
 
         vm.apply {
             trackNameLiveData.observe(viewLifecycleOwner) { name ->
@@ -219,6 +200,36 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         goBackBtn.setOnClickListener {
             onBackPressed()
         }
+    }
+
+    private fun render(uiState: UiState) {
+        if (vm.serverReplied.value == true) {
+            isLiked = vm.isLikedLiveData.value
+            isAdded = vm.isAddedLiveData.value
+
+            favIcon.isClickable = true
+            mediaIcon.isClickable = true
+            playIcon.isClickable = true
+
+            // Остальные вьюшки:
+            vm.coverImageLinkLiveData.observe(viewLifecycleOwner) { cover ->
+                Picasso.get()
+                    .load(Uri.parse(cover))
+                    .placeholder(R.drawable.note_placeholder)
+                    .into(coverImage)
+            }
+        } else {
+            Toast.makeText(
+                activity,
+                "Ошибка: не удалось связаться с сервером",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        vm.getTrackInfoFromServer(currentId, requireActivity().applicationContext)
     }
 
     override fun onDestroy() {

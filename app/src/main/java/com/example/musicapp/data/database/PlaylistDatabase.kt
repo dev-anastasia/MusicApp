@@ -22,17 +22,15 @@ abstract class PlaylistDatabase : RoomDatabase() {
         private var DB_INSTANCE: PlaylistDatabase? = null
 
         fun getDatabase(context: Context): PlaylistDatabase {
-            return if (DB_INSTANCE != null)
-                DB_INSTANCE!!
-            else {
+            if (DB_INSTANCE == null) {
                 val db = Room.databaseBuilder(
                     context,
                     PlaylistDatabase::class.java,
                     "database-playlists-and-favs"
                 ).build()
                 DB_INSTANCE = db
-                DB_INSTANCE!!
             }
+            return DB_INSTANCE!!
         }
     }
 }

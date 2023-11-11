@@ -53,6 +53,11 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     override fun updateLD(hashmap: HashMap<String, String>) {
         // Обновить данные лайвдаты из мапы после ответа из сети
 
+
+        //hashmap -> UiState object
+
+        // liveData.value(UiState)
+
         trackNameLiveData.value = hashmap[TRACK_NAME]
         artistNameLiveData.value = hashmap[ARTIST_NAME]
         coverImageLinkLiveData.value = hashmap[COVER_IMAGE]
