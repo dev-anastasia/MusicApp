@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.media.adapter
+package com.example.musicapp.presentation.ui.media.playlistsAdapter
 
 import android.view.View
 import android.widget.ImageButton

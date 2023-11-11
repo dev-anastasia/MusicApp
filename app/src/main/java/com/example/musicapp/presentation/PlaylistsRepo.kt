@@ -1,7 +1,7 @@
 package com.example.musicapp.presentation
 
 import android.content.Context
-import com.example.musicapp.domain.entities.database.PlaylistEntity
+import com.example.musicapp.data.database.PlaylistEntity
 
 interface PlaylistsRepo {
 

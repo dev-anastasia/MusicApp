@@ -1,8 +1,8 @@
-package com.example.musicapp.presentation.ui.media.adapter
+package com.example.musicapp.presentation.ui.media.playlistsAdapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.domain.entities.database.PlaylistEntity
+import com.example.musicapp.data.database.PlaylistEntity
 
 class PlaylistDiffUtilCallback(
     private val oldList: MutableList<PlaylistEntity>,

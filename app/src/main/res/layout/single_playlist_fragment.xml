@@ -51,7 +51,7 @@
             android:layout_marginTop="6dp"
             android:background="@color/theme_background"
             android:orientation="vertical"
-            tools:listitem="@layout/search_item_view" />
+            tools:listitem="@layout/track_item_view" />
 
     </LinearLayout>
 

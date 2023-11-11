@@ -15,7 +15,7 @@ import androidx.fragment.app.viewModels
 import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.presenters.PlayerViewModel
-import com.example.musicapp.presentation.ui.search.SearchFragment.Companion.TRACK_ID
+import com.example.musicapp.presentation.ui.media.viewpager.FavsFragment
 import com.squareup.picasso.Picasso
 
 class PlayerFragment : Fragment(R.layout.fragment_player) {
@@ -50,13 +50,12 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         artistName.isSelected = true
 
         // Получение и сохранение данных из сети + заполнение вьюшек:
-        val currentId: Long = this.requireArguments().getLong(TRACK_ID)
+        val currentId: Long = this.requireArguments().getLong(FavsFragment.TRACK_ID)
 
         // К сети обращаемся 1 раз - при первом создании фрагмента:
         if (savedInstanceState == null) {
             vm.apply {
-                initUserPrefsLD() // Инициализация статусов isLiked и isAddedToMedia
-                onGetTrackInfoClicked(currentId)
+                getTrackInfoFromServer(currentId, requireContext())
             }
 
             mediaPlayer.apply {
@@ -66,7 +65,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
 
         // Если успешно загрузили данные из сети:
-        if (vm.serverReplied) {
+        if (vm.serverReplied.value == true) {
             isLiked = vm.isLikedLiveData.value
             isAdded = vm.isAddedLiveData.value
 
@@ -117,10 +116,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
         favIcon.setOnClickListener {
             if (isLiked == true) {
-                vm.updateIsLikedLD(false)
+                vm.updateIsLikedLD(requireContext(), false)
                 favIcon.setBackgroundResource(R.drawable.icon_fav_empty)
             } else {
-                vm.updateIsLikedLD(true)
+                vm.updateIsLikedLD(requireContext(), true)
                 favIcon.setBackgroundResource(R.drawable.icon_fav_liked)
             }
         }

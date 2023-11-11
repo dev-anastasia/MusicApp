@@ -5,16 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.PlaylistsResultListener
-import com.example.musicapp.domain.entities.database.PlaylistEntity
+import com.example.musicapp.data.database.PlaylistEntity
 
-class PlaylistsViewModel : ViewModel(), PlaylistsResultListener {
+class PlaylistsViewModel : ViewModel() {
 
     private val useCase = Creator.playlistsUseCase
     val allPlaylists = MutableLiveData<List<PlaylistEntity>>() // Список плейлистов в БД
-
-    init {
-        Creator.setPlaylistUseCaseVM(this)
-    }
 
     fun addPlaylist(context: Context, playlist: PlaylistEntity) {
         val thread = Thread {
@@ -50,7 +46,7 @@ class PlaylistsViewModel : ViewModel(), PlaylistsResultListener {
         updateList(list)
     }
 
-    override fun updateList(list: List<PlaylistEntity>) {
+    private fun updateList(list: List<PlaylistEntity>) {
         this.allPlaylists.value = list
     }
 }

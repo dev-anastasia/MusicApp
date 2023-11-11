@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.search.adapter
+package com.example.musicapp.presentation.ui.media.tracksAdapter
 
 import android.view.View
 import android.widget.ImageView
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.squareup.picasso.Picasso
 
-class MusicPieceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class TrackEntityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val cover: ImageView = itemView.findViewById(R.id.track_item_view_iv_cover)
     val songName: TextView = itemView.findViewById(R.id.track_tv_song_name)
     val author: TextView = itemView.findViewById(R.id.track_tv_author)

@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.media.adapter
+package com.example.musicapp.presentation.ui.media.playlistsAdapter
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.domain.entities.database.PlaylistEntity
+import com.example.musicapp.data.database.PlaylistEntity
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.squareup.picasso.Picasso
 
@@ -19,7 +19,7 @@ class MediaPlaylistsAdapter(
     PopupMenu.OnMenuItemClickListener {
 
     private val list: MutableList<PlaylistEntity> = mutableListOf()
-
+    private var currPlaylistId = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
         // Создаём по макету из layout'а холдер для наших вьюшек
@@ -42,11 +42,12 @@ class MediaPlaylistsAdapter(
             .into(holder.cover)
 
         holder.itemView.setOnClickListener {
-            onPlaylistClick(list[position].id)
+            onPlaylistClick(list[position].playlistId)
         }
 
         holder.menu.setOnClickListener {
-            itemIdListener.currId = position
+            currPlaylistId = list[position].playlistId
+            println(currPlaylistId)
             showMenu(holder.menu)
         }
     }
@@ -85,7 +86,7 @@ class MediaPlaylistsAdapter(
         list.clear()
         list.addAll(newList)
         diffUtil.dispatchUpdatesTo(this)
-        notifyItemInserted(0)
+        notifyDataSetChanged()  // Хотела использовать NotifyItemInserted, но не могу правильно передать в него position
     }
 
     private fun onPlaylistClick(id: Int) {
@@ -104,7 +105,7 @@ class MediaPlaylistsAdapter(
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
-        itemIdListener.deletePlaylistClicked()
+        itemIdListener.deletePlaylistClicked(currPlaylistId)
         return true
     }
 }

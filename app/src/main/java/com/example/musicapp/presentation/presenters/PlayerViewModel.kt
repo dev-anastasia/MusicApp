@@ -1,5 +1,6 @@
 package com.example.musicapp.presentation.presenters
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
@@ -9,10 +10,11 @@ import com.example.musicapp.Creator.DURATION
 import com.example.musicapp.Creator.PREVIEW
 import com.example.musicapp.Creator.TRACK_NAME
 import com.example.musicapp.domain.TrackInfoListener
+import com.example.musicapp.data.database.FavTrackEntity
 
 class PlayerViewModel : ViewModel(), TrackInfoListener {
 
-    private val useCase = Creator.trackInfoUseCase
+    private val trackInfoUseCase = Creator.trackInfoUseCase
 
     val trackNameLiveData = MutableLiveData<String>()
     val artistNameLiveData = MutableLiveData<String>()
@@ -21,14 +23,20 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     val previewLiveData = MutableLiveData<String>()
     val isLikedLiveData = MutableLiveData<Boolean>()
     val isAddedLiveData = MutableLiveData<Boolean>()
-    var serverReplied = false
+    val serverReplied = MutableLiveData<Boolean>()
+    var trackId: Long = 0
 
-    fun onGetTrackInfoClicked(currentId: Long) {
-        useCase.getTrackInfo(currentId)
-        countDuration()
+    init {
+        isLikedLiveData.value = false
+        isAddedLiveData.value = false
+        serverReplied.value = false
     }
 
-
+    fun getTrackInfoFromServer(currentId: Long, context: Context) {
+        trackId = currentId
+        trackInfoUseCase.getTrackInfo(currentId, context)
+        countDuration()
+    }
 
     private fun countDuration() {
         if (durationLiveData.value != null) {
@@ -51,27 +59,44 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         previewLiveData.value = hashmap[PREVIEW]
         durationLiveData.value = hashmap[DURATION]
 
-        serverReplied = true
+        serverReplied.value = true
     }
 
-    fun updateIsLikedLD(status: Boolean) {
+    // Логика нажатие на кнопку с сердечком
+    fun updateIsLikedLD(context: Context, status: Boolean) {
+        if (status) {
+            // добавить в избранное
+            val newFavTrack = FavTrackEntity(
+                trackId,
+                artistNameLiveData.value!!,
+                trackNameLiveData.value!!,
+                coverImageLinkLiveData.value!!,
+                System.currentTimeMillis()
+            )
+            val thread = Thread {
+                trackInfoUseCase.addTrackToFavourites(context, newFavTrack)
+            }
+            thread.apply {
+                start()
+                join()
+            }
+        } else {
+            // удалить из списка избранного
+            val thread = Thread {
+                trackInfoUseCase.deleteTrackFromFavourites(context, trackId)
+            }
+            thread.apply {
+                start()
+                join()
+            }
+        }
+
         isLikedLiveData.value = status
     }
 
+    // Логика нажатия на иконку "Медиа"
     fun updateIsAddedLD(status: Boolean) {
-
-
+        // добавить в Медиа / удалить из Медиа
         isAddedLiveData.value = status
-    }
-
-    fun initUserPrefsLD() {
-        if (isLikedLiveData.value == null)
-            isLikedLiveData.value = false
-        if (isAddedLiveData.value == null)
-            isAddedLiveData.value = false
-    }
-
-    fun onMediaClicked() {
-
     }
 }

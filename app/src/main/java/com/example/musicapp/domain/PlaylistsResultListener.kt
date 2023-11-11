@@ -1,6 +1,6 @@
 package com.example.musicapp.domain
 
-import com.example.musicapp.domain.entities.database.PlaylistEntity
+import com.example.musicapp.data.database.PlaylistEntity
 
 interface PlaylistsResultListener {
 

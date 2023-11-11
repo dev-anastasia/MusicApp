@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.search.adapter
+package com.example.musicapp.presentation.ui.media.tracksAdapter
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,19 +6,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.domain.entities.MusicPiece
+import com.example.musicapp.data.database.FavTrackEntity
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.squareup.picasso.Picasso
 
-class TracksAdapter(
+class TrackEntityAdapter(
     private val itemIdListener: OnTrackClickListener    // Интерфейс для выбора item'а из RV
-) : Adapter<MusicPieceViewHolder>() {
+) : Adapter<TrackEntityViewHolder>() {
 
-    private val list: MutableList<MusicPiece> = mutableListOf()
+    private val list: MutableList<FavTrackEntity> = mutableListOf()
 
-    fun updateList(newList: List<MusicPiece>) {
+    fun updateList(newList: List<FavTrackEntity>) {
         val diffUtil = DiffUtil.calculateDiff(
-            MusicPieceDiffUtilCallback(
+            TrackEntityDiffUtilCallback(
                 list,
                 newList
             )
@@ -32,17 +32,17 @@ class TracksAdapter(
         itemIdListener.onItemClick(id)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicPieceViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackEntityViewHolder {
         // Создаём по макету из layout'а холдер для наших вьюшек
         val itemView = LayoutInflater
             .from(parent.context)
             .inflate(R.layout.track_item_view, parent, false)
-        return MusicPieceViewHolder(itemView)
+        return TrackEntityViewHolder(itemView)
     }
 
     override fun getItemCount(): Int = list.size
 
-    override fun onBindViewHolder(holder: MusicPieceViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TrackEntityViewHolder, position: Int) {
         holder.songName.text = list[position].trackName
         holder.author.text = list[position].artistName
         Picasso.get()
@@ -55,7 +55,7 @@ class TracksAdapter(
     }
 
     override fun onBindViewHolder(
-        holder: MusicPieceViewHolder,
+        holder: TrackEntityViewHolder,
         position: Int,
         payloads: MutableList<Any>
     ) {
@@ -65,13 +65,13 @@ class TracksAdapter(
             val bundle = payloads.first() as Bundle
             for (key in bundle.keySet()) {
                 when (key) {
-                    (MusicPieceDiffUtilCallback.NAME) ->
+                    (TrackEntityDiffUtilCallback.NAME) ->
                         holder.updateAuthorName(bundle.getString(key)!!)
 
-                    (MusicPieceDiffUtilCallback.TRACK) ->
+                    (TrackEntityDiffUtilCallback.TRACK) ->
                         holder.updateTrackName(bundle.getString(key)!!)
 
-                    (MusicPieceDiffUtilCallback.COVER) ->
+                    (TrackEntityDiffUtilCallback.COVER) ->
                         holder.updateCoverImage(bundle.getString(key)!!)
                 }
             }

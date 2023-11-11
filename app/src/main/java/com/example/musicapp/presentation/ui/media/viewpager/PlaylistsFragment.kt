@@ -1,34 +1,28 @@
 package com.example.musicapp.presentation.ui.media.viewpager
 
 import android.os.Bundle
-import android.view.ContextMenu
-import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.example.musicapp.presentation.presenters.PlaylistsViewModel
 import com.example.musicapp.presentation.ui.media.SinglePlaylistFragment
-import com.example.musicapp.presentation.ui.media.adapter.MediaPlaylistsAdapter
+import com.example.musicapp.presentation.ui.media.playlistsAdapter.MediaPlaylistsAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class PlaylistsFragment(override var currId: Int = 0) :
+class PlaylistsFragment() :
     Fragment(R.layout.fragment_playlists),
     OnPlaylistClickListener {
 
     private lateinit var mediaAdapter: MediaPlaylistsAdapter
-    private lateinit var vm: PlaylistsViewModel
+    private lateinit var vm: PlaylistsViewModel  // владелец - MediaActivity
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val vm: PlaylistsViewModel =
-            ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.media_fragment_playlists_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
@@ -40,10 +34,12 @@ class PlaylistsFragment(override var currId: Int = 0) :
         mediaAdapter = MediaPlaylistsAdapter(this)
         recyclerView.adapter = mediaAdapter
 
+        vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
+
         vm.getList(requireContext())
 
         vm.allPlaylists.observe(viewLifecycleOwner) { list ->
-            mediaAdapter.updateList(list)   // notify'и здесь или в адаптере не помогают
+            mediaAdapter.updateList(list)
         }
 
         // Кнопка добавления плейлиста
@@ -70,8 +66,8 @@ class PlaylistsFragment(override var currId: Int = 0) :
             .commit()
     }
 
-    override fun deletePlaylistClicked() {
-        vm.deletePlaylist(requireContext(), currId)
+    override fun deletePlaylistClicked(id: Int) {
+        vm.deletePlaylist(requireContext(), id)
     }
 
     private companion object {

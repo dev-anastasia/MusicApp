@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:background="@color/theme_background"
             android:orientation="vertical"
-            tools:listitem="@layout/search_item_view" />
+            tools:listitem="@layout/track_item_view" />
 
         <ImageView
             android:id="@+id/search_fragment_iv_loading"

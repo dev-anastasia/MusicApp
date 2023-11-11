@@ -10,14 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
-import com.example.musicapp.presentation.presenters.PlaylistsViewModel
+import com.example.musicapp.presentation.presenters.TracksViewModel
 import com.example.musicapp.presentation.ui.search.adapter.TracksAdapter
 
 class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     OnTrackClickListener {
 
     private lateinit var tracksAdapter: TracksAdapter
-    private val vm: PlaylistsViewModel by viewModels()
+    private val vm: TracksViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -35,21 +35,20 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         recyclerView.adapter = tracksAdapter
 
         val id = this@SinglePlaylistFragment.arguments?.getInt(ID_KEY)
-        if (id == null) {
+
+        vm.allTracks.observe(viewLifecycleOwner) { list ->
+            // Обновить список адаптера
+        }
+
+        if (vm.allTracks.value!!.isEmpty()) {
             view.findViewById<LinearLayout>(R.id.ll_single_playlist_fragment_empty_playlist)
                 .visibility = View.VISIBLE
-        } else {
-
         }
 
         view.findViewById<ImageButton>(R.id.single_playlist_fragment_btn_go_back)
             .setOnClickListener {
                 onBackPressed()
             }
-
-//        vm.newList.observe(viewLifecycleOwner) { list ->
-//            tracksAdapter.updateList(list)
-//        }
     }
 
     override fun onItemClick(id: Long) {

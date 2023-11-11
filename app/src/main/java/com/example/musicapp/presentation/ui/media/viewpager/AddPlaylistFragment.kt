@@ -12,12 +12,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.musicapp.R
-import com.example.musicapp.domain.entities.database.PlaylistEntity
+import com.example.musicapp.data.database.PlaylistEntity
 import com.example.musicapp.presentation.presenters.PlaylistsViewModel
 
 class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
-    private lateinit var vm: PlaylistsViewModel
+    private lateinit var vm: PlaylistsViewModel  // владелец - MediaActivity
     private lateinit var editText: EditText
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
