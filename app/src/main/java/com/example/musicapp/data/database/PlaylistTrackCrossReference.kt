@@ -7,3 +7,9 @@ import androidx.room.Entity
 //    val playlistId: Int,
 //    val trackId: Long
 //)
+//
+//val list: List<Long> = SELECT trackId FROM PlaylistTrackCrossRef Where playlistId=:playlistIdSelected
+//
+//        for (item: list){
+//            SELECT ...
+//        }
