@@ -17,11 +17,16 @@ class SearchViewModel : ViewModel(), SearchResultsListener {
     }
 
     override fun showEmptyResultsMessage() {
-        println("")
+        println("Empty List!")
     }
 
     override fun onGetTrackListClicked(queryText: String, entity: String) {
-        searchUseCase.getSearchResult(queryText, entity)
+        searchUseCase.getSearchResult(queryText, entity) {
+            if (it.isEmpty())
+                showEmptyResultsMessage()
+            else
+                update(it)
+        }
     }
 
     override fun update(newList: List<MusicPiece>) {

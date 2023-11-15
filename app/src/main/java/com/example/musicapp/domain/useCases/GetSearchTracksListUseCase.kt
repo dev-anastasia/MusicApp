@@ -1,22 +1,23 @@
 package com.example.musicapp.domain.useCases
 
+import android.os.Handler
+import android.os.Looper
 import com.example.musicapp.domain.SearchRepo
-import com.example.musicapp.domain.SearchResultsListener
+import com.example.musicapp.domain.entities.MusicPiece
 
-class GetSearchTracksListUseCase(
-    private val repo: SearchRepo,
-    private var vm: SearchResultsListener? = null
-) {
+class GetSearchTracksListUseCase(private val repo: SearchRepo) {
 
-    fun getSearchResult(queryText: String, entity: String) {
-        val list = repo.getSearchResult(queryText, entity)
-        if (list.isEmpty().not())
-            vm?.update(list)
-        else
-            vm?.showEmptyResultsMessage()
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    fun getSearchResult(queryText: String, entity: String, callback: (List<MusicPiece>) -> Unit) {
+        repo.getSearchResult(queryText, entity) {
+            mainHandler.post {
+                callback(it)
+            }
+        }
     }
 
-    fun setVM(vm: SearchResultsListener) {
-        this.vm = vm
-    }
+//    fun setVM(vm: SearchResultsListener) {
+//        this.vm = vm
+//    }
 }

@@ -3,21 +3,21 @@ package com.example.musicapp.domain.useCases
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import com.example.musicapp.domain.TrackInfoListener
 import com.example.musicapp.domain.TrackInfoRepo
 import com.example.musicapp.domain.database.PlaylistTrackCrossRef
 
-class GetTrackInfoUseCase(
-    private val repo: TrackInfoRepo,
-    private var vm: TrackInfoListener? = null
-) {
+class GetTrackInfoUseCase(private val repo: TrackInfoRepo) {
 
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    fun getTrackInfo(currentId: Long, context: Context) {
+    fun getTrackInfo(
+        currentId: Long,
+        context: Context,
+        callback: (HashMap<String, String>) -> Unit
+    ) {
         repo.getTrackInfo(currentId, context) {
             mainHandler.post {
-                vm?.updateLiveData(it)
+                callback(it)
             }
         }
     }
@@ -28,9 +28,5 @@ class GetTrackInfoUseCase(
 
     fun deleteTrackFromFavourites(context: Context, trackId: Long, playlistId: Int) {
         repo.deleteTrackFromFavourites(context, trackId, playlistId)
-    }
-
-    fun setVM(vm: TrackInfoListener) {
-        this.vm = vm
     }
 }

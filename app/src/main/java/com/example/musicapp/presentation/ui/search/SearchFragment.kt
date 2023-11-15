@@ -49,7 +49,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         tracksAdapter = TracksAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        Creator.setSearchUseCaseVM(vm)
+        //Creator.setSearchUseCaseVM(vm)
         vm.newList.observe(viewLifecycleOwner) { list ->
             tracksAdapter.updateList(list)
         }

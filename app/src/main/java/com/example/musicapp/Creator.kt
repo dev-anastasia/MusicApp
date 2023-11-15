@@ -38,11 +38,11 @@ object Creator {
     private val getTracksIdsRepo: GetTracksIdsRepo = GetTracksIdsRepoImpl()
     val favTracksRepoUseCase = GetTracksIdsListUseCase(getTracksIdsRepo)
 
-    fun setSearchUseCaseVM(vm: SearchViewModel) {
-        searchUseCase.setVM(vm)
-    }
+//    fun setSearchUseCaseVM(vm: SearchViewModel) {
+//        searchUseCase.setVM(vm)
+//    }
 
-    fun setPlayerUseCaseVM(vm: PlayerViewModel) {
-        trackInfoUseCase.setVM(vm)
-    }
+//    fun setPlayerUseCaseVM(vm: PlayerViewModel) {
+//        trackInfoUseCase.setVM(vm)
+//    }
 }

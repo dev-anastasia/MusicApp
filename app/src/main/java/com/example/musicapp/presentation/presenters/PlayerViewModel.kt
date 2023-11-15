@@ -11,19 +11,21 @@ import com.example.musicapp.Creator.PREVIEW
 import com.example.musicapp.Creator.TRACK_NAME
 import com.example.musicapp.domain.TrackInfoListener
 import com.example.musicapp.domain.database.PlaylistTrackCrossRef
+import com.example.musicapp.presentation.ui.player.UIState
 
 class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     private val trackInfoUseCase = Creator.trackInfoUseCase
 
+    val uiState = MutableLiveData<UIState<Int>>()
+
     val trackNameLiveData = MutableLiveData<String>()
     val artistNameLiveData = MutableLiveData<String>()
     val coverImageLinkLiveData = MutableLiveData<String>()
     val durationLiveData = MutableLiveData<String>()
-    val previewLiveData = MutableLiveData<String>()
+    val audioPreviewLiveData = MutableLiveData<String>()
     val isLikedLiveData = MutableLiveData<Boolean>()
     val isAddedLiveData = MutableLiveData<Boolean>()
-    val serverReplied = MutableLiveData<Boolean>()
     var trackId: Long = 0
 
     init {
@@ -31,31 +33,34 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         artistNameLiveData.value = ""
         coverImageLinkLiveData.value = ""
         durationLiveData.value = ""
-        previewLiveData.value = ""
+        audioPreviewLiveData.value = ""
         isLikedLiveData.value = false
         isAddedLiveData.value = false
-        serverReplied.value = false
     }
 
     fun getTrackInfoFromServer(currentId: Long, context: Context) {
         trackId = currentId
-        trackInfoUseCase.getTrackInfo(currentId, context)
-        countDuration()
+
+        trackInfoUseCase.getTrackInfo(currentId, context) {
+            countDuration()     // Благодаря юзкейсу выполняется в main-потоке
+        }
     }
 
     private fun countDuration() {
+        durationLiveData.value = "0"
+
         if (durationLiveData.value != null) {
             if (durationLiveData.value!!.isEmpty().not()) {
                 val dur = durationLiveData.value!!.toLong()
                 val durationInMinutes = (dur / 1000 / 60).toString()
                 var durationInSeconds = (dur / 1000 % 60).toString()
+
                 if (durationInSeconds.length < 2)
                     durationInSeconds = "0$durationInSeconds"   // вместо "1:7" -> "1:07"
+
                 durationLiveData.value = "$durationInMinutes:$durationInSeconds"
-            } else
-                durationLiveData.value = "0:00"
-        } else
-            durationLiveData.value = "0:00"
+            }
+        }
     }
 
     override fun updateLiveData(hashmap: HashMap<String, String>) {
@@ -69,16 +74,15 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
             trackNameLiveData.value = hashmap[TRACK_NAME]
             artistNameLiveData.value = hashmap[ARTIST_NAME]
             coverImageLinkLiveData.value = hashmap[COVER_IMAGE]
-            previewLiveData.value = hashmap[PREVIEW]
+            audioPreviewLiveData.value = hashmap[PREVIEW]
             durationLiveData.value = hashmap[DURATION]
         } else {
             trackNameLiveData.value = ""
             artistNameLiveData.value = ""
             coverImageLinkLiveData.value = ""
-            previewLiveData.value = ""
+            audioPreviewLiveData.value = ""
             durationLiveData.value = ""
         }
-        serverReplied.value = true
     }
 
     // Логика нажатие на кнопку с сердечком

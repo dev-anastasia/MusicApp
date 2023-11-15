@@ -13,7 +13,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.presenters.PlayerViewModel
 import com.example.musicapp.presentation.ui.media.viewpager.FavsFragment
@@ -23,8 +22,50 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     private lateinit var setCurrentTimeRunnable: Runnable
     private lateinit var setCurrentSeekBarPosition: Runnable
+
     private lateinit var uiHandler: Handler
     private val vm: PlayerViewModel by viewModels()
+
+    private val trackName: TextView
+        get() {
+            return requireView().findViewById(R.id.player_fragment_tv_song_name)
+        }
+    private val artistName: TextView
+        get() {
+            return requireView().findViewById(R.id.player_fragment_tv_artist_name)
+        }
+    private val duration: TextView
+        get() {
+            return requireView().findViewById(R.id.player_fragment_tv_duration)
+        }
+    private val currentTime: TextView
+        get() {
+            return requireView().findViewById(R.id.player_fragment_tv_current_time)
+        }
+    private val playIcon: ImageButton
+        get() {
+            return requireView().findViewById(R.id.player_fragment_iv_icon_play)
+        }
+    private val likeIcon: ImageButton
+        get() {
+            return requireView().findViewById(R.id.player_fragment_iv_icon_fav)
+        }
+    private val mediaIcon: ImageButton
+        get() {
+            return requireView().findViewById(R.id.player_fragment_iv_icon_media)
+        }
+    private val seekbar: SeekBar
+        get() {
+            return requireView().findViewById(R.id.player_fragment_seekbar)
+        }
+    private val goBackBtn: ImageButton
+        get() {
+            return requireView().findViewById(R.id.player_fragment_btn_go_back)
+        }
+    private val coverImage: ImageView
+        get() {
+            return requireView().findViewById(R.id.player_fragment_iv_cover)
+        }
 
     private val currentId: Long
         get() {
@@ -37,62 +78,45 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val trackName = view.findViewById<TextView>(R.id.player_fragment_tv_song_name)
-        val artistName = view.findViewById<TextView>(R.id.player_fragment_tv_artist_name)
-        val duration = view.findViewById<TextView>(R.id.player_fragment_tv_duration)
-        val currentTime = view.findViewById<TextView>(R.id.player_fragment_tv_current_time)
-        val playIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
-        val favIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_fav)
-        val mediaIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_media)
-        val seekbar = view.findViewById<SeekBar>(R.id.player_fragment_seekbar)
-        val goBackBtn = view.findViewById<ImageButton>(R.id.player_fragment_btn_go_back)
-        val coverImage = view.findViewById<ImageView>(R.id.player_fragment_iv_cover)
+//        val trackName = view.findViewById<TextView>(R.id.player_fragment_tv_song_name)
+//        val artistName = view.findViewById<TextView>(R.id.player_fragment_tv_artist_name)
+//        val duration = view.findViewById<TextView>(R.id.player_fragment_tv_duration)
+//        val currentTime = view.findViewById<TextView>(R.id.player_fragment_tv_current_time)
+//        val playIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
+//        val favIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_fav)
+//        val mediaIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_media)
+//        val seekbar = view.findViewById<SeekBar>(R.id.player_fragment_seekbar)
+//        val goBackBtn = view.findViewById<ImageButton>(R.id.player_fragment_btn_go_back)
+//        val coverImage = view.findViewById<ImageView>(R.id.player_fragment_iv_cover)
 
         var isLiked: Boolean? = null
         var isAdded: Boolean? = null
 
         uiHandler = Handler(Looper.getMainLooper())
-        Creator.setPlayerUseCaseVM(vm)
+        //Creator.setPlayerUseCaseVM(vm)
 
         // Для автопрокрутки текста:
         trackName.isSelected = true
         artistName.isSelected = true
 
-        // vm.uiState.observe()
-
         // Если успешно загрузили данные из сети:
-        if (vm.serverReplied.value == true) {
-            isLiked = vm.isLikedLiveData.value
-            isAdded = vm.isAddedLiveData.value
 
-            favIcon.isClickable = true
-            mediaIcon.isClickable = true
-            playIcon.isClickable = true
-
-            // Остальные вьюшки:
-            vm.coverImageLinkLiveData.observe(viewLifecycleOwner) { cover ->
-                Picasso.get()
-                    .load(Uri.parse(cover))
-                    .placeholder(R.drawable.note_placeholder)
-                    .into(coverImage)
-            }
-        } else {
-            Toast.makeText(
-                activity,
-                "Ошибка: не удалось связаться с сервером",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
 
         vm.apply {
-            trackNameLiveData.observe(viewLifecycleOwner) { name ->
-                trackName.text = name
+            trackNameLiveData.observe(viewLifecycleOwner) {
+                trackName.text = it
             }
-            artistNameLiveData.observe(viewLifecycleOwner) { name ->
-                artistName.text = name
+            artistNameLiveData.observe(viewLifecycleOwner) {
+                artistName.text = it
             }
-            durationLiveData.observe(viewLifecycleOwner) { dur ->
-                duration.text = dur
+            durationLiveData.observe(viewLifecycleOwner) {
+                duration.text = it
+            }
+            isLikedLiveData.observe(viewLifecycleOwner) {
+                isLiked = it
+            }
+            isAddedLiveData.observe(viewLifecycleOwner) {
+                isAdded = it
             }
         }
 
@@ -106,17 +130,17 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
         // Иконка "Избранное/Нравится"
         if (isLiked == true)
-            favIcon.setBackgroundResource(R.drawable.icon_fav_liked)
+            likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
         else
-            favIcon.setBackgroundResource(R.drawable.icon_fav_empty)
+            likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
 
-        favIcon.setOnClickListener {
+        likeIcon.setOnClickListener {
             if (isLiked == true) {
                 vm.updateIsLikedLD(requireActivity().applicationContext, false)
-                favIcon.setBackgroundResource(R.drawable.icon_fav_empty)
+                likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
             } else {
                 vm.updateIsLikedLD(requireActivity().applicationContext, true)
-                favIcon.setBackgroundResource(R.drawable.icon_fav_liked)
+                likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
             }
         }
 
@@ -222,14 +246,58 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         super.onResume()
 
         // Запрос в сеть
-        vm.getTrackInfoFromServer(currentId, requireActivity().applicationContext)
+        Thread {
+            vm.getTrackInfoFromServer(currentId, requireActivity().applicationContext)
+        }.start()
 
-        if (vm.previewLiveData.value!!.isEmpty().not()) {
-            mediaPlayer.apply {
-                setDataSource(vm.previewLiveData.value)
-                prepareAsync()
+        vm.uiState.observe(viewLifecycleOwner) {
+            when (vm.uiState.value) {
+                (UIState.Success) -> {
+
+                }
+
+                (UIState.Loading) -> {
+
+                }
+
+                (UIState.Error) -> {
+                    Toast.makeText(
+                        activity,
+                        "Ошибка: не удалось связаться с сервером",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                else -> throw IllegalStateException("Illegal UI State")
             }
         }
+
+
+    }
+
+    private fun setPlayer() {
+        mediaPlayer.apply {
+            setDataSource(vm.audioPreviewLiveData.value)
+            prepareAsync()
+        }
+    }
+
+    private fun setUI() {
+        likeIcon.isClickable = true
+        mediaIcon.isClickable = true
+        playIcon.isClickable = true
+
+        // Остальные вьюшки:
+        vm.coverImageLinkLiveData.observe(viewLifecycleOwner) { cover ->
+            Picasso.get()
+                .load(Uri.parse(cover))
+                .placeholder(R.drawable.note_placeholder)
+                .into(coverImage)
+        }
+    }
+
+    private fun setIcons() {
+
     }
 
 //    private fun render(uiState: UIState) {
@@ -237,7 +305,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 //    }
 
     override fun onDestroy() {
-        onBackPressed()
+        onBackPressed()     // ниже
         super.onDestroy()
     }
 
