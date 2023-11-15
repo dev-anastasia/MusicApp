@@ -15,7 +15,7 @@ class SearchRepoImpl : SearchRepo {
     ): List<MusicPiece> {
 
         lateinit var response: Response<Music>
-        lateinit var body: Music
+        var responseBody: Music? = null
 
         val thread = Thread {
             val searchObject: Call<Music> = RetrofitUtils.musicService.getSearchResult(
@@ -23,16 +23,19 @@ class SearchRepoImpl : SearchRepo {
                 entity
             )
             response = searchObject.execute()
-            body = response.body()!!
+            responseBody = response.body()
         }
         thread.apply {
             start()
             join()
         }
 
-        return if (body.resultCount != 0)
-            body.results
-        else
+        return if (responseBody != null) {
+            if (responseBody!!.resultCount != 0)
+                responseBody!!.results
+            else
+                emptyList()
+        } else
             emptyList()
     }
 }

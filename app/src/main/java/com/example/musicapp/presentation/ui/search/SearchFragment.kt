@@ -18,7 +18,7 @@ import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.player.PlayerFragment
-import com.example.musicapp.presentation.ui.search.adapter.TracksAdapter
+import com.example.musicapp.presentation.ui.search.searchAdapter.TracksAdapter
 
 class SearchFragment : Fragment(R.layout.fragment_search),
     OnTrackClickListener {
@@ -75,7 +75,10 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         fun hideKeyboard() {    // При работе с сервером убирает клавиатуру
             val v: View? = activity?.currentFocus
             val inputMethodManager = activity?.getSystemService(InputMethodManager::class.java)
-            inputMethodManager?.hideSoftInputFromWindow(v?.windowToken, InputMethodManager.HIDE_IMPLICIT_ONLY)
+            inputMethodManager?.hideSoftInputFromWindow(
+                v?.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
         }
 
         // запрос SearchView
@@ -91,9 +94,9 @@ class SearchFragment : Fragment(R.layout.fragment_search),
                 vm.onGetTrackListClicked(currentQueryText!!, ENTITY)
 
                 loadingImage.visibility = View.GONE
-                if (currentQueryText?.isEmpty()!!.not()) {
+                if (currentQueryText?.isEmpty()!!.not())
                     hideKeyboard()
-                }
+
             }
         }
 

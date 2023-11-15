@@ -12,8 +12,6 @@ import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.TracksViewModel
 import com.example.musicapp.presentation.ui.media.tracksAdapter.TrackEntityAdapter
 import com.example.musicapp.presentation.ui.player.PlayerFragment
-import com.example.musicapp.presentation.ui.search.SearchFragment
-import com.example.musicapp.presentation.ui.search.adapter.TracksAdapter
 
 class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
@@ -34,7 +32,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         favsAdapter = TrackEntityAdapter(this)
         recyclerView.adapter = favsAdapter
 
-        vm.getFavTracksList(requireContext())
+        vm.getTracksIdsList(requireActivity().applicationContext, 0)
 
         vm.allTracks.observe(viewLifecycleOwner) { list ->
             favsAdapter.updateList(list)

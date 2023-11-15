@@ -1,8 +1,8 @@
 package com.example.musicapp.data.repos
 
 import android.content.Context
-import com.example.musicapp.data.database.PlaylistEntity
-import com.example.musicapp.data.database.PlaylistDatabase
+import com.example.musicapp.domain.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistDatabase
 import com.example.musicapp.presentation.PlaylistsRepo
 
 class PlaylistsRepoImpl : PlaylistsRepo {

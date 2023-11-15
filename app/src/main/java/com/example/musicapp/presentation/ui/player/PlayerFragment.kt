@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
@@ -25,6 +26,14 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private lateinit var uiHandler: Handler
     private val vm: PlayerViewModel by viewModels()
 
+    private val currentId: Long
+        get() {
+            if (_currentId == null)
+                _currentId = this.requireArguments().getLong(FavsFragment.TRACK_ID)
+            return _currentId!!
+        }
+    private var _currentId: Long? = null    // packing property
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -32,11 +41,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         val artistName = view.findViewById<TextView>(R.id.player_fragment_tv_artist_name)
         val duration = view.findViewById<TextView>(R.id.player_fragment_tv_duration)
         val currentTime = view.findViewById<TextView>(R.id.player_fragment_tv_current_time)
-        val playIcon = view.findViewById<ImageView>(R.id.player_fragment_iv_icon_play)
-        val favIcon = view.findViewById<ImageView>(R.id.player_fragment_iv_icon_fav)
-        val mediaIcon = view.findViewById<ImageView>(R.id.player_fragment_iv_icon_media)
+        val playIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
+        val favIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_fav)
+        val mediaIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_media)
         val seekbar = view.findViewById<SeekBar>(R.id.player_fragment_seekbar)
-        val goBackBtn = view.findViewById<ImageView>(R.id.player_fragment_btn_go_back)
+        val goBackBtn = view.findViewById<ImageButton>(R.id.player_fragment_btn_go_back)
         val coverImage = view.findViewById<ImageView>(R.id.player_fragment_iv_cover)
 
         var isLiked: Boolean? = null
@@ -49,20 +58,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         trackName.isSelected = true
         artistName.isSelected = true
 
-        // Получение и сохранение данных из сети + заполнение вьюшек:
-        val currentId: Long = this.requireArguments().getLong(FavsFragment.TRACK_ID)
-
-        // К сети обращаемся 1 раз - при первом создании фрагмента:
-        if (savedInstanceState == null) {
-            vm.apply {
-                getTrackInfoFromServer(currentId, requireContext())
-            }
-
-            mediaPlayer.apply {
-                setDataSource(vm.previewLiveData.value)
-                prepareAsync()
-            }
-        }
+        // vm.uiState.observe()
 
         // Если успешно загрузили данные из сети:
         if (vm.serverReplied.value == true) {
@@ -116,10 +112,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
         favIcon.setOnClickListener {
             if (isLiked == true) {
-                vm.updateIsLikedLD(requireContext(), false)
+                vm.updateIsLikedLD(requireActivity().applicationContext, false)
                 favIcon.setBackgroundResource(R.drawable.icon_fav_empty)
             } else {
-                vm.updateIsLikedLD(requireContext(), true)
+                vm.updateIsLikedLD(requireActivity().applicationContext, true)
                 favIcon.setBackgroundResource(R.drawable.icon_fav_liked)
             }
         }
@@ -210,6 +206,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                         }
                     }
                 }
+
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             }
@@ -220,6 +217,24 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             onBackPressed()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Запрос в сеть
+        vm.getTrackInfoFromServer(currentId, requireActivity().applicationContext)
+
+        if (vm.previewLiveData.value!!.isEmpty().not()) {
+            mediaPlayer.apply {
+                setDataSource(vm.previewLiveData.value)
+                prepareAsync()
+            }
+        }
+    }
+
+//    private fun render(uiState: UIState) {
+//        // перенести сюда обновление ui: иконки, текст...
+//    }
 
     override fun onDestroy() {
         onBackPressed()

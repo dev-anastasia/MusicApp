@@ -1,4 +1,4 @@
-package com.example.musicapp.data.database
+package com.example.musicapp.domain.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -10,5 +10,5 @@ data class TrackEntity(
     @ColumnInfo val artistName: String,
     @ColumnInfo val trackName: String,
     @ColumnInfo val artworkUrl60: String,
-    @ColumnInfo val timeMillis: Long
+    @ColumnInfo val systemTimeMillis: Long      // Время добавления трека в БД
 )

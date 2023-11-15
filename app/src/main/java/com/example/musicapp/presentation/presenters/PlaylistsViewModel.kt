@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
-import com.example.musicapp.domain.PlaylistsResultListener
-import com.example.musicapp.data.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistEntity
 
 class PlaylistsViewModel : ViewModel() {
 

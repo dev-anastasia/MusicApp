@@ -4,30 +4,31 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
-import com.example.musicapp.data.database.FavTrackEntity
+import com.example.musicapp.domain.database.TrackEntity
 
 class TracksViewModel : ViewModel() {
 
-    val allTracks = MutableLiveData<List<FavTrackEntity>>()
+    val allTracks = MutableLiveData<List<TrackEntity>>()
     private val useCase = Creator.favTracksRepoUseCase
 
     init {
         allTracks.value = emptyList()
     }
 
-    fun getFavTracksList(context: Context) {
-        var list = emptyList<FavTrackEntity>()
-        val thread = Thread {
-            list = useCase.getAllFavTracks(context)
-        }
-        thread.apply {
-            start()
-            join()
-        }
-        updateList(list)
+    fun getTracksIdsList(context: Context, playlistId: Int) {
+        Thread {
+            useCase.getTracksIds(context, playlistId) { idsList -> // Здесь - список id треков
+                if (idsList.isEmpty())
+                    println("Empty list")
+                else
+                    useCase.getTracksList(context, idsList) { tracksList -> // Здесь - список треков
+                        updateList(tracksList)
+                    }
+            }
+        }.start()
     }
 
-    private fun updateList(list: List<FavTrackEntity>) {
+    private fun updateList(list: List<TrackEntity>) {
         this.allTracks.value = list
     }
 }

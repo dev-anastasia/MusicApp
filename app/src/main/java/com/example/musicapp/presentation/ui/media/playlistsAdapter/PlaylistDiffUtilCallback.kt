@@ -2,7 +2,7 @@ package com.example.musicapp.presentation.ui.media.playlistsAdapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.data.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistEntity
 
 class PlaylistDiffUtilCallback(
     private val oldList: MutableList<PlaylistEntity>,
@@ -31,8 +31,8 @@ class PlaylistDiffUtilCallback(
             bundle.putString(COVER, newList[newItemPosition].cover)
         if (oldList[oldItemPosition].songCount != newList[newItemPosition].songCount)
             bundle.putInt(COUNT, newList[newItemPosition].songCount)
-        if (oldList[oldItemPosition].timeMillis != newList[newItemPosition].timeMillis)
-            bundle.putLong(TIME, newList[newItemPosition].timeMillis)
+        if (oldList[oldItemPosition].systemTimeMillis != newList[newItemPosition].systemTimeMillis)
+            bundle.putLong(TIME, newList[newItemPosition].systemTimeMillis)
 
         return bundle
     }

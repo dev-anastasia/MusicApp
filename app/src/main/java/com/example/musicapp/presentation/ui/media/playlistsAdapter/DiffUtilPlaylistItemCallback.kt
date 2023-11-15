@@ -1,7 +1,7 @@
 package com.example.musicapp.presentation.ui.media.playlistsAdapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.data.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistEntity
 
 class DiffUtilPlaylistItemCallback : DiffUtil.ItemCallback<PlaylistEntity>() {
     override fun areItemsTheSame(oldItem: PlaylistEntity, newItem: PlaylistEntity): Boolean {

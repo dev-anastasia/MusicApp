@@ -36,7 +36,7 @@ class PlaylistsFragment() :
 
         vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
 
-        vm.getList(requireContext())
+        vm.getList(requireActivity().applicationContext)
 
         vm.allPlaylists.observe(viewLifecycleOwner) { list ->
             mediaAdapter.updateList(list)
@@ -67,7 +67,7 @@ class PlaylistsFragment() :
     }
 
     override fun deletePlaylistClicked(id: Int) {
-        vm.deletePlaylist(requireContext(), id)
+        vm.deletePlaylist(requireActivity().applicationContext, id)
     }
 
     private companion object {

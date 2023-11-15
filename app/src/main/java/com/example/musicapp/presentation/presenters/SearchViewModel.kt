@@ -6,8 +6,6 @@ import com.example.musicapp.Creator
 import com.example.musicapp.domain.SearchResultsListener
 import com.example.musicapp.domain.entities.MusicPiece
 
-// Посчитала, что двум активити нужны разные ViewModel'и во имя соблюдения Single Responsibiity,
-// а у разных фрагментов была бы одна ViewModel
 class SearchViewModel : ViewModel(), SearchResultsListener {
 
     private val searchUseCase = Creator.searchUseCase
@@ -18,7 +16,7 @@ class SearchViewModel : ViewModel(), SearchResultsListener {
         newList.value = emptyList()
     }
 
-    override fun showMessage() {
+    override fun showEmptyResultsMessage() {
         println("")
     }
 

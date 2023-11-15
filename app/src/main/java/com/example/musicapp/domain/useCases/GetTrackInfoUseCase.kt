@@ -1,26 +1,33 @@
 package com.example.musicapp.domain.useCases
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import com.example.musicapp.domain.TrackInfoListener
 import com.example.musicapp.domain.TrackInfoRepo
-import com.example.musicapp.data.database.FavTrackEntity
+import com.example.musicapp.domain.database.PlaylistTrackCrossRef
 
 class GetTrackInfoUseCase(
     private val repo: TrackInfoRepo,
     private var vm: TrackInfoListener? = null
 ) {
 
+    private val mainHandler = Handler(Looper.getMainLooper())
+
     fun getTrackInfo(currentId: Long, context: Context) {
-        val hashmap = repo.getTrackInfo(currentId, context)
-        vm?.updateLD(hashmap)
+        repo.getTrackInfo(currentId, context) {
+            mainHandler.post {
+                vm?.updateLiveData(it)
+            }
+        }
     }
 
-    fun addTrackToFavourites(context: Context, track: FavTrackEntity) {
-        repo.addTrackToFavourites(context, track)
+    fun addTrackToPlaylist(context: Context, crossRef: PlaylistTrackCrossRef) {
+        repo.addTrackToPlaylist(context, crossRef)
     }
 
-    fun deleteTrackFromFavourites(context: Context, id: Long) {
-        repo.deleteTrackFromFavourites(context, id)
+    fun deleteTrackFromFavourites(context: Context, trackId: Long, playlistId: Int) {
+        repo.deleteTrackFromFavourites(context, trackId, playlistId)
     }
 
     fun setVM(vm: TrackInfoListener) {

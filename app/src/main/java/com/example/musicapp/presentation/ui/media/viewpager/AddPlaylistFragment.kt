@@ -12,7 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.musicapp.R
-import com.example.musicapp.data.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistEntity
 import com.example.musicapp.presentation.presenters.PlaylistsViewModel
 
 class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
@@ -72,8 +72,7 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
             0,
             System.currentTimeMillis()
         )
-        vm.addPlaylist(requireContext(), newPlaylist)
-        Toast.makeText(requireContext(), "Inserted!", Toast.LENGTH_SHORT).show()
+        vm.addPlaylist(requireActivity().applicationContext, newPlaylist)
         requireActivity().supportFragmentManager.popBackStack()
     }
 }

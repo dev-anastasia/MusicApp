@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.TracksViewModel
-import com.example.musicapp.presentation.ui.search.adapter.TracksAdapter
+import com.example.musicapp.presentation.ui.search.searchAdapter.TracksAdapter
 
 class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     OnTrackClickListener {

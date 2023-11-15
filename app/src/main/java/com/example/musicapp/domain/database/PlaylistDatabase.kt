@@ -1,4 +1,4 @@
-package com.example.musicapp.data.database
+package com.example.musicapp.domain.database
 
 import android.content.Context
 import androidx.room.Database
@@ -9,9 +9,8 @@ import androidx.room.RoomDatabase
     entities = [
         PlaylistEntity::class,
         TrackEntity::class,
-        FavTrackEntity::class
-        //PlaylistTrackCrossRef::class
-               ], version = 1
+        PlaylistTrackCrossRef::class
+    ], version = 1
 )
 abstract class PlaylistDatabase : RoomDatabase() {
 
@@ -22,17 +21,15 @@ abstract class PlaylistDatabase : RoomDatabase() {
         private var DB_INSTANCE: PlaylistDatabase? = null
 
         fun getDatabase(context: Context): PlaylistDatabase {
-            return if (DB_INSTANCE != null)
-                DB_INSTANCE!!
-            else {
+            if (DB_INSTANCE == null) {
                 val db = Room.databaseBuilder(
                     context,
                     PlaylistDatabase::class.java,
                     "database-playlists-and-favs"
                 ).build()
                 DB_INSTANCE = db
-                DB_INSTANCE!!
             }
+            return DB_INSTANCE!!
         }
     }
 }

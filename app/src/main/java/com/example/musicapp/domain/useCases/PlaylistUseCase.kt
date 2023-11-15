@@ -1,7 +1,7 @@
 package com.example.musicapp.domain.useCases
 
 import android.content.Context
-import com.example.musicapp.data.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistEntity
 import com.example.musicapp.presentation.PlaylistsRepo
 
 class PlaylistUseCase(private var repo: PlaylistsRepo) {

@@ -1,4 +1,4 @@
-package com.example.musicapp.data.database
+package com.example.musicapp.domain.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -10,5 +10,5 @@ data class PlaylistEntity(
     @ColumnInfo val cover: String?,
     @ColumnInfo val name: String,
     @ColumnInfo val songCount: Int,
-    @ColumnInfo val timeMillis: Long
+    @ColumnInfo val systemTimeMillis: Long    // Время создания плейлиста
 )

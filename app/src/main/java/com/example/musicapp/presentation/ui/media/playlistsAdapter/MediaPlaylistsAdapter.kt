@@ -9,7 +9,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.data.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistEntity
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.squareup.picasso.Picasso
 

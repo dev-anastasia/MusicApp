@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.search.adapter
+package com.example.musicapp.presentation.ui.search.searchAdapter
 
 import android.os.Bundle
 import android.view.LayoutInflater

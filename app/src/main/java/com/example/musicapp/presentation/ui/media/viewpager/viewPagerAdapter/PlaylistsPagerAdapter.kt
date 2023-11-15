@@ -1,8 +1,9 @@
-package com.example.musicapp.presentation.ui.media.viewpager
+package com.example.musicapp.presentation.ui.media.viewpager.viewPagerAdapter
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.musicapp.presentation.ui.media.SinglePlaylistFragment
+import com.example.musicapp.presentation.ui.media.viewpager.FavsFragment
+import com.example.musicapp.presentation.ui.media.viewpager.PlaylistsFragment
 
 class PlaylistsPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 

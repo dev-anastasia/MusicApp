@@ -8,5 +8,5 @@ interface SearchResultsListener {
 
     fun update(newList: List<MusicPiece>)
 
-    fun showMessage()
+    fun showEmptyResultsMessage()
 }

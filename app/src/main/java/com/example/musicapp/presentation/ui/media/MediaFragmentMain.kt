@@ -5,9 +5,8 @@ import android.view.View
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
-import com.example.musicapp.Creator
 import com.example.musicapp.R
-import com.example.musicapp.presentation.ui.media.viewpager.PlaylistsPagerAdapter
+import com.example.musicapp.presentation.ui.media.viewpager.viewPagerAdapter.PlaylistsPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 

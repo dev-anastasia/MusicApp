@@ -1,15 +1,15 @@
 package com.example.musicapp
 
-import com.example.musicapp.data.repos.FavTracksRepoImpl
+import com.example.musicapp.data.repos.GetTracksIdsRepoImpl
 import com.example.musicapp.data.repos.PlaylistsRepoImpl
 import com.example.musicapp.data.repos.SearchRepoImpl
 import com.example.musicapp.data.repos.TrackInfoRepoImpl
-import com.example.musicapp.domain.FavTracksRepo
+import com.example.musicapp.domain.GetTracksIdsRepo
 import com.example.musicapp.domain.SearchRepo
 import com.example.musicapp.domain.TrackInfoRepo
-import com.example.musicapp.domain.useCases.GetFavTracksListUseCase
+import com.example.musicapp.domain.useCases.GetTracksIdsListUseCase
 import com.example.musicapp.domain.useCases.GetTrackInfoUseCase
-import com.example.musicapp.domain.useCases.GetTrackListUseCase
+import com.example.musicapp.domain.useCases.GetSearchTracksListUseCase
 import com.example.musicapp.domain.useCases.PlaylistUseCase
 import com.example.musicapp.presentation.PlaylistsRepo
 import com.example.musicapp.presentation.presenters.PlayerViewModel
@@ -27,7 +27,7 @@ object Creator {
     const val LIKED_STATUS = "liked status"
 
     private val searchRepo: SearchRepo = SearchRepoImpl() // Приводим к типу интерфейса
-    val searchUseCase = GetTrackListUseCase(searchRepo)
+    val searchUseCase = GetSearchTracksListUseCase(searchRepo)
 
     private val trackInfoRepo: TrackInfoRepo = TrackInfoRepoImpl()
     val trackInfoUseCase = GetTrackInfoUseCase(trackInfoRepo)
@@ -35,8 +35,8 @@ object Creator {
     private val playlistsRepo: PlaylistsRepo = PlaylistsRepoImpl()
     val playlistsUseCase = PlaylistUseCase(playlistsRepo)
 
-    private val favTracksRepo: FavTracksRepo = FavTracksRepoImpl()
-    val favTracksRepoUseCase = GetFavTracksListUseCase(favTracksRepo)
+    private val getTracksIdsRepo: GetTracksIdsRepo = GetTracksIdsRepoImpl()
+    val favTracksRepoUseCase = GetTracksIdsListUseCase(getTracksIdsRepo)
 
     fun setSearchUseCaseVM(vm: SearchViewModel) {
         searchUseCase.setVM(vm)

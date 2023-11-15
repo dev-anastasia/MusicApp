@@ -10,7 +10,7 @@ import com.example.musicapp.Creator.DURATION
 import com.example.musicapp.Creator.PREVIEW
 import com.example.musicapp.Creator.TRACK_NAME
 import com.example.musicapp.domain.TrackInfoListener
-import com.example.musicapp.data.database.FavTrackEntity
+import com.example.musicapp.domain.database.PlaylistTrackCrossRef
 
 class PlayerViewModel : ViewModel(), TrackInfoListener {
 
@@ -27,6 +27,11 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     var trackId: Long = 0
 
     init {
+        trackNameLiveData.value = ""
+        artistNameLiveData.value = ""
+        coverImageLinkLiveData.value = ""
+        durationLiveData.value = ""
+        previewLiveData.value = ""
         isLikedLiveData.value = false
         isAddedLiveData.value = false
         serverReplied.value = false
@@ -40,25 +45,39 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     private fun countDuration() {
         if (durationLiveData.value != null) {
-            val dur = durationLiveData.value!!.toLong()
-            val durationInMinutes = (dur / 1000 / 60).toString()
-            var durationInSeconds = (dur / 1000 % 60).toString()
-            if (durationInSeconds.length < 2)
-                durationInSeconds = "0$durationInSeconds"   // вместо "1:7" -> "1:07"
-            durationLiveData.value = "$durationInMinutes:$durationInSeconds"
+            if (durationLiveData.value!!.isEmpty().not()) {
+                val dur = durationLiveData.value!!.toLong()
+                val durationInMinutes = (dur / 1000 / 60).toString()
+                var durationInSeconds = (dur / 1000 % 60).toString()
+                if (durationInSeconds.length < 2)
+                    durationInSeconds = "0$durationInSeconds"   // вместо "1:7" -> "1:07"
+                durationLiveData.value = "$durationInMinutes:$durationInSeconds"
+            } else
+                durationLiveData.value = "0:00"
         } else
             durationLiveData.value = "0:00"
     }
 
-    override fun updateLD(hashmap: HashMap<String, String>) {
+    override fun updateLiveData(hashmap: HashMap<String, String>) {
         // Обновить данные лайвдаты из мапы после ответа из сети
 
-        trackNameLiveData.value = hashmap[TRACK_NAME]
-        artistNameLiveData.value = hashmap[ARTIST_NAME]
-        coverImageLinkLiveData.value = hashmap[COVER_IMAGE]
-        previewLiveData.value = hashmap[PREVIEW]
-        durationLiveData.value = hashmap[DURATION]
-
+        // Перенести эти состояния(hashmap) в UIState,
+        // здесь будет только лайвдата с uiState
+        // liveData.value = UIState
+        //
+        if (hashmap.isEmpty().not()) {
+            trackNameLiveData.value = hashmap[TRACK_NAME]
+            artistNameLiveData.value = hashmap[ARTIST_NAME]
+            coverImageLinkLiveData.value = hashmap[COVER_IMAGE]
+            previewLiveData.value = hashmap[PREVIEW]
+            durationLiveData.value = hashmap[DURATION]
+        } else {
+            trackNameLiveData.value = ""
+            artistNameLiveData.value = ""
+            coverImageLinkLiveData.value = ""
+            previewLiveData.value = ""
+            durationLiveData.value = ""
+        }
         serverReplied.value = true
     }
 
@@ -66,29 +85,20 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     fun updateIsLikedLD(context: Context, status: Boolean) {
         if (status) {
             // добавить в избранное
-            val newFavTrack = FavTrackEntity(
-                trackId,
-                artistNameLiveData.value!!,
-                trackNameLiveData.value!!,
-                coverImageLinkLiveData.value!!,
-                System.currentTimeMillis()
+            val crossRef = PlaylistTrackCrossRef(
+                0,
+                trackId
             )
             val thread = Thread {
-                trackInfoUseCase.addTrackToFavourites(context, newFavTrack)
+                trackInfoUseCase.addTrackToPlaylist(context, crossRef)
             }
-            thread.apply {
-                start()
-                join()
-            }
+            thread.start()
         } else {
             // удалить из списка избранного
             val thread = Thread {
-                trackInfoUseCase.deleteTrackFromFavourites(context, trackId)
+                trackInfoUseCase.deleteTrackFromFavourites(context, trackId, 0)
             }
-            thread.apply {
-                start()
-                join()
-            }
+            thread.start()
         }
 
         isLikedLiveData.value = status

@@ -1,13 +1,14 @@
 package com.example.musicapp.domain
 
 import android.content.Context
-import com.example.musicapp.data.database.FavTrackEntity
+import com.example.musicapp.domain.database.PlaylistTrackCrossRef
+import com.example.musicapp.domain.database.TrackEntity
 
 interface TrackInfoRepo {
 
-    fun getTrackInfo(currentId: Long, context: Context) : HashMap<String, String>
+    fun getTrackInfo(currentId: Long, context: Context, callback: (HashMap<String, String>) -> Unit)
 
-    fun addTrackToFavourites(context: Context, track: FavTrackEntity)
+    fun addTrackToPlaylist(context: Context, crossRef: PlaylistTrackCrossRef)
 
-    fun deleteTrackFromFavourites(context: Context, id: Long)
+    fun deleteTrackFromFavourites(context: Context, trackId: Long, playlistId: Int)
 }
