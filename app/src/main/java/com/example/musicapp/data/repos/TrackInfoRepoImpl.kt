@@ -23,7 +23,7 @@ class TrackInfoRepoImpl : TrackInfoRepo {
 
         val mapOfSpecs = HashMap<String, String>()
 
-        val thread = Thread {
+        Thread {
             val searchObject: Call<Tracks> = RetrofitUtils.musicService.getTrackInfoById(currentId)
             val responseBody = searchObject.execute().body()
 
@@ -38,8 +38,7 @@ class TrackInfoRepoImpl : TrackInfoRepo {
                 }
             }   // В остальных случаях вернётся пустая мапа
             callback(mapOfSpecs)
-        }
-        thread.start()
+        }.start()
     }
 
     override fun addTrackToPlaylist(context: Context, crossRef: PlaylistTrackCrossRef) {

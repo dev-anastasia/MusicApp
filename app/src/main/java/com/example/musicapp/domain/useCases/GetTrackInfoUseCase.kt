@@ -16,9 +16,7 @@ class GetTrackInfoUseCase(private val repo: TrackInfoRepo) {
         callback: (HashMap<String, String>) -> Unit
     ) {
         repo.getTrackInfo(currentId, context) {
-            mainHandler.post {
-                callback(it)
-            }
+            callback(it)
         }
     }
 

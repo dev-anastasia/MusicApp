@@ -42,7 +42,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         get() {
             return requireView().findViewById(R.id.player_fragment_tv_current_time)
         }
-    private val playIcon: ImageButton
+    private val playBtn: ImageButton
         get() {
             return requireView().findViewById(R.id.player_fragment_iv_icon_play)
         }
@@ -78,102 +78,71 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        val trackName = view.findViewById<TextView>(R.id.player_fragment_tv_song_name)
-//        val artistName = view.findViewById<TextView>(R.id.player_fragment_tv_artist_name)
-//        val duration = view.findViewById<TextView>(R.id.player_fragment_tv_duration)
-//        val currentTime = view.findViewById<TextView>(R.id.player_fragment_tv_current_time)
-//        val playIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
-//        val favIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_fav)
-//        val mediaIcon = view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_media)
-//        val seekbar = view.findViewById<SeekBar>(R.id.player_fragment_seekbar)
-//        val goBackBtn = view.findViewById<ImageButton>(R.id.player_fragment_btn_go_back)
-//        val coverImage = view.findViewById<ImageView>(R.id.player_fragment_iv_cover)
+//        // Подписываемся на ViewModel
+//        vm.apply {
+//            trackNameLiveData.observe(viewLifecycleOwner) {
+//                trackName.text = it
+//            }
+//            artistNameLiveData.observe(viewLifecycleOwner) {
+//                artistName.text = it
+//            }
+//            durationLiveData.observe(viewLifecycleOwner) {
+//                duration.text = it
+//            }
+//            isLikedLiveData.observe(viewLifecycleOwner) {
+//                if (it == true)
+//                    likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
+//                else
+//                    likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
+//            }
+//            isAddedLiveData.observe(viewLifecycleOwner) {
+//                if (it == true)
+//                    mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
+//                else
+//                    mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
+//            }
+//            uiState.observe(viewLifecycleOwner) {
+//                when (vm.uiState.value) {
+//                    (UIState.Success) -> {
+//                        updateUI()
+//                    }
+//
+//                    (UIState.Loading) -> {}
+//
+//                    (UIState.Error) -> {
+//                        Toast.makeText(
+//                            activity,
+//                            "Ошибка: не удалось связаться с сервером",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                    }
+//
+//                    else -> throw IllegalStateException("Illegal UI State")
+//                }
+//            }
+//        }
 
-        var isLiked: Boolean? = null
-        var isAdded: Boolean? = null
-
+        // Инициализируем lateinit vars
         uiHandler = Handler(Looper.getMainLooper())
-        //Creator.setPlayerUseCaseVM(vm)
-
-        // Для автопрокрутки текста:
-        trackName.isSelected = true
-        artistName.isSelected = true
-
-        // Если успешно загрузили данные из сети:
-
-
-        vm.apply {
-            trackNameLiveData.observe(viewLifecycleOwner) {
-                trackName.text = it
-            }
-            artistNameLiveData.observe(viewLifecycleOwner) {
-                artistName.text = it
-            }
-            durationLiveData.observe(viewLifecycleOwner) {
-                duration.text = it
-            }
-            isLikedLiveData.observe(viewLifecycleOwner) {
-                isLiked = it
-            }
-            isAddedLiveData.observe(viewLifecycleOwner) {
-                isAdded = it
-            }
-        }
-
-        // Кнопка play
-        playIcon.apply {
-            if (mediaPlayer.isPlaying)
-                setBackgroundResource(R.drawable.icon_pause)
-            else
-                setBackgroundResource(R.drawable.icon_play_active)
-        }
-
-        // Иконка "Избранное/Нравится"
-        if (isLiked == true)
-            likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
-        else
-            likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
-
-        likeIcon.setOnClickListener {
-            if (isLiked == true) {
-                vm.updateIsLikedLD(requireActivity().applicationContext, false)
-                likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
-            } else {
-                vm.updateIsLikedLD(requireActivity().applicationContext, true)
-                likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
-            }
-        }
-
-        // Иконка "Медиатека"
-        if (isAdded == true)
-            mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
-        else
-            mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
-
-        mediaIcon.setOnClickListener {
-            if (isAdded == true) {
-                vm.updateIsAddedLD(false)
-                mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
-            } else {
-                vm.updateIsAddedLD(true)
-                mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
-            }
-        }
 
         // Runnable для установки текущего времени:
         setCurrentTimeRunnable = Runnable {
-            val currentInMinutes: String =
-                (mediaPlayer.currentPosition / 1000 / 60).toString()
-            var currentInSeconds: String =
-                (mediaPlayer.currentPosition / 1000 % 60).toString()
-            if (currentInSeconds.length < 2)
-                currentInSeconds = "0$currentInSeconds"     // вместо "1:7" -> "1:07"
+            if (vm.durationLiveData.value == "0:00")
+                currentTime.text = vm.durationLiveData.value
+            else {
+                val currentTimeInMinutes: String =
+                    (mediaPlayer.currentPosition / 1000 / 60).toString()
+                var currentTimeInSeconds: String =
+                    (mediaPlayer.currentPosition / 1000 % 60).toString()
+                if (currentTimeInSeconds.length < 2)
+                    currentTimeInSeconds = "0$currentTimeInSeconds"     // вместо "1:7" -> "1:07"
 
-            currentTime.text = "$currentInMinutes:$currentInSeconds"
-            uiHandler.postDelayed(setCurrentTimeRunnable, CURRENT_TIME_CHECK_TIMER)
+                currentTime.text = "$currentTimeInMinutes:$currentTimeInSeconds"
+                uiHandler.postDelayed(setCurrentTimeRunnable, CURRENT_TIME_CHECK_TIMER)
+            }
         }
 
-        // Runnable для установки прогресса seekbar'a (запуск ниже):
+        // Runnable для установки прогресса seekbar'a:
         setCurrentSeekBarPosition = Runnable {     // Установка позиции seekbar'а
             seekbar.progress = mediaPlayer.currentPosition * 100 / mediaPlayer.duration
             uiHandler.postDelayed(setCurrentSeekBarPosition, CURRENT_SEEKBAR_CHECK_TIMER)
@@ -186,27 +155,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             removeCallbacks(setCurrentSeekBarPosition)
             post(setCurrentTimeRunnable)
             post(setCurrentSeekBarPosition)
-        }
-
-        fun play() {
-            mediaPlayer.start()
-            playIcon.setBackgroundResource(R.drawable.icon_pause)
-            // По завершении трека:
-            mediaPlayer.setOnCompletionListener {
-                playIcon.setBackgroundResource(R.drawable.icon_play_active)
-            }
-        }
-
-        fun pause() {
-            mediaPlayer.pause()
-            playIcon.setBackgroundResource(R.drawable.icon_play_active)
-        }
-
-        playIcon.setOnClickListener {
-            if (mediaPlayer.isPlaying)
-                pause()
-            else
-                play()
         }
 
         seekbar.setOnSeekBarChangeListener(
@@ -223,10 +171,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                             removeCallbacks(setCurrentSeekBarPosition)
                             post(setCurrentTimeRunnable)
                             post(setCurrentSeekBarPosition)
-                            // Переменные:
-                            // seekBar?.progress - прогресс seekbar'a от 0 до 100
-                            // progress - указанный пользователем прогресс от 0 до 100
-                            // mediaPlayer.duration - фактическая длительность всего трека в плеере
                         }
                     }
                 }
@@ -235,44 +179,77 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             }
         )
-
-        // Кнопки "назад" - в приложении и системная
-        goBackBtn.setOnClickListener {
-            onBackPressed()
-        }
     }
 
     override fun onResume() {
-        super.onResume()
 
         // Запрос в сеть
-        Thread {
-            vm.getTrackInfoFromServer(currentId, requireActivity().applicationContext)
-        }.start()
+        vm.getTrackInfoFromServer(currentId, requireActivity().applicationContext)
 
-        vm.uiState.observe(viewLifecycleOwner) {
-            when (vm.uiState.value) {
-                (UIState.Success) -> {
+        // Подписываемся на ViewModel
+        vm.apply {
+            trackNameLiveData.observe(viewLifecycleOwner) {
+                trackName.text = it
+            }
+            artistNameLiveData.observe(viewLifecycleOwner) {
+                artistName.text = it
+            }
+            durationLiveData.observe(viewLifecycleOwner) {
+                duration.text = it
+            }
+            isLikedLiveData.observe(viewLifecycleOwner) {
+                if (it == true)
+                    likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
+                else
+                    likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
+            }
+            isAddedLiveData.observe(viewLifecycleOwner) {
+                if (it == true)
+                    mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
+                else
+                    mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
+            }
+            uiState.observe(viewLifecycleOwner) {
+                when (vm.uiState.value) {
+                    (UIState.Success) -> {
+                        updateUI()
+                    }
 
+                    (UIState.Loading) -> {}
+
+                    (UIState.Error) -> {
+                        Toast.makeText(
+                            activity,
+                            "Ошибка: не удалось связаться с сервером",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    else -> throw IllegalStateException("Illegal UI State")
                 }
-
-                (UIState.Loading) -> {
-
-                }
-
-                (UIState.Error) -> {
-                    Toast.makeText(
-                        activity,
-                        "Ошибка: не удалось связаться с сервером",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                else -> throw IllegalStateException("Illegal UI State")
             }
         }
 
+        // Иконка "Вернуться назад"
+        goBackBtn.setOnClickListener {
+            onBackPressed()
+        }
 
+        super.onResume()
+    }
+
+    private fun play() {
+        mediaPlayer.start()
+        playBtn.setBackgroundResource(R.drawable.icon_pause)
+        // По завершении трека:
+        mediaPlayer.setOnCompletionListener {
+            playBtn.setBackgroundResource(R.drawable.icon_play_active)
+        }
+    }
+
+    private fun updateUI() {
+        setPlayer()
+        setUI()
     }
 
     private fun setPlayer() {
@@ -280,14 +257,61 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             setDataSource(vm.audioPreviewLiveData.value)
             prepareAsync()
         }
+
+        // Кнопка play
+        playBtn.apply {
+            isClickable = true
+
+            if (mediaPlayer.isPlaying)
+                setBackgroundResource(R.drawable.icon_pause)
+            else
+                setBackgroundResource(R.drawable.icon_play_active)
+
+            setOnClickListener {
+                if (mediaPlayer.isPlaying)
+                    pause()
+                else
+                    play()
+            }
+        }
+    }
+
+    private fun pause() {
+        mediaPlayer.pause()
+        playBtn.setBackgroundResource(R.drawable.icon_play_active)
     }
 
     private fun setUI() {
-        likeIcon.isClickable = true
-        mediaIcon.isClickable = true
-        playIcon.isClickable = true
+        likeIcon.apply {
+            isClickable = true
+            setOnClickListener {
+                if (vm.isLikedLiveData.value == true) {
+                    vm.updateIsLikedLD(requireActivity().applicationContext, false)
+                    likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
+                } else {
+                    vm.updateIsLikedLD(requireActivity().applicationContext, true)
+                    likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
+                }
+            }
+        }
 
-        // Остальные вьюшки:
+        mediaIcon.apply {
+            isClickable = true
+            setOnClickListener {
+                if (isAdded) {
+                    vm.updateIsAddedLD(false)
+                    mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
+                } else {
+                    vm.updateIsAddedLD(true)
+                    mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
+                }
+            }
+        }
+
+        // Для автопрокрутки текста:
+        trackName.isSelected = true
+        artistName.isSelected = true
+
         vm.coverImageLinkLiveData.observe(viewLifecycleOwner) { cover ->
             Picasso.get()
                 .load(Uri.parse(cover))
@@ -296,16 +320,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
-    private fun setIcons() {
-
-    }
-
-//    private fun render(uiState: UIState) {
-//        // перенести сюда обновление ui: иконки, текст...
-//    }
-
-    override fun onDestroy() {
-        onBackPressed()     // ниже
+    override fun onDestroy() {  // Проблема при перевороте экрана!!!
+        onBackPressed()
         super.onDestroy()
     }
 
@@ -319,7 +335,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             release()
         }
         mediaPlayer = MediaPlayer()
-        requireActivity().supportFragmentManager.popBackStack()
+        parentFragmentManager.popBackStack()
     }
 
     private companion object {

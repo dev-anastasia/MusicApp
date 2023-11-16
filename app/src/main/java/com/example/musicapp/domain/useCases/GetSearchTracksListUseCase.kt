@@ -11,9 +11,7 @@ class GetSearchTracksListUseCase(private val repo: SearchRepo) {
 
     fun getSearchResult(queryText: String, entity: String, callback: (List<MusicPiece>) -> Unit) {
         repo.getSearchResult(queryText, entity) {
-            mainHandler.post {
-                callback(it)
-            }
+            callback(it)
         }
     }
 

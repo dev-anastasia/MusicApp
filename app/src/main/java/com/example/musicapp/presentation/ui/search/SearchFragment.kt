@@ -13,31 +13,48 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.player.PlayerFragment
+import com.example.musicapp.presentation.ui.player.UIState
 import com.example.musicapp.presentation.ui.search.searchAdapter.TracksAdapter
 
 class SearchFragment : Fragment(R.layout.fragment_search),
     OnTrackClickListener {
 
+    private val vm: SearchViewModel by viewModels()
+
     private lateinit var searchQueryRunnable: Runnable
     private lateinit var tracksAdapter: TracksAdapter
-    private val vm: SearchViewModel by viewModels()
+    private lateinit var uiHandler: Handler
+    private var currentQueryText: String? = ""  // текущий текст запроса
+
+    private val errorText: TextView
+        get() {
+            return requireView().findViewById(R.id.search_fragment_tv_error)
+        }
+    private val loadingImage: ImageView
+        get() {
+            return requireView().findViewById(R.id.search_fragment_iv_loading)
+        }
+    private val errorLayout: FrameLayout
+        get() {
+            return requireView().findViewById(R.id.search_fragment_fl_error)
+        }
+    private val searchView: SearchView
+        get() {
+            return requireView().findViewById(R.id.search_fragment_search_view)
+        }
+    private val goBackBtn: ImageView
+        get() {
+            return requireView().findViewById(R.id.search_fragment_btn_go_back)
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val uiHandler = Handler(Looper.getMainLooper())
-        var currentQueryText: String? = ""  // текущий текст запроса
-
-        val errorText: TextView = view.findViewById(R.id.search_fragment_tv_error)
-        val loadingImage: ImageView = view.findViewById(R.id.search_fragment_iv_loading)
-        val errorLayout: FrameLayout = view.findViewById(R.id.search_fragment_fl_error)
-        val searchView: SearchView = view.findViewById(R.id.search_fragment_search_view)
-        val goBackBtn: ImageView = view.findViewById(R.id.search_fragment_btn_go_back)
+        uiHandler = Handler(Looper.getMainLooper())
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.search_fragment_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
@@ -49,36 +66,29 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         tracksAdapter = TracksAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        //Creator.setSearchUseCaseVM(vm)
         vm.newList.observe(viewLifecycleOwner) { list ->
             tracksAdapter.updateList(list)
         }
 
-        // Методы активити
-        fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
-            errorLayout.visibility = View.VISIBLE
-            loadingImage.visibility = View.GONE
-            errorText.text = "Ничего не найдено :("
-        }
 
-        fun showSomeSearchProblem() {   // Сообщение о любой ошибке
-            errorLayout.visibility = View.VISIBLE
-            loadingImage.visibility = View.GONE
-            errorText.text = "Непредвиденная ошибка"
-        }
+        vm.uiState.observe(viewLifecycleOwner) {
+            when (it) {
+                (UIState.Loading) -> {
+                    hideNoSuchResults()
+                    hideKeyboard()
+                    showLoadingIcon()
+                }
 
-        fun showLoading() {     // Иконка загрузки
-            loadingImage.visibility = View.VISIBLE
-            errorLayout.visibility = View.GONE
-        }
+                (UIState.Error) -> {
+                    showNoSuchResult()
+                }
 
-        fun hideKeyboard() {    // При работе с сервером убирает клавиатуру
-            val v: View? = activity?.currentFocus
-            val inputMethodManager = activity?.getSystemService(InputMethodManager::class.java)
-            inputMethodManager?.hideSoftInputFromWindow(
-                v?.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS
-            )
+                (UIState.Success) -> {
+                    hideLoadingIcon()
+                }
+
+                else -> throw IllegalStateException("Wrong uiState!")
+            }
         }
 
         // запрос SearchView
@@ -88,20 +98,47 @@ class SearchFragment : Fragment(R.layout.fragment_search),
 
             if (currentQueryText!!.isEmpty().not()) {
 
-                showLoading()   // У меня он показывается на долю секунды, даже не заметен
-
-                // Оповещаем посредника о клике
-                vm.onGetTrackListClicked(currentQueryText!!, ENTITY)
-
-                loadingImage.visibility = View.GONE
-                if (currentQueryText?.isEmpty()!!.not())
-                    hideKeyboard()
-
+                vm.onGetTracksListClicked(currentQueryText!!, ENTITY)
             }
         }
+    }
+
+    // Методы активити
+    private fun showLoadingIcon() {     // Иконка загрузки
+        if (tracksAdapter.getList().isEmpty().not())
+            tracksAdapter.updateList(emptyList())
+        loadingImage.visibility = View.VISIBLE
+        errorLayout.visibility = View.GONE
+    }
+
+    private fun hideLoadingIcon() {
+        loadingImage.visibility = View.GONE
+    }
+
+    private fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
+        if (tracksAdapter.getList().isEmpty().not())
+            tracksAdapter.updateList(emptyList())
+        errorLayout.visibility = View.VISIBLE
+        loadingImage.visibility = View.GONE
+        errorText.text = "Ничего не найдено :("
+    }
+
+    private fun hideNoSuchResults() {
+        errorLayout.visibility = View.GONE
+    }
+
+    private fun hideKeyboard() {    // При работе с сервером убирает клавиатуру
+        val v: View? = activity?.currentFocus
+        val inputMethodManager = activity?.getSystemService(InputMethodManager::class.java)
+        inputMethodManager?.hideSoftInputFromWindow(
+            v?.windowToken,
+            InputMethodManager.HIDE_NOT_ALWAYS
+        )
+    }
+
+    override fun onResume() {
 
         searchView.setOnQueryTextListener( // требует listener
-
             object : SearchView.OnQueryTextListener {     // тот самый требуемый listener
 
                 override fun onQueryTextSubmit(query: String?): Boolean {
@@ -124,6 +161,8 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         goBackBtn.setOnClickListener {
             onBackPressed()
         }
+
+        super.onResume()
     }
 
     override fun onItemClick(id: Long) {

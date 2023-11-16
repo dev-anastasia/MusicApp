@@ -1,6 +1,8 @@
 package com.example.musicapp.presentation.presenters
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
@@ -16,6 +18,7 @@ import com.example.musicapp.presentation.ui.player.UIState
 class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     private val trackInfoUseCase = Creator.trackInfoUseCase
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     val uiState = MutableLiveData<UIState<Int>>()
 
@@ -29,10 +32,11 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     var trackId: Long = 0
 
     init {
+        uiState.value = UIState.Loading
         trackNameLiveData.value = ""
         artistNameLiveData.value = ""
         coverImageLinkLiveData.value = ""
-        durationLiveData.value = ""
+        durationLiveData.value = "0:00"
         audioPreviewLiveData.value = ""
         isLikedLiveData.value = false
         isAddedLiveData.value = false
@@ -41,25 +45,25 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     fun getTrackInfoFromServer(currentId: Long, context: Context) {
         trackId = currentId
 
-        trackInfoUseCase.getTrackInfo(currentId, context) {
-            countDuration()     // Благодаря юзкейсу выполняется в main-потоке
+        Thread {
+            trackInfoUseCase.getTrackInfo(currentId, context) {
+                mainHandler.post {
+                    updateLiveData(it)
+                }
+            }
         }
     }
 
     private fun countDuration() {
-        durationLiveData.value = "0"
+        if (durationLiveData.value!! != "0:00") {
+            val dur = durationLiveData.value!!.toLong()
+            val durationInMinutes = (dur / 1000 / 60).toString()
+            var durationInSeconds = (dur / 1000 % 60).toString()
 
-        if (durationLiveData.value != null) {
-            if (durationLiveData.value!!.isEmpty().not()) {
-                val dur = durationLiveData.value!!.toLong()
-                val durationInMinutes = (dur / 1000 / 60).toString()
-                var durationInSeconds = (dur / 1000 % 60).toString()
+            if (durationInSeconds.length < 2)
+                durationInSeconds = "0$durationInSeconds"   // вместо "1:7" -> "1:07"
 
-                if (durationInSeconds.length < 2)
-                    durationInSeconds = "0$durationInSeconds"   // вместо "1:7" -> "1:07"
-
-                durationLiveData.value = "$durationInMinutes:$durationInSeconds"
-            }
+            durationLiveData.value = "$durationInMinutes:$durationInSeconds"
         }
     }
 
@@ -69,20 +73,24 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         // Перенести эти состояния(hashmap) в UIState,
         // здесь будет только лайвдата с uiState
         // liveData.value = UIState
-        //
+
         if (hashmap.isEmpty().not()) {
             trackNameLiveData.value = hashmap[TRACK_NAME]
             artistNameLiveData.value = hashmap[ARTIST_NAME]
             coverImageLinkLiveData.value = hashmap[COVER_IMAGE]
             audioPreviewLiveData.value = hashmap[PREVIEW]
             durationLiveData.value = hashmap[DURATION]
+
+            uiState.value = UIState.Success
         } else {
             trackNameLiveData.value = ""
             artistNameLiveData.value = ""
             coverImageLinkLiveData.value = ""
             audioPreviewLiveData.value = ""
-            durationLiveData.value = ""
+
+            uiState.value = UIState.Error
         }
+        countDuration()
     }
 
     // Логика нажатие на кнопку с сердечком
@@ -93,16 +101,14 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
                 0,
                 trackId
             )
-            val thread = Thread {
+            Thread {
                 trackInfoUseCase.addTrackToPlaylist(context, crossRef)
-            }
-            thread.start()
+            }.start()
         } else {
             // удалить из списка избранного
-            val thread = Thread {
+            Thread {
                 trackInfoUseCase.deleteTrackFromFavourites(context, trackId, 0)
-            }
-            thread.start()
+            }.start()
         }
 
         isLikedLiveData.value = status

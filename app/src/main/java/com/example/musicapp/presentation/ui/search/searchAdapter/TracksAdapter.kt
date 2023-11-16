@@ -16,6 +16,10 @@ class TracksAdapter(
 
     private val list: MutableList<MusicPiece> = mutableListOf()
 
+    fun getList(): MutableList<MusicPiece> {
+        return this.list
+    }
+
     fun updateList(newList: List<MusicPiece>) {
         val diffUtil = DiffUtil.calculateDiff(
             MusicPieceDiffUtilCallback(
