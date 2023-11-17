@@ -36,11 +36,11 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
 
         val id = this@SinglePlaylistFragment.arguments?.getInt(ID_KEY)
 
-        vm.allTracks.observe(viewLifecycleOwner) { list ->
+        vm.tracksList.observe(viewLifecycleOwner) { list ->
             // Обновить список адаптера
         }
 
-        if (vm.allTracks.value!!.isEmpty()) {
+        if (vm.tracksList.value!!.isEmpty()) {
             view.findViewById<LinearLayout>(R.id.ll_single_playlist_fragment_empty_playlist)
                 .visibility = View.VISIBLE
         }

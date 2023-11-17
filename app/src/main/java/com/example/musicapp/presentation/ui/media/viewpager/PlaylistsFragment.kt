@@ -13,7 +13,7 @@ import com.example.musicapp.presentation.ui.media.SinglePlaylistFragment
 import com.example.musicapp.presentation.ui.media.playlistsAdapter.MediaPlaylistsAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class PlaylistsFragment() :
+class PlaylistsFragment :
     Fragment(R.layout.fragment_playlists),
     OnPlaylistClickListener {
 

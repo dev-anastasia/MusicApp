@@ -1,16 +1,16 @@
 package com.example.musicapp.data.repos
 
 import android.content.Context
-import com.example.musicapp.Creator.ARTIST_NAME
-import com.example.musicapp.Creator.COVER_IMAGE
-import com.example.musicapp.Creator.DURATION
-import com.example.musicapp.Creator.PREVIEW
-import com.example.musicapp.Creator.TRACK_NAME
 import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.TrackInfoRepo
 import com.example.musicapp.domain.database.PlaylistDatabase
 import com.example.musicapp.domain.database.PlaylistTrackCrossRef
 import com.example.musicapp.domain.entities.Tracks
+import com.example.musicapp.presentation.presenters.PlayerViewModel.Companion.ARTIST_NAME
+import com.example.musicapp.presentation.presenters.PlayerViewModel.Companion.COVER_IMAGE
+import com.example.musicapp.presentation.presenters.PlayerViewModel.Companion.DURATION
+import com.example.musicapp.presentation.presenters.PlayerViewModel.Companion.PREVIEW
+import com.example.musicapp.presentation.presenters.PlayerViewModel.Companion.TRACK_NAME
 import retrofit2.Call
 
 class TrackInfoRepoImpl : TrackInfoRepo {
@@ -42,7 +42,7 @@ class TrackInfoRepoImpl : TrackInfoRepo {
     }
 
     override fun addTrackToPlaylist(context: Context, crossRef: PlaylistTrackCrossRef) {
-        PlaylistDatabase.getDatabase(context).playlistsDao().insertTrack(crossRef)
+        PlaylistDatabase.getDatabase(context).playlistsDao().addPlaylistTrackRef(crossRef)
     }
 
     override fun deleteTrackFromFavourites(context: Context, trackId: Long, playlistId: Int) {

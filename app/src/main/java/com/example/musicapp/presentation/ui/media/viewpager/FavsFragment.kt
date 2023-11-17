@@ -15,11 +15,14 @@ import com.example.musicapp.presentation.ui.player.PlayerFragment
 
 class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
-    private lateinit var favsAdapter: TrackEntityAdapter
+    private lateinit var tracksAdapter: TrackEntityAdapter
     private val vm: TracksViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val emptyPlaylistMessage =
+            view.findViewById<LinearLayout>(R.id.ll_favs_playlist_fragment_empty_playlist)
 
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.favs_fragment_recycler_view)
@@ -29,18 +32,20 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
             false
         )
         // Адаптер и ViewModel
-        favsAdapter = TrackEntityAdapter(this)
-        recyclerView.adapter = favsAdapter
+        tracksAdapter = TrackEntityAdapter(this)
+        recyclerView.adapter = tracksAdapter
 
-        vm.getTracksIdsList(requireActivity().applicationContext, 0)
+        vm.apply {
+            getTracksList(requireActivity().applicationContext, -1) // Получаем список треков
 
-        vm.allTracks.observe(viewLifecycleOwner) { list ->
-            favsAdapter.updateList(list)
-        }
+            tracksList.observe(viewLifecycleOwner) {
+                tracksAdapter.updateList(it)
 
-        if (vm.allTracks.value!!.isEmpty()) {     // Если плейлист избранных треков пустой
-            view.findViewById<LinearLayout>(R.id.ll_favs_playlist_fragment_empty_playlist)
-                .visibility = View.VISIBLE
+                if (it.isEmpty())  // Если плейлист избранных треков пустой
+                    emptyPlaylistMessage.visibility = View.VISIBLE
+                else
+                    emptyPlaylistMessage.visibility = View.GONE
+            }
         }
     }
 
@@ -58,6 +63,6 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
     }
 
     companion object {
-        const val TRACK_ID = "id key"
+        const val TRACK_ID = "track id key"
     }
 }

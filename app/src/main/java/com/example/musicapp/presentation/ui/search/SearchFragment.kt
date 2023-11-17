@@ -17,7 +17,6 @@ import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.player.PlayerFragment
-import com.example.musicapp.presentation.ui.player.UIState
 import com.example.musicapp.presentation.ui.search.searchAdapter.TracksAdapter
 
 class SearchFragment : Fragment(R.layout.fragment_search),
@@ -51,6 +50,8 @@ class SearchFragment : Fragment(R.layout.fragment_search),
             return requireView().findViewById(R.id.search_fragment_btn_go_back)
         }
 
+    // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -66,24 +67,24 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         tracksAdapter = TracksAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        vm.newList.observe(viewLifecycleOwner) { list ->
+        vm.searchResultsList.observe(viewLifecycleOwner) { list ->
             tracksAdapter.updateList(list)
         }
 
 
-        vm.uiState.observe(viewLifecycleOwner) {
+        vm.searchUiState.observe(viewLifecycleOwner) {
             when (it) {
-                (UIState.Loading) -> {
+                (SearchUIState.Loading) -> {
                     hideNoSuchResults()
                     hideKeyboard()
                     showLoadingIcon()
                 }
 
-                (UIState.Error) -> {
+                (SearchUIState.Error) -> {
                     showNoSuchResult()
                 }
 
-                (UIState.Success) -> {
+                (SearchUIState.Success) -> {
                     hideLoadingIcon()
                 }
 
@@ -97,43 +98,9 @@ class SearchFragment : Fragment(R.layout.fragment_search),
                 currentQueryText = ""
 
             if (currentQueryText!!.isEmpty().not()) {
-
                 vm.onGetTracksListClicked(currentQueryText!!, ENTITY)
             }
         }
-    }
-
-    // Методы активити
-    private fun showLoadingIcon() {     // Иконка загрузки
-        if (tracksAdapter.getList().isEmpty().not())
-            tracksAdapter.updateList(emptyList())
-        loadingImage.visibility = View.VISIBLE
-        errorLayout.visibility = View.GONE
-    }
-
-    private fun hideLoadingIcon() {
-        loadingImage.visibility = View.GONE
-    }
-
-    private fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
-        if (tracksAdapter.getList().isEmpty().not())
-            tracksAdapter.updateList(emptyList())
-        errorLayout.visibility = View.VISIBLE
-        loadingImage.visibility = View.GONE
-        errorText.text = "Ничего не найдено :("
-    }
-
-    private fun hideNoSuchResults() {
-        errorLayout.visibility = View.GONE
-    }
-
-    private fun hideKeyboard() {    // При работе с сервером убирает клавиатуру
-        val v: View? = activity?.currentFocus
-        val inputMethodManager = activity?.getSystemService(InputMethodManager::class.java)
-        inputMethodManager?.hideSoftInputFromWindow(
-            v?.windowToken,
-            InputMethodManager.HIDE_NOT_ALWAYS
-        )
     }
 
     override fun onResume() {
@@ -179,9 +146,44 @@ class SearchFragment : Fragment(R.layout.fragment_search),
             .commit()
     }
 
+    // МЕТОДЫ ДЛЯ ОБНОВЛЕНИЯ UI:
+
+    private fun showLoadingIcon() {     // Иконка загрузки
+        if (tracksAdapter.getList().isEmpty().not())
+            tracksAdapter.updateList(emptyList())
+        loadingImage.visibility = View.VISIBLE
+        errorLayout.visibility = View.GONE
+    }
+
+    private fun hideLoadingIcon() {
+        loadingImage.visibility = View.GONE
+    }
+
+    private fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
+        if (tracksAdapter.getList().isEmpty().not())
+            tracksAdapter.updateList(emptyList())
+        errorLayout.visibility = View.VISIBLE
+        loadingImage.visibility = View.GONE
+        errorText.text = "Ничего не найдено :("
+    }
+
+    private fun hideNoSuchResults() {
+        errorLayout.visibility = View.GONE
+    }
+
+    private fun hideKeyboard() {    // При работе с сервером убирает клавиатуру
+        val v: View? = activity?.currentFocus
+        val inputMethodManager = activity?.getSystemService(InputMethodManager::class.java)
+        inputMethodManager?.hideSoftInputFromWindow(
+            v?.windowToken,
+            InputMethodManager.HIDE_NOT_ALWAYS
+        )
+    }
+
     private fun onBackPressed() {
         activity?.onBackPressedDispatcher?.onBackPressed()
     }
+
 
     companion object {
         const val BASE_URL = "https://itunes.apple.com/"

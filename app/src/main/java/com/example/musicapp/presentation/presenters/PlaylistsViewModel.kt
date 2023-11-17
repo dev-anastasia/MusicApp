@@ -8,12 +8,11 @@ import com.example.musicapp.domain.database.PlaylistEntity
 
 class PlaylistsViewModel : ViewModel() {
 
-    private val useCase = Creator.playlistsUseCase
     val allPlaylists = MutableLiveData<List<PlaylistEntity>>() // Список плейлистов в БД
 
     fun addPlaylist(context: Context, playlist: PlaylistEntity) {
         val thread = Thread {
-            useCase.addPlaylist(context, playlist)
+            Creator.insertPlaylistUseCase.insertPlaylist(context, playlist)
         }
         thread.apply {
             start()
@@ -24,7 +23,7 @@ class PlaylistsViewModel : ViewModel() {
 
     fun deletePlaylist(context: Context, id: Int) {
         val thread = Thread {
-            useCase.deletePlaylist(context, id)
+            Creator.deletePlaylistUseCase.deletePlaylist(context, id)
         }
         thread.apply {
             start()
@@ -36,7 +35,7 @@ class PlaylistsViewModel : ViewModel() {
     fun getList(context: Context) {
         var list = emptyList<PlaylistEntity>()
         val thread = Thread {
-            list = useCase.getAllPlaylists(context)
+            list = Creator.getPlaylistsUseCase.getAllPlaylists(context)
         }
         thread.apply {
             start()

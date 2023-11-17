@@ -5,29 +5,22 @@ import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
-import com.example.musicapp.domain.SearchResultsListener
 import com.example.musicapp.domain.entities.MusicPiece
-import com.example.musicapp.presentation.ui.player.UIState
+import com.example.musicapp.presentation.ui.search.SearchUIState
 
-class SearchViewModel : ViewModel(), SearchResultsListener {
+class SearchViewModel : ViewModel() {
 
-    private val searchUseCase = Creator.searchUseCase
-    val uiState = MutableLiveData<UIState<Int>>()
+    val searchUiState = MutableLiveData<SearchUIState<Int>>()
+    val searchResultsList = MutableLiveData<List<MusicPiece>>()
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    val newList = MutableLiveData<List<MusicPiece>>()
-
     init {
-        newList.value = emptyList()
+        searchResultsList.value = emptyList()
     }
 
-    override fun showEmptyResultsMessage() {
-        uiState.value = UIState.Error
-    }
-
-    override fun onGetTracksListClicked(queryText: String, entity: String) {
-        uiState.value = UIState.Loading
-        searchUseCase.getSearchResult(queryText, entity) {
+    fun onGetTracksListClicked(queryText: String, entity: String) {
+        searchUiState.value = SearchUIState.Loading
+        Creator.getTracksListUseCase.getSearchResults(queryText, entity) {
             mainHandler.post {
                 if (it.isEmpty())
                     showEmptyResultsMessage()
@@ -37,8 +30,12 @@ class SearchViewModel : ViewModel(), SearchResultsListener {
         }
     }
 
-    override fun update(newList: List<MusicPiece>) {
-        this.newList.value = newList
-        uiState.value = UIState.Success
+    private fun showEmptyResultsMessage() {
+        searchUiState.value = SearchUIState.Error
+    }
+
+    private fun update(newList: List<MusicPiece>) {
+        this.searchResultsList.value = newList
+        searchUiState.value = SearchUIState.Success
     }
 }

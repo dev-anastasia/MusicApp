@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.musicapp.R
 import com.example.musicapp.presentation.presenters.PlayerViewModel
-import com.example.musicapp.presentation.ui.media.viewpager.FavsFragment
 import com.squareup.picasso.Picasso
 
 class PlayerFragment : Fragment(R.layout.fragment_player) {
@@ -70,63 +69,21 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private val currentId: Long
         get() {
             if (_currentId == null)
-                _currentId = this.requireArguments().getLong(FavsFragment.TRACK_ID)
+                _currentId = this.requireArguments().getLong(TRACK_ID)
             return _currentId!!
         }
     private var _currentId: Long? = null    // packing property
 
+
+    // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-//        // Подписываемся на ViewModel
-//        vm.apply {
-//            trackNameLiveData.observe(viewLifecycleOwner) {
-//                trackName.text = it
-//            }
-//            artistNameLiveData.observe(viewLifecycleOwner) {
-//                artistName.text = it
-//            }
-//            durationLiveData.observe(viewLifecycleOwner) {
-//                duration.text = it
-//            }
-//            isLikedLiveData.observe(viewLifecycleOwner) {
-//                if (it == true)
-//                    likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
-//                else
-//                    likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
-//            }
-//            isAddedLiveData.observe(viewLifecycleOwner) {
-//                if (it == true)
-//                    mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
-//                else
-//                    mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
-//            }
-//            uiState.observe(viewLifecycleOwner) {
-//                when (vm.uiState.value) {
-//                    (UIState.Success) -> {
-//                        updateUI()
-//                    }
-//
-//                    (UIState.Loading) -> {}
-//
-//                    (UIState.Error) -> {
-//                        Toast.makeText(
-//                            activity,
-//                            "Ошибка: не удалось связаться с сервером",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                    }
-//
-//                    else -> throw IllegalStateException("Illegal UI State")
-//                }
-//            }
-//        }
 
         // Инициализируем lateinit vars
         uiHandler = Handler(Looper.getMainLooper())
 
-        // Runnable для установки текущего времени:
-        setCurrentTimeRunnable = Runnable {
+        setCurrentTimeRunnable = Runnable {     // Runnable для установки текущего времени:
             if (vm.durationLiveData.value == "0:00")
                 currentTime.text = vm.durationLiveData.value
             else {
@@ -142,82 +99,50 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             }
         }
 
-        // Runnable для установки прогресса seekbar'a:
-        setCurrentSeekBarPosition = Runnable {     // Установка позиции seekbar'а
-            seekbar.progress = mediaPlayer.currentPosition * 100 / mediaPlayer.duration
+        setCurrentSeekBarPosition = Runnable {     // Runnable для установки прогресса seekbar'a:
+            if (vm.durationLiveData.value != "0:00")
+                seekbar.progress = mediaPlayer.currentPosition * 100 / mediaPlayer.duration
+            else
+                seekbar.progress = 0
             uiHandler.postDelayed(setCurrentSeekBarPosition, CURRENT_SEEKBAR_CHECK_TIMER)
         }
 
-        // Чтобы не перегружать поток при смене конфигураций - сначала удаляем, а потом запускаем
-        // runnables для установки текущего времени и прогресса seekbar'а:
-        uiHandler.apply {
-            removeCallbacks(setCurrentTimeRunnable)
-            removeCallbacks(setCurrentSeekBarPosition)
-            post(setCurrentTimeRunnable)
-            post(setCurrentSeekBarPosition)
-        }
-
-        seekbar.setOnSeekBarChangeListener(
-            object : SeekBar.OnSeekBarChangeListener {  // Оповещает об изменениях в seekbar'е
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-                    if (fromUser) {
-                        mediaPlayer.seekTo(mediaPlayer.duration * progress / 100)
-                        uiHandler.apply {
-                            removeCallbacks(setCurrentTimeRunnable)
-                            removeCallbacks(setCurrentSeekBarPosition)
-                            post(setCurrentTimeRunnable)
-                            post(setCurrentSeekBarPosition)
-                        }
-                    }
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-            }
-        )
-    }
-
-    override fun onResume() {
-
-        // Запрос в сеть
-        vm.getTrackInfoFromServer(currentId, requireActivity().applicationContext)
-
-        // Подписываемся на ViewModel
         vm.apply {
+
             trackNameLiveData.observe(viewLifecycleOwner) {
                 trackName.text = it
             }
+
             artistNameLiveData.observe(viewLifecycleOwner) {
                 artistName.text = it
             }
+
             durationLiveData.observe(viewLifecycleOwner) {
                 duration.text = it
             }
+
             isLikedLiveData.observe(viewLifecycleOwner) {
                 if (it == true)
                     likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
                 else
                     likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
             }
-            isAddedLiveData.observe(viewLifecycleOwner) {
+
+            isAddedToMediaLiveData.observe(viewLifecycleOwner) {
                 if (it == true)
                     mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
                 else
                     mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
             }
-            uiState.observe(viewLifecycleOwner) {
-                when (vm.uiState.value) {
-                    (UIState.Success) -> {
+
+            playerUiState.observe(viewLifecycleOwner) {
+                when (it) {
+
+                    (PlayerUIState.Success) -> {
                         updateUI()
                     }
 
-                    (UIState.Loading) -> {}
-
-                    (UIState.Error) -> {
+                    (PlayerUIState.Error) -> {
                         Toast.makeText(
                             activity,
                             "Ошибка: не удалось связаться с сервером",
@@ -229,6 +154,20 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+
+        vm.getTrackInfoFromServer(currentId, requireActivity().applicationContext)
+
+        // Чтобы не перегружать поток при смене конфигураций - сначала удаляем, а потом запускаем
+        // runnables для установки текущего времени и прогресса seekbar'а:
+        uiHandler.apply {
+            removeCallbacks(setCurrentTimeRunnable)
+            removeCallbacks(setCurrentSeekBarPosition)
+            post(setCurrentTimeRunnable)
+            post(setCurrentSeekBarPosition)
+        }
 
         // Иконка "Вернуться назад"
         goBackBtn.setOnClickListener {
@@ -238,18 +177,16 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         super.onResume()
     }
 
-    private fun play() {
-        mediaPlayer.start()
-        playBtn.setBackgroundResource(R.drawable.icon_pause)
-        // По завершении трека:
-        mediaPlayer.setOnCompletionListener {
-            playBtn.setBackgroundResource(R.drawable.icon_play_active)
-        }
+    override fun onPause() {
+        pause()
+        super.onPause()
     }
+
 
     private fun updateUI() {
         setPlayer()
-        setUI()
+        setSeekbar()
+        setIcons()
     }
 
     private fun setPlayer() {
@@ -276,20 +213,32 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
+    private fun play() {
+        mediaPlayer.start()
+        playBtn.setBackgroundResource(R.drawable.icon_pause)
+        // По завершении трека:
+        mediaPlayer.setOnCompletionListener {
+            onStop()
+            playBtn.setBackgroundResource(R.drawable.icon_play_active)
+        }
+    }
+
     private fun pause() {
         mediaPlayer.pause()
         playBtn.setBackgroundResource(R.drawable.icon_play_active)
     }
 
-    private fun setUI() {
+    private fun setIcons() {
         likeIcon.apply {
             isClickable = true
+            vm.checkIfFavourite(requireActivity().applicationContext)
+
             setOnClickListener {
                 if (vm.isLikedLiveData.value == true) {
-                    vm.updateIsLikedLD(requireActivity().applicationContext, false)
+                    vm.likeClicked(requireActivity().applicationContext, false)
                     likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
                 } else {
-                    vm.updateIsLikedLD(requireActivity().applicationContext, true)
+                    vm.likeClicked(requireActivity().applicationContext, true)
                     likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
                 }
             }
@@ -298,11 +247,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         mediaIcon.apply {
             isClickable = true
             setOnClickListener {
-                if (isAdded) {
-                    vm.updateIsAddedLD(false)
+                if (vm.isAddedToMediaLiveData.value == true) {
+                    // Добавить логику в VM
                     mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
                 } else {
-                    vm.updateIsAddedLD(true)
+                    // Добавить логику в VM
                     mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
                 }
             }
@@ -312,7 +261,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         trackName.isSelected = true
         artistName.isSelected = true
 
-        vm.coverImageLinkLiveData.observe(viewLifecycleOwner) { cover ->
+        vm.artworkUrl60LiveData.observe(viewLifecycleOwner) { cover ->
             Picasso.get()
                 .load(Uri.parse(cover))
                 .placeholder(R.drawable.note_placeholder)
@@ -320,8 +269,40 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
+    private fun setSeekbar() {
+        seekbar.apply {
+            isClickable = true      // Теперь можно перематывать время трека
+
+            setOnSeekBarChangeListener(
+                object : SeekBar.OnSeekBarChangeListener {  // Оповещает об изменениях в seekbar'е
+                    override fun onProgressChanged(
+                        seekBar: SeekBar?,
+                        progress: Int,
+                        fromUser: Boolean
+                    ) {
+                        if (fromUser) {
+                            mediaPlayer.seekTo(mediaPlayer.duration * progress / 100)
+                            uiHandler.apply {
+                                removeCallbacks(setCurrentTimeRunnable)
+                                removeCallbacks(setCurrentSeekBarPosition)
+                                post(setCurrentTimeRunnable)
+                                post(setCurrentSeekBarPosition)
+                            }
+                        }
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+                }
+            )
+        }
+    }
+
     override fun onDestroy() {  // Проблема при перевороте экрана!!!
-        onBackPressed()
+        uiHandler.apply {
+            removeCallbacks(setCurrentSeekBarPosition)
+            removeCallbacks(setCurrentTimeRunnable)
+        }
         super.onDestroy()
     }
 
@@ -335,11 +316,12 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             release()
         }
         mediaPlayer = MediaPlayer()
-        parentFragmentManager.popBackStack()
+        requireActivity().supportFragmentManager.popBackStack()
     }
 
     private companion object {
         const val CURRENT_TIME_CHECK_TIMER = 1000L
+        const val TRACK_ID = "track id key"
         const val CURRENT_SEEKBAR_CHECK_TIMER = 600L
         var mediaPlayer = MediaPlayer()
     }

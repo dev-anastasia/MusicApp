@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.musicapp.R
 import com.example.musicapp.domain.database.PlaylistEntity
 import com.example.musicapp.presentation.presenters.PlaylistsViewModel
+import kotlin.random.Random
 
 class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
@@ -66,7 +67,7 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
                 )
 
         val newPlaylist = PlaylistEntity(
-            0,
+            Random.nextInt(),
             null,
             playlistName,
             0,

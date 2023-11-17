@@ -2,7 +2,6 @@ package com.example.musicapp.domain
 
 import android.content.Context
 import com.example.musicapp.domain.database.PlaylistTrackCrossRef
-import com.example.musicapp.domain.database.TrackEntity
 
 interface TrackInfoRepo {
 

@@ -7,7 +7,7 @@ interface PlaylistsRepo {
 
     fun getAllPlaylists(context: Context) : List<PlaylistEntity>
 
-    fun addPlaylist(context: Context, playlist: PlaylistEntity)
+    fun insertPlaylist(context: Context, playlist: PlaylistEntity)
 
     fun deletePlaylist(context: Context, id: Int)
 }

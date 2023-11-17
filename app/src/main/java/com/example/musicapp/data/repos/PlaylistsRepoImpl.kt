@@ -1,8 +1,8 @@
 package com.example.musicapp.data.repos
 
 import android.content.Context
-import com.example.musicapp.domain.database.PlaylistEntity
 import com.example.musicapp.domain.database.PlaylistDatabase
+import com.example.musicapp.domain.database.PlaylistEntity
 import com.example.musicapp.presentation.PlaylistsRepo
 
 class PlaylistsRepoImpl : PlaylistsRepo {
@@ -11,7 +11,7 @@ class PlaylistsRepoImpl : PlaylistsRepo {
         return PlaylistDatabase.getDatabase(context).playlistsDao().getAllPlaylists()
     }
 
-    override fun addPlaylist(context: Context, playlist: PlaylistEntity) {
+    override fun insertPlaylist(context: Context, playlist: PlaylistEntity) {
         PlaylistDatabase.getDatabase(context).playlistsDao().insertPlaylist(playlist)
     }
 
