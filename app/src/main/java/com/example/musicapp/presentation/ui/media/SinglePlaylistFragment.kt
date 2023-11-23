@@ -11,18 +11,29 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.TracksViewModel
-import com.example.musicapp.presentation.ui.search.searchAdapter.TracksAdapter
+import com.example.musicapp.presentation.ui.media.tracksAdapter.TrackEntityAdapter
+import com.example.musicapp.presentation.ui.player.PlayerFragment
 
 class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     OnTrackClickListener {
 
-    private lateinit var tracksAdapter: TracksAdapter
+    private lateinit var tracksAdapter: TrackEntityAdapter
     private val vm: TracksViewModel by viewModels()
+    private val playlistId: Int
+        get() {
+            if (_playlistId == null)
+                _playlistId = this@SinglePlaylistFragment.arguments?.getInt(ID_KEY)
+            return _playlistId!!
+        }
+    private var _playlistId: Int? = null    // packing property
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Адаптер - используется тот же, что в поисковике
+        val emptyPlaylistMessage: LinearLayout =
+            view.findViewById(R.id.ll_single_playlist_fragment_empty_playlist)
+
+        // Адаптер - ДОЛЖЕН использоваться тот же, что в поисковике (маппинг TrackEntity в Track!)
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.single_playlist_fragment_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
@@ -30,30 +41,47 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
             LinearLayoutManager.VERTICAL,
             false
         )
-        // Адаптер
-        tracksAdapter = TracksAdapter(this)
+        // Адаптер и ViewModel
+        tracksAdapter = TrackEntityAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        val id = this@SinglePlaylistFragment.arguments?.getInt(ID_KEY)
+        vm.apply {
 
-        vm.tracksList.observe(viewLifecycleOwner) { list ->
-            // Обновить список адаптера
+            getTracksList(requireActivity().applicationContext, playlistId)
+
+            tracksList.observe(viewLifecycleOwner) {
+                tracksAdapter.updateList(it)
+
+                if (it!!.isEmpty())
+                    emptyPlaylistMessage.visibility = View.VISIBLE
+                else
+                    emptyPlaylistMessage.visibility = View.GONE
+            }
         }
+    }
 
-        if (vm.tracksList.value!!.isEmpty()) {
-            view.findViewById<LinearLayout>(R.id.ll_single_playlist_fragment_empty_playlist)
-                .visibility = View.VISIBLE
-        }
+    override fun onResume() {
 
-        view.findViewById<ImageButton>(R.id.single_playlist_fragment_btn_go_back)
+        requireView().findViewById<ImageButton>(R.id.single_playlist_fragment_btn_go_back)
             .setOnClickListener {
                 onBackPressed()
             }
+
+        super.onResume()
     }
 
     override fun onItemClick(id: Long) {
         // Открытие PlayerFragment'а
-        TODO("Not yet implemented")
+        val playerFragment = PlayerFragment()
+        val bundle = Bundle()
+        bundle.putLong(TRACK_ID, id)
+        playerFragment.arguments = bundle
+
+        activity?.supportFragmentManager!!.beginTransaction()
+            .replace(R.id.media_container_main, playerFragment)
+            .addToBackStack("added PlayerFragment")
+            .setReorderingAllowed(true)
+            .commit()
     }
 
     private fun onBackPressed() {
@@ -62,5 +90,6 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
 
     private companion object {
         const val ID_KEY = "id key"
+        const val TRACK_ID = "track id key"
     }
 }

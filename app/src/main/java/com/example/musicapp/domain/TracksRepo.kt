@@ -2,45 +2,67 @@ package com.example.musicapp.domain
 
 import android.content.Context
 import com.example.musicapp.domain.database.PlaylistTrackCrossRef
-import com.example.musicapp.domain.database.PlaylistWithTracks
-import com.example.musicapp.domain.database.TrackEntity
-import com.example.musicapp.domain.entities.MusicPiece
+import com.example.musicapp.domain.database.TrackTable
+import com.example.musicapp.domain.entities.MusicTrack
 
 interface TracksRepo {
 
-    fun getTracksIds(
+    fun getTracksIdsInSinglePlaylist(
         context: Context,
         playlistId: Int
     ): List<Long>
 
-    fun getTracksInPlaylist(
+    fun getPlaylistCover(
         context: Context,
-        trackId: Long,
-        callback: (List<TrackEntity>) -> Unit
-    )
+        playlistId: Int
+    ): String
 
     fun getTracksList(
         context: Context,
         trackIdsList: List<Long>,
-        callback: (List<TrackEntity>) -> Unit
+        callback: (List<TrackTable>) -> Unit
     )
 
     fun getSearchResult(
         queryText: String,
         entity: String,
-        callback: (List<MusicPiece>) -> Unit
+        callback: (List<MusicTrack>) -> Unit
     )
 
-    fun addPlaylistTrackRef(
-        track: TrackEntity,
+    fun findTrackInSinglePlaylist(
+        trackId: Long,
+        playlistId: Int,
+        context: Context,
+        callback: (List<Long>) -> Unit
+    )
+
+    fun getPlaylistsOfThisTrack(
+        trackId: Long,
+        context: Context,
+        callback: (List<Int>) -> Unit
+    )
+
+    fun findTrackInMedia(
+        trackId: Long,
+        context: Context,
+        callback: (List<Long>) -> Unit
+    )
+
+    fun getTrackInfo(
+        currentId: Long,
+        context: Context,
+        callback: (HashMap<String, String>) -> Unit
+    )
+
+    fun addTrackInPlaylist(
+        track: TrackTable,
         ref: PlaylistTrackCrossRef,
         context: Context
     )
 
-    fun findTrackInDB(
-        playlistId: Int,
+    fun deleteTrackFromPlaylist(
         trackId: Long,
-        context: Context,
-        callback: (List<Long>) -> Unit
+        playlistId: Int,
+        context: Context
     )
 }

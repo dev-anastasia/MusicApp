@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.domain.entities.MusicPiece
+import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.squareup.picasso.Picasso
 
@@ -14,13 +14,13 @@ class TracksAdapter(
     private val itemIdListener: OnTrackClickListener    // Интерфейс для выбора item'а из RV
 ) : Adapter<MusicPieceViewHolder>() {
 
-    private val list: MutableList<MusicPiece> = mutableListOf()
+    private val list: MutableList<MusicTrack> = mutableListOf()
 
-    fun getList(): MutableList<MusicPiece> {
+    fun getList(): MutableList<MusicTrack> {
         return this.list
     }
 
-    fun updateList(newList: List<MusicPiece>) {
+    fun updateList(newList: List<MusicTrack>) {
         val diffUtil = DiffUtil.calculateDiff(
             MusicPieceDiffUtilCallback(
                 list,
@@ -50,7 +50,7 @@ class TracksAdapter(
         holder.songName.text = list[position].trackName
         holder.author.text = list[position].artistName
         Picasso.get()
-            .load(list[position].artworkUrl60)
+            .load(list[position].artworkUrl100)
             .into(holder.cover)
 
         holder.itemView.setOnClickListener {

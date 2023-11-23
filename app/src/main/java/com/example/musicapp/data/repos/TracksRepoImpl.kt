@@ -5,45 +5,70 @@ import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.TracksRepo
 import com.example.musicapp.domain.database.PlaylistDatabase
 import com.example.musicapp.domain.database.PlaylistTrackCrossRef
-import com.example.musicapp.domain.database.PlaylistWithTracks
-import com.example.musicapp.domain.database.TrackEntity
+import com.example.musicapp.domain.database.TrackTable
 import com.example.musicapp.domain.entities.Music
-import com.example.musicapp.domain.entities.MusicPiece
+import com.example.musicapp.domain.entities.MusicTrack
+import com.example.musicapp.domain.entities.TracksList
+import com.example.musicapp.presentation.presenters.PlayerViewModel
 import retrofit2.Call
 
 class TracksRepoImpl : TracksRepo {
 
-    override fun getTracksIds(
+    override fun getTrackInfo(
+        currentId: Long,
+        context: Context,
+        callback: (HashMap<String, String>) -> Unit
+    ) {
+
+        val mapOfSpecs = HashMap<String, String>()
+
+        Thread {
+            val searchObject: Call<TracksList> =
+                RetrofitUtils.musicService.getTrackInfoById(currentId)
+            val responseBody = searchObject.execute().body()
+
+            if (responseBody != null) {
+                if (responseBody.resultCount != 0) {
+                    val res = responseBody.results[0]
+                    mapOfSpecs[PlayerViewModel.ARTIST_NAME] = res.artistName
+                    mapOfSpecs[PlayerViewModel.TRACK_NAME] = res.trackName
+                    mapOfSpecs[PlayerViewModel.DURATION] = res.trackTimeMillis.toString()
+                    mapOfSpecs[PlayerViewModel.PREVIEW] = res.previewUrl
+                    mapOfSpecs[PlayerViewModel.COVER_IMAGE_100] = res.artworkUrl100
+                }
+            }   // В остальных случаях вернётся пустая мапа
+            callback(mapOfSpecs)
+        }.start()
+    }
+
+    override fun getTracksIdsInSinglePlaylist(
         context: Context,
         playlistId: Int
     ): List<Long> {
         return PlaylistDatabase.getDatabase(context).playlistsDao().getTracksIds(playlistId)
     }
 
-    override fun getTracksInPlaylist(
-        context: Context,
-        trackId: Long,
-        callback: (List<TrackEntity>) -> Unit
-    ) {
-        val res = PlaylistDatabase.getDatabase(context).playlistsDao()
-            .getAllTracksListById(trackId)
-        callback(res)
+    override fun getPlaylistCover(context: Context, playlistId: Int): String {
+        return PlaylistDatabase.getDatabase(context).playlistsDao()
+            .getPlaylistCover(playlistId, context)
     }
 
     override fun getTracksList(
         context: Context,
         trackIdsList: List<Long>,
-        callback: (List<TrackEntity>) -> Unit
+        callback: (List<TrackTable>) -> Unit
     ) {
+        val res = mutableListOf<TrackTable>()
         for (i in trackIdsList) {
-            callback(PlaylistDatabase.getDatabase(context).playlistsDao().getAllTracksListById(i))
+            res.addAll(PlaylistDatabase.getDatabase(context).playlistsDao().getAllTracksListById(i))
         }
+        callback(res)
     }
 
     override fun getSearchResult(
         queryText: String,
         entity: String,
-        callback: (List<MusicPiece>) -> Unit
+        callback: (List<MusicTrack>) -> Unit
     ) {
 
         var responseBody: Music?
@@ -54,7 +79,7 @@ class TracksRepoImpl : TracksRepo {
                 entity
             )
             responseBody = searchObject.execute().body()
-            var res = emptyList<MusicPiece>()
+            var res = emptyList<MusicTrack>()
 
             if (responseBody != null) {
                 if (responseBody!!.resultCount != 0)
@@ -65,23 +90,53 @@ class TracksRepoImpl : TracksRepo {
         thread.start()
     }
 
-    override fun addPlaylistTrackRef(
-        track: TrackEntity,
+    override fun addTrackInPlaylist(
+        track: TrackTable,
         ref: PlaylistTrackCrossRef,
         context: Context
     ) {
-        PlaylistDatabase.getDatabase(context).playlistsDao().addPlaylistTrackRef(ref)
-        PlaylistDatabase.getDatabase(context).playlistsDao().addTrackToDB(track)
+        PlaylistDatabase.getDatabase(context).playlistsDao()
+            .addTrackToPlaylist(ref, track)
     }
 
-    override fun findTrackInDB(
+
+    override fun findTrackInSinglePlaylist(
+        trackId: Long,
         playlistId: Int,
+        context: Context,
+        callback: (List<Long>) -> Unit
+    ) {
+        val res = PlaylistDatabase.getDatabase(context).playlistsDao()
+            .findTrackInSinglePlaylist(playlistId, trackId)
+        callback(res)
+    }
+
+    override fun getPlaylistsOfThisTrack(
+        trackId: Long,
+        context: Context,
+        callback: (List<Int>) -> Unit
+    ) {
+        val res = PlaylistDatabase.getDatabase(context).playlistsDao()
+            .getPlaylistsOfThisTrack(trackId)
+        callback(res)
+    }
+
+    override fun findTrackInMedia(
         trackId: Long,
         context: Context,
         callback: (List<Long>) -> Unit
     ) {
-        val res =
-            PlaylistDatabase.getDatabase(context).playlistsDao().findTrackInDB(playlistId, trackId)
+        val res = PlaylistDatabase.getDatabase(context).playlistsDao()
+            .lookForTrackInPlaylists(trackId)
         callback(res)
+    }
+
+    override fun deleteTrackFromPlaylist(
+        trackId: Long,
+        playlistId: Int,
+        context: Context
+    ) {
+        PlaylistDatabase.getDatabase(context).playlistsDao().deleteTrackFromPlaylist(
+            PlaylistTrackCrossRef(playlistId, trackId), trackId)
     }
 }

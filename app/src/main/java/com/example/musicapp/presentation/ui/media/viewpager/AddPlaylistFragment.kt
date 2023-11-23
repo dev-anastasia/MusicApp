@@ -6,15 +6,11 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.musicapp.R
-import com.example.musicapp.domain.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistTable
 import com.example.musicapp.presentation.presenters.PlaylistsViewModel
-import kotlin.random.Random
 
 class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
@@ -28,7 +24,7 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
         editText = view.findViewById(R.id.et_new_playlist_name)
 
-        val commitBtn: ImageButton = view.findViewById(R.id.btn_commit_add_playlist)
+        val commitBtn: ImageButton = view.findViewById(R.id.btn_add_playlist)
         val cancelBtn: ImageButton = view.findViewById(R.id.btn_cancel_adding)
 
         // Открыть клавиатуру
@@ -59,18 +55,17 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
     private fun addPlaylist() {
 
-        val playlistName = (
-                if (editText.text.isEmpty().not())
-                    editText.text.toString()
-                else
-                    "My Playlist"
-                )
+        val playlistName =
+            if (editText.text.isEmpty())
+                "My Playlist"
+            else
+                editText.text.toString()
 
-        val newPlaylist = PlaylistEntity(
-            Random.nextInt(),
+
+        val newPlaylist = PlaylistTable(
+            0,
             null,
             playlistName,
-            0,
             System.currentTimeMillis()
         )
         vm.addPlaylist(requireActivity().applicationContext, newPlaylist)

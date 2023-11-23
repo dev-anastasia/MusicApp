@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.TrackInfoListener
 import com.example.musicapp.domain.database.PlaylistTrackCrossRef
-import com.example.musicapp.domain.database.TrackEntity
+import com.example.musicapp.domain.database.TrackTable
 import com.example.musicapp.presentation.ui.player.PlayerUIState
 
 class PlayerViewModel : ViewModel(), TrackInfoListener {
@@ -17,24 +17,15 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     val playerUiState = MutableLiveData<PlayerUIState<Int>>()
 
-    val trackNameLiveData = MutableLiveData<String>()
-    val artistNameLiveData = MutableLiveData<String>()
-    val artworkUrl60LiveData = MutableLiveData<String>()
-    val durationLiveData = MutableLiveData<String>()
-    val audioPreviewLiveData = MutableLiveData<String>()
-    val isLikedLiveData = MutableLiveData<Boolean>()
-    val isAddedToMediaLiveData = MutableLiveData<Boolean>()
+    val trackNameLiveData = MutableLiveData("")
+    val artistNameLiveData = MutableLiveData("")
+    val cover100LiveData = MutableLiveData("")  // Больший размер (для плеера)
+    private val cover60LiveData = MutableLiveData("")   // Меньший размер (для БД)
+    val durationLiveData = MutableLiveData("")
+    val audioPreviewLiveData = MutableLiveData("")
+    val isLikedLiveData = MutableLiveData(false)
+    val isAddedToMediaLiveData = MutableLiveData(false)
     var trackId: Long = 0
-
-    init {
-        trackNameLiveData.value = ""
-        artistNameLiveData.value = ""
-        artworkUrl60LiveData.value = ""
-        durationLiveData.value = "0:00"
-        audioPreviewLiveData.value = ""
-        isLikedLiveData.value = false
-        isAddedToMediaLiveData.value = false
-    }
 
     fun getTrackInfoFromServer(currentId: Long, context: Context) {
         trackId = currentId
@@ -68,13 +59,13 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         // здесь будет только лайвдата с uiState
         // liveData.value = UIState
 
-        if (hashmap.isEmpty().not()) {
+        if (hashmap.isEmpty().not()) {          // СОКРАТИТЬ - DATA CLASS?
             if (trackNameLiveData.value != hashmap[TRACK_NAME])
                 trackNameLiveData.value = hashmap[TRACK_NAME]
             if (artistNameLiveData.value != hashmap[ARTIST_NAME])
                 artistNameLiveData.value = hashmap[ARTIST_NAME]
-            if (artworkUrl60LiveData.value != hashmap[COVER_IMAGE])
-                artworkUrl60LiveData.value = hashmap[COVER_IMAGE]
+            if (cover100LiveData.value != hashmap[COVER_IMAGE_100])
+                cover100LiveData.value = hashmap[COVER_IMAGE_100]
             if (audioPreviewLiveData.value != hashmap[PREVIEW])
                 audioPreviewLiveData.value = hashmap[PREVIEW]
             if (durationLiveData.value != hashmap[DURATION])
@@ -85,7 +76,8 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         } else {
             trackNameLiveData.value = ""
             artistNameLiveData.value = ""
-            artworkUrl60LiveData.value = ""
+            cover100LiveData.value = ""
+            cover60LiveData.value = ""
             audioPreviewLiveData.value = ""
 
             playerUiState.value = PlayerUIState.Error
@@ -95,8 +87,8 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     //Проверка статуса "Нравится"/"Не нравится" (иконка с сердечком)
     fun checkIfFavourite(context: Context) {
-        Thread {
-            Creator.getTracksListUseCase.findTrackInDB(-1, trackId, context) {
+        Thread {                                            // "-1" - номер плейлиста избранных треков
+            Creator.getTracksListUseCase.findTrackInSinglePlaylist(trackId, -1, context) {
                 mainHandler.post {
                     isLikedLiveData.value = it.isNotEmpty() // список непустой = true, в избранном
                 }
@@ -104,45 +96,90 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         }.start()
     }
 
-    // Логика нажатия на кнопку "Нравится"
-    fun likeClicked(context: Context, status: Boolean) {
-        val track = TrackEntity(
-            trackId,
-            artistNameLiveData.value!!,
-            trackNameLiveData.value!!,
-            artworkUrl60LiveData.value!!,
-            System.currentTimeMillis()
-        )
-        val crossRef = PlaylistTrackCrossRef(-1, trackId)
-        if (status) {
-            // добавляем в избранное
-            Thread {
-                Creator.insertTrackUseCase.addTrackToPlaylist(track, crossRef, context)
-            }.start()
-        } else {
-            // удаляем из списка избранного
-            Thread {
-
-            }.start()
-        }
-
-        isLikedLiveData.value = status
+    fun checkIfAddedToMedia(context: Context) {
+        Thread {
+            Creator.getTracksListUseCase.lookForTrackInMedia(trackId, context) {
+                mainHandler.post {
+                    isAddedToMediaLiveData.value =
+                        it.isNotEmpty() // список непустой = true, в избранном
+                }
+            }
+        }.start()
     }
 
-    // Логика нажатия на иконку "Медиа"
-    fun addToMediaClicked(context: Context, playlistId: Int, status: Boolean) {
-        if (status) {
-            // добавляем в медиатеку
+    // Логика нажатия на кнопку "Нравится"
+    fun likeClicked(context: Context) {
+        if (isLikedLiveData.value == false) {
+            // Добавляем в избранное:
             Thread {
-                val res = Creator.getPlaylistsUseCase.getAllPlaylists(context)
-                if (res.isEmpty()) {
-
+                val crossRef =
+                    PlaylistTrackCrossRef(-1, trackId) // "-1" - номер плейлиста избранных треков
+                val track = TrackTable(
+                    trackId,
+                    artistNameLiveData.value.toString(),
+                    trackNameLiveData.value.toString(),
+                    cover60LiveData.value.toString(),
+                    System.currentTimeMillis()
+                )
+                Creator.insertTrackUseCase.addTrackToPlaylist(track, crossRef, context)
+                mainHandler.post {
+                    isLikedLiveData.value = true
                 }
             }.start()
         } else {
-            // удаляем из медиатеки
+            // Удаляем из избранного:
+            Thread {
+                Creator.deleteTrackUseCase.deleteTrackFromPlaylist(trackId, -1, context)
+                mainHandler.post {
+                    isLikedLiveData.value = false
+                }
+            }.start()
         }
-        isAddedToMediaLiveData.value = status
+    }
+
+    // Логика нажатия на иконку "Медиа"
+    fun mediaIconClicked(context: Context, playlistId: Int) {
+        Thread {    // Ищем: есть ли уже трек в выбранном плейлисте? (по аналогии с Яндекс.Музыкой)
+            Creator.getTracksListUseCase.findTrackInSinglePlaylist(
+                trackId, playlistId, context
+            ) {
+                if (it.isEmpty()) {   // Если трека нет в этом плейлисте - добавляем
+                    addToMedia(context, playlistId)
+                } else {       // Если трек уже есть в этом плейлисте - удаляем
+                    deleteFromMedia(context, playlistId)
+                }
+            }
+        }.start()
+    }
+
+    private fun addToMedia(context: Context, playlistId: Int) {
+        Thread {
+            val crossRef = PlaylistTrackCrossRef(playlistId, trackId)
+            val track = TrackTable(
+                trackId,
+                artistNameLiveData.value.toString(),
+                trackNameLiveData.value.toString(),
+                cover100LiveData.value.toString(),
+                System.currentTimeMillis()
+            )
+            Creator.insertTrackUseCase.addTrackToPlaylist(track, crossRef, context)
+            mainHandler.post {
+                isAddedToMediaLiveData.value = true
+            }
+        }.start()
+    }
+
+    private fun deleteFromMedia(context: Context, playlistId: Int) {
+        Thread {
+            Creator.deleteTrackUseCase.deleteTrackFromPlaylist(trackId, playlistId, context)
+            // Обновляем иконку "Медиа" (проверяем, есть ли все еще трек в медиатеке)
+            Creator.getTracksListUseCase.lookForTrackInMedia(trackId, context) {
+                mainHandler.post {
+                    isAddedToMediaLiveData.value =
+                        it.isNotEmpty()  // Если список пуст - трек есть в Медиатеке (true)
+                }
+            }
+        }.start()
     }
 
     companion object {
@@ -150,6 +187,6 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         const val TRACK_NAME = "track name key"
         const val DURATION = "duration key"
         const val PREVIEW = "preview key"
-        const val COVER_IMAGE = "cover image key"
+        const val COVER_IMAGE_100 = "cover image key"
     }
 }

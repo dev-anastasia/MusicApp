@@ -1,6 +1,6 @@
 package com.example.musicapp.domain.entities
 
-data class Tracks(
+data class TracksList(
     val resultCount: Int,
     val results: MutableList<TrackInfo>
 )

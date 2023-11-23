@@ -2,35 +2,42 @@ package com.example.musicapp.domain.useCases.tracks
 
 import android.content.Context
 import com.example.musicapp.domain.TracksRepo
-import com.example.musicapp.domain.database.PlaylistWithTracks
-import com.example.musicapp.domain.database.TrackEntity
-import com.example.musicapp.domain.entities.MusicPiece
+import com.example.musicapp.domain.database.TrackTable
+import com.example.musicapp.domain.entities.MusicTrack
 
 class GetTracksListUseCase(private val repo: TracksRepo) {
 
     fun getTracksList(
         context: Context,
         playlistId: Int,
-        callback: (List<TrackEntity>) -> Unit
+        callback: (List<TrackTable>) -> Unit
     ) {
-        val idsList = repo.getTracksIds(context, playlistId)
-        for (i in idsList) {
-            repo.getTracksInPlaylist(context, i, callback)
-        }
+        val idsList = repo.getTracksIdsInSinglePlaylist(context, playlistId)
+        repo.getTracksList(context, idsList, callback)
     }
 
     fun getSearchResults(
         queryText: String,
         entity: String,
-        callback: (List<MusicPiece>) -> Unit
+        callback: (List<MusicTrack>) -> Unit
     ) {
         repo.getSearchResult(queryText, entity, callback)
     }
 
-    fun findTrackInDB(playlistId: Int,
-                      trackId: Long,
-                      context: Context,
-                      callback: (List<Long>) -> Unit) {
-        repo.findTrackInDB(playlistId, trackId, context, callback)
+    fun findTrackInSinglePlaylist(
+        trackId: Long,
+        playlistId: Int,
+        context: Context,
+        callback: (List<Long>) -> Unit
+    ) {
+        repo.findTrackInSinglePlaylist(trackId, playlistId, context, callback)
+    }
+
+    fun lookForTrackInMedia(
+        trackId: Long,
+        context: Context,
+        callback: (List<Long>) -> Unit
+    ) {
+        repo.findTrackInMedia(trackId, context, callback)
     }
 }

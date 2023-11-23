@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.domain.database.TrackEntity
+import com.example.musicapp.domain.database.TrackTable
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.squareup.picasso.Picasso
 
@@ -14,9 +14,9 @@ class TrackEntityAdapter(
     private val itemIdListener: OnTrackClickListener    // Интерфейс для выбора item'а из RV
 ) : Adapter<TrackEntityViewHolder>() {
 
-    private val list: MutableList<TrackEntity> = mutableListOf()
+    private val list: MutableList<TrackTable> = mutableListOf()
 
-    fun updateList(newList: List<TrackEntity>) {
+    fun updateList(newList: List<TrackTable>) {
         val diffUtil = DiffUtil.calculateDiff(
             TrackEntityDiffUtilCallback(
                 list,

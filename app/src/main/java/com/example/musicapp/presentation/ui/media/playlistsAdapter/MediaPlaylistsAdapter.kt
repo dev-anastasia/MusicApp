@@ -9,7 +9,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.domain.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistTable
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.squareup.picasso.Picasso
 
@@ -18,7 +18,7 @@ class MediaPlaylistsAdapter(
 ) : Adapter<PlaylistViewHolder>(),
     PopupMenu.OnMenuItemClickListener {
 
-    private val list: MutableList<PlaylistEntity> = mutableListOf()
+    private val list: MutableList<PlaylistTable> = mutableListOf()
     private var currPlaylistId = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
@@ -33,11 +33,14 @@ class MediaPlaylistsAdapter(
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
 
-        holder.name.text = list[position].name
-        holder.count.text = list[position].songCount.toString()
+        holder.name.text = list[position].playlistName
 
+        holder.count.text = "Всего треков: " +
+                "${itemIdListener.getPlaylistTracksCount(list[position].playlistId)}"
+
+        val coverString = itemIdListener.getPlaylistCover(list[position].playlistId)
         Picasso.get()
-            .load(list[position].cover)
+            .load(coverString)
             .placeholder(R.drawable.note_placeholder)
             .into(holder.cover)
 
@@ -76,7 +79,7 @@ class MediaPlaylistsAdapter(
         }
     }
 
-    fun updateList(newList: List<PlaylistEntity>) {
+    fun updateList(newList: List<PlaylistTable>) {
         val diffUtil = DiffUtil.calculateDiff(
             PlaylistDiffUtilCallback(
                 list,
@@ -93,12 +96,13 @@ class MediaPlaylistsAdapter(
         itemIdListener.openPlaylistClicked(id)
     }
 
-    // Ниже - методы для PopupMenu
+    // Методы для PopupMenu:
 
     private fun showMenu(view: View) {
         val pMenu = PopupMenu(view.context, view)
         pMenu.apply {
             inflate(R.menu.menu)
+            pMenu.menu.add("Удалить")
             setOnMenuItemClickListener(this@MediaPlaylistsAdapter)
             show()
         }

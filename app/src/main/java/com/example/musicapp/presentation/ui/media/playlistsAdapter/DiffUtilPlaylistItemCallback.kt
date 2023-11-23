@@ -1,18 +1,16 @@
 package com.example.musicapp.presentation.ui.media.playlistsAdapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.domain.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistTable
 
-class DiffUtilPlaylistItemCallback : DiffUtil.ItemCallback<PlaylistEntity>() {
-    override fun areItemsTheSame(oldItem: PlaylistEntity, newItem: PlaylistEntity): Boolean {
+class DiffUtilPlaylistItemCallback : DiffUtil.ItemCallback<PlaylistTable>() {
+    override fun areItemsTheSame(oldItem: PlaylistTable, newItem: PlaylistTable): Boolean {
         return (oldItem.playlistId == newItem.playlistId)
     }
 
-    override fun areContentsTheSame(oldItem: PlaylistEntity, newItem: PlaylistEntity): Boolean {
-        return (oldItem.cover == newItem.cover
+    override fun areContentsTheSame(oldItem: PlaylistTable, newItem: PlaylistTable): Boolean {
+        return (oldItem.playlistCover == newItem.playlistCover
                 &&
-                oldItem.name == newItem.name
-                &&
-                oldItem.songCount == newItem.songCount)
+                oldItem.playlistName == newItem.playlistName)
     }
 }

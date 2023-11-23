@@ -5,10 +5,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "playlists_table")
-data class PlaylistEntity(
-    @PrimaryKey(autoGenerate = false) val playlistId: Int,
-    @ColumnInfo val cover: String?,
-    @ColumnInfo val name: String,
-    @ColumnInfo val songCount: Int,
+data class PlaylistTable(
+    @PrimaryKey(autoGenerate = true) val playlistId: Int,
+    @ColumnInfo val playlistCover: String?,
+    @ColumnInfo val playlistName: String,
     @ColumnInfo val systemTimeMillis: Long    // Время создания плейлиста
 )

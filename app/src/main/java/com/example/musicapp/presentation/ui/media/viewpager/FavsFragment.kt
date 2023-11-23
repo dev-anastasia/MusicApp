@@ -17,12 +17,13 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
     private lateinit var tracksAdapter: TrackEntityAdapter
     private val vm: TracksViewModel by viewModels()
+    private val emptyPlaylistMessage: LinearLayout
+        get() {
+            return requireView().findViewById(R.id.ll_favs_playlist_fragment_empty_playlist)
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val emptyPlaylistMessage =
-            view.findViewById<LinearLayout>(R.id.ll_favs_playlist_fragment_empty_playlist)
 
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.favs_fragment_recycler_view)
@@ -35,17 +36,14 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         tracksAdapter = TrackEntityAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        vm.apply {
-            getTracksList(requireActivity().applicationContext, -1) // Получаем список треков
+        vm.getTracksList(requireActivity().applicationContext, -1) // Получаем список треков
+        vm.tracksList.observe(viewLifecycleOwner) {
+            tracksAdapter.updateList(it)
 
-            tracksList.observe(viewLifecycleOwner) {
-                tracksAdapter.updateList(it)
-
-                if (it.isEmpty())  // Если плейлист избранных треков пустой
-                    emptyPlaylistMessage.visibility = View.VISIBLE
-                else
-                    emptyPlaylistMessage.visibility = View.GONE
-            }
+            if (it.isEmpty())  // Если плейлист избранных треков пустой
+                emptyPlaylistMessage.visibility = View.VISIBLE
+            else
+                emptyPlaylistMessage.visibility = View.GONE
         }
     }
 

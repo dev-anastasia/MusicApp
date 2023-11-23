@@ -6,11 +6,11 @@ import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
-import com.example.musicapp.domain.database.TrackEntity
+import com.example.musicapp.domain.database.TrackTable
 
 class TracksViewModel : ViewModel() {
 
-    val tracksList = MutableLiveData<List<TrackEntity>>()
+    val tracksList = MutableLiveData<List<TrackTable>>()
     private val mainHandler = Handler(Looper.getMainLooper())
 
     init {
@@ -21,14 +21,13 @@ class TracksViewModel : ViewModel() {
         Thread {
             Creator.getTracksListUseCase.getTracksList(context, playlistId) {
                 mainHandler.post {
-                    if (it.isNotEmpty())
-                        updateList(it)
+                    updateList(it)
                 }
             }
         }.start()
     }
 
-    private fun updateList(list: List<TrackEntity>) {
+    private fun updateList(list: List<TrackTable>) {
         this.tracksList.value = list
     }
 }

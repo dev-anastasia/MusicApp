@@ -5,25 +5,32 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Menu.NONE
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.musicapp.Creator
 import com.example.musicapp.R
+import com.example.musicapp.domain.database.PlaylistTable
 import com.example.musicapp.presentation.presenters.PlayerViewModel
 import com.squareup.picasso.Picasso
 
-class PlayerFragment : Fragment(R.layout.fragment_player) {
+class PlayerFragment : Fragment(R.layout.fragment_player),
+    PopupMenu.OnMenuItemClickListener {
 
     private lateinit var setCurrentTimeRunnable: Runnable
     private lateinit var setCurrentSeekBarPosition: Runnable
-
     private lateinit var uiHandler: Handler
+
     private val vm: PlayerViewModel by viewModels()
+    private val playlistsList = mutableListOf<PlaylistTable>()
 
     private val trackName: TextView
         get() {
@@ -106,8 +113,13 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 seekbar.progress = 0
             uiHandler.postDelayed(setCurrentSeekBarPosition, CURRENT_SEEKBAR_CHECK_TIMER)
         }
+    }
+
+    override fun onResume() {
 
         vm.apply {
+
+            getTrackInfoFromServer(currentId, requireActivity().applicationContext)
 
             trackNameLiveData.observe(viewLifecycleOwner) {
                 trackName.text = it
@@ -154,20 +166,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 }
             }
         }
-    }
 
-    override fun onResume() {
-
-        vm.getTrackInfoFromServer(currentId, requireActivity().applicationContext)
-
-        // Чтобы не перегружать поток при смене конфигураций - сначала удаляем, а потом запускаем
-        // runnables для установки текущего времени и прогресса seekbar'а:
-        uiHandler.apply {
-            removeCallbacks(setCurrentTimeRunnable)
-            removeCallbacks(setCurrentSeekBarPosition)
-            post(setCurrentTimeRunnable)
-            post(setCurrentSeekBarPosition)
-        }
+        // Получение списка доступных плейлистов (для дальнейшего добавления в медиатеку)
+        getListOfUsersPlaylists()
 
         // Иконка "Вернуться назад"
         goBackBtn.setOnClickListener {
@@ -178,10 +179,33 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     }
 
     override fun onPause() {
-        pause()
+        pausePlayer()
+
+        uiHandler.apply {
+            removeCallbacks(setCurrentTimeRunnable)
+            removeCallbacks(setCurrentSeekBarPosition)
+        }
+
         super.onPause()
     }
 
+    override fun onDestroy() {  // Проблема при перевороте экрана!!!
+        uiHandler.apply {
+            removeCallbacks(setCurrentSeekBarPosition)
+            removeCallbacks(setCurrentTimeRunnable)
+        }
+        super.onDestroy()
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        if (item != null) {
+            val playlistId = playlistsList[item.itemId].playlistId
+            vm.mediaIconClicked(requireActivity().applicationContext, playlistId)
+        }
+        return true
+    }
+
+    // ЧАСТНЫЕ МЕТОДЫ ФРАГМЕНТА:
 
     private fun updateUI() {
         setPlayer()
@@ -206,54 +230,69 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
             setOnClickListener {
                 if (mediaPlayer.isPlaying)
-                    pause()
+                    pausePlayer()
                 else
-                    play()
+                    playPlayer()
             }
         }
     }
 
-    private fun play() {
-        mediaPlayer.start()
+    private fun playPlayer() {
+        mediaPlayer.apply {
+            start()
+            setOnCompletionListener {   // При завершении трека:
+                onStop()
+                playBtn.setBackgroundResource(R.drawable.icon_play_active)
+            }
+        }
         playBtn.setBackgroundResource(R.drawable.icon_pause)
-        // По завершении трека:
-        mediaPlayer.setOnCompletionListener {
-            onStop()
-            playBtn.setBackgroundResource(R.drawable.icon_play_active)
+
+        uiHandler.apply {
+            post(setCurrentTimeRunnable)
+            post(setCurrentSeekBarPosition)
         }
     }
 
-    private fun pause() {
+    private fun pausePlayer() {
         mediaPlayer.pause()
         playBtn.setBackgroundResource(R.drawable.icon_play_active)
     }
 
-    private fun setIcons() {
+    private fun stopPlayer() {
+        mediaPlayer.stop()
+
+        uiHandler.apply {
+            removeCallbacks(setCurrentTimeRunnable)
+            removeCallbacks(setCurrentSeekBarPosition)
+        }
+    }
+
+    private fun setIcons() {    // Установка иконок "Избранное" и "Медиа"
+        vm.apply {
+            checkIfFavourite(requireActivity().applicationContext)
+            checkIfAddedToMedia(requireActivity().applicationContext)
+        }
+
         likeIcon.apply {
             isClickable = true
-            vm.checkIfFavourite(requireActivity().applicationContext)
 
             setOnClickListener {
-                if (vm.isLikedLiveData.value == true) {
-                    vm.likeClicked(requireActivity().applicationContext, false)
-                    likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
-                } else {
-                    vm.likeClicked(requireActivity().applicationContext, true)
-                    likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
-                }
+                vm.likeClicked(requireActivity().applicationContext)
             }
         }
 
         mediaIcon.apply {
             isClickable = true
+
             setOnClickListener {
-                if (vm.isAddedToMediaLiveData.value == true) {
-                    // Добавить логику в VM
-                    mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
-                } else {
-                    // Добавить логику в VM
-                    mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
-                }
+                if (playlistsList.isEmpty())
+                    Toast.makeText(
+                        context,
+                        "Медиатека пуста. Создайте первый плейлист!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                else
+                    showMenu(it)
             }
         }
 
@@ -261,13 +300,14 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         trackName.isSelected = true
         artistName.isSelected = true
 
-        vm.artworkUrl60LiveData.observe(viewLifecycleOwner) { cover ->
+        vm.cover100LiveData.observe(viewLifecycleOwner) { cover ->
             Picasso.get()
                 .load(Uri.parse(cover))
                 .placeholder(R.drawable.note_placeholder)
                 .into(coverImage)
         }
     }
+
 
     private fun setSeekbar() {
         seekbar.apply {
@@ -298,21 +338,37 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
-    override fun onDestroy() {  // Проблема при перевороте экрана!!!
-        uiHandler.apply {
-            removeCallbacks(setCurrentSeekBarPosition)
-            removeCallbacks(setCurrentTimeRunnable)
-        }
-        super.onDestroy()
+    private fun getListOfUsersPlaylists() {
+        Thread {
+            playlistsList.clear()
+            playlistsList.addAll(
+                Creator.getPlaylistsUseCase
+                    .getAllPlaylists(requireActivity().applicationContext)
+            )
+        }.start()
     }
 
-    private fun onBackPressed() {   // Вызывается из SearchActivity!!
+    private fun showMenu(view: View) {
+        uiHandler.post {
+            val pMenu = PopupMenu(view.context, view)
+            for (i in 0 until playlistsList.size) {
+                pMenu.menu.add(NONE, i, NONE, playlistsList[i].playlistName)
+            }
+            pMenu.apply {
+                inflate(R.menu.menu)
+                setOnMenuItemClickListener(this@PlayerFragment)
+                show()
+            }
+        }
+    }
+
+    private fun onBackPressed() {
         uiHandler.apply {
             removeCallbacks(setCurrentSeekBarPosition)
             removeCallbacks(setCurrentTimeRunnable)
         }
         mediaPlayer.apply {
-            stop()
+            stopPlayer()
             release()
         }
         mediaPlayer = MediaPlayer()

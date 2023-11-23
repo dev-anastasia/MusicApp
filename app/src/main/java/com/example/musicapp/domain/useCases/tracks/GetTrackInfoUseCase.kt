@@ -1,9 +1,9 @@
 package com.example.musicapp.domain.useCases.tracks
 
 import android.content.Context
-import com.example.musicapp.domain.TrackInfoRepo
+import com.example.musicapp.domain.TracksRepo
 
-class GetTrackInfoUseCase(private val repo: TrackInfoRepo) {
+class GetTrackInfoUseCase(private val repo: TracksRepo) {
 
     fun getTrackInfo(
         currentId: Long,

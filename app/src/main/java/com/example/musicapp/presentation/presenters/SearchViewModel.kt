@@ -5,13 +5,13 @@ import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
-import com.example.musicapp.domain.entities.MusicPiece
+import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.presentation.ui.search.SearchUIState
 
 class SearchViewModel : ViewModel() {
 
     val searchUiState = MutableLiveData<SearchUIState<Int>>()
-    val searchResultsList = MutableLiveData<List<MusicPiece>>()
+    val searchResultsList = MutableLiveData<List<MusicTrack>>()
     private val mainHandler = Handler(Looper.getMainLooper())
 
     init {
@@ -34,7 +34,7 @@ class SearchViewModel : ViewModel() {
         searchUiState.value = SearchUIState.Error
     }
 
-    private fun update(newList: List<MusicPiece>) {
+    private fun update(newList: List<MusicTrack>) {
         this.searchResultsList.value = newList
         searchUiState.value = SearchUIState.Success
     }

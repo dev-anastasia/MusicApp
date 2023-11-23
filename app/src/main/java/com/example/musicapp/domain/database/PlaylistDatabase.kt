@@ -7,8 +7,8 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [
-        PlaylistEntity::class,
-        TrackEntity::class,
+        PlaylistTable::class,
+        TrackTable::class,
         PlaylistTrackCrossRef::class
     ], version = 1
 )

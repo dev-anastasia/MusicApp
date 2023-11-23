@@ -2,11 +2,11 @@ package com.example.musicapp.presentation.ui.media.playlistsAdapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.domain.database.PlaylistEntity
+import com.example.musicapp.domain.database.PlaylistTable
 
 class PlaylistDiffUtilCallback(
-    private val oldList: MutableList<PlaylistEntity>,
-    private val newList: List<PlaylistEntity>
+    private val oldList: MutableList<PlaylistTable>,
+    private val newList: List<PlaylistTable>
 ) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int = oldList.size
@@ -25,12 +25,10 @@ class PlaylistDiffUtilCallback(
 
     override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
         val bundle = Bundle()
-        if (oldList[oldItemPosition].name != newList[newItemPosition].name)
-            bundle.putString(NAME, newList[newItemPosition].name)
-        if (oldList[oldItemPosition].cover != newList[newItemPosition].cover)
-            bundle.putString(COVER, newList[newItemPosition].cover)
-        if (oldList[oldItemPosition].songCount != newList[newItemPosition].songCount)
-            bundle.putInt(COUNT, newList[newItemPosition].songCount)
+        if (oldList[oldItemPosition].playlistName != newList[newItemPosition].playlistName)
+            bundle.putString(NAME, newList[newItemPosition].playlistName)
+        if (oldList[oldItemPosition].playlistCover != newList[newItemPosition].playlistCover)
+            bundle.putString(COVER, newList[newItemPosition].playlistCover)
         if (oldList[oldItemPosition].systemTimeMillis != newList[newItemPosition].systemTimeMillis)
             bundle.putLong(TIME, newList[newItemPosition].systemTimeMillis)
 

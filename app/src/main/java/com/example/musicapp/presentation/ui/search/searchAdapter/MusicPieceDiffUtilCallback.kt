@@ -2,11 +2,11 @@ package com.example.musicapp.presentation.ui.search.searchAdapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.domain.entities.MusicPiece
+import com.example.musicapp.domain.entities.MusicTrack
 
 class MusicPieceDiffUtilCallback(
-    private val oldList: List<MusicPiece>,
-    private val newList: List<MusicPiece>) : DiffUtil.Callback() {
+    private val oldList: List<MusicTrack>,
+    private val newList: List<MusicTrack>) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int = oldList.size
 
@@ -21,7 +21,7 @@ class MusicPieceDiffUtilCallback(
                 &&
                 oldList[oldItemPosition].trackName == newList[newItemPosition].trackName
                 &&
-                oldList[oldItemPosition].artworkUrl60 == newList[newItemPosition].artworkUrl60)
+                oldList[oldItemPosition].artworkUrl100 == newList[newItemPosition].artworkUrl100)
     }
 
     override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
@@ -30,8 +30,8 @@ class MusicPieceDiffUtilCallback(
             bundle.putString(NAME, newList[newItemPosition].artistName)
         if (oldList[oldItemPosition].trackName != newList[newItemPosition].trackName)
             bundle.putString(TRACK, newList[newItemPosition].trackName)
-        if (oldList[oldItemPosition].artworkUrl60 != newList[newItemPosition].artworkUrl60)
-            bundle.putString(COVER, newList[newItemPosition].artworkUrl60)
+        if (oldList[oldItemPosition].artworkUrl100 != newList[newItemPosition].artworkUrl100)
+            bundle.putString(COVER, newList[newItemPosition].artworkUrl100)
 
         return bundle
     }
