@@ -6,7 +6,6 @@ import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
-import com.example.musicapp.domain.database.PlaylistTable
 import com.example.musicapp.domain.entities.Playlist
 
 class PlaylistsViewModel : ViewModel() {
@@ -19,15 +18,11 @@ class PlaylistsViewModel : ViewModel() {
         addPlaylistFragmentIsOpen.value = false
     }
 
-    fun addPlaylist(context: Context, playlist: PlaylistTable) {
-        val thread = Thread {
+    fun addPlaylist(context: Context, playlist: Playlist) {
+        Thread {
             Creator.insertPlaylistUseCase.insertPlaylist(context, playlist)
-        }
-        thread.apply {
-            start()
-            join()
-        }
-        getListOfUsersPlaylists(context)
+            getListOfUsersPlaylists(context)
+        }.start()
     }
 
     fun deletePlaylist(context: Context, id: Int) {

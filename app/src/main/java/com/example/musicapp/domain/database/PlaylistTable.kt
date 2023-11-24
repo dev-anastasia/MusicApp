@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "playlists_table")
 data class PlaylistTable(
     @PrimaryKey(autoGenerate = true) val playlistId: Int,
-    @ColumnInfo val playlistCover: String?,
     @ColumnInfo val playlistName: String,
+    @ColumnInfo val playlistCover: String?,
     @ColumnInfo val systemTimeMillis: Long    // Время создания плейлиста
 )

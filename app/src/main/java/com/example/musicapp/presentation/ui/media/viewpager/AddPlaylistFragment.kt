@@ -10,7 +10,7 @@ import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.musicapp.R
-import com.example.musicapp.domain.database.PlaylistTable
+import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.presenters.PlaylistsViewModel
 
 class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
@@ -72,10 +72,10 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
             else
                 editText.text.toString()
 
-        val newPlaylist = PlaylistTable(
+        val newPlaylist = Playlist(
             0,
-            null,
             playlistName,
+            null,
             System.currentTimeMillis()
         )
         vm.addPlaylist(apContext, newPlaylist)

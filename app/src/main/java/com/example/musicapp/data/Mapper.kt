@@ -28,7 +28,12 @@ class Mapper {
         return playlistList
     }
 
-    fun playlistToPlaylistTable() {
-
+    fun playlistToPlaylistTable(playlist: Playlist): PlaylistTable {
+        return PlaylistTable(
+            playlist.playlistId,
+            playlist.playlistName,
+            playlist.playlistCover,
+            playlist.systemTimeMillis
+        )
     }
 }

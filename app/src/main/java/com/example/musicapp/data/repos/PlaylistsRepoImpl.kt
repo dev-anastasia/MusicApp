@@ -3,7 +3,6 @@ package com.example.musicapp.data.repos
 import android.content.Context
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.domain.database.PlaylistDatabase
-import com.example.musicapp.domain.database.PlaylistTable
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.PlaylistsRepo
 
@@ -31,8 +30,9 @@ class PlaylistsRepoImpl : PlaylistsRepo {
         return mapper.playlistTableListToPlaylistList(list)
     }
 
-    override fun insertPlaylist(context: Context, playlist: PlaylistTable) {
-        PlaylistDatabase.getDatabase(context).dao().insertPlaylist(playlist)
+    override fun insertPlaylist(context: Context, playlist: Playlist) {
+        val playlistTable = mapper.playlistToPlaylistTable(playlist)
+        PlaylistDatabase.getDatabase(context).dao().insertPlaylist(playlistTable)
     }
 
     override fun deletePlaylist(context: Context, id: Int) {
