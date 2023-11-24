@@ -9,23 +9,24 @@ import com.example.musicapp.Creator
 import com.example.musicapp.domain.TrackInfoListener
 import com.example.musicapp.domain.database.PlaylistTrackCrossRef
 import com.example.musicapp.domain.database.TrackTable
+import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.ui.player.PlayerUIState
 
 class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     private val mainHandler = Handler(Looper.getMainLooper())
-
+    private val uiHandler = Handler(Looper.getMainLooper())
     val playerUiState = MutableLiveData<PlayerUIState<Int>>()
 
     val trackNameLiveData = MutableLiveData("")
     val artistNameLiveData = MutableLiveData("")
-    val cover100LiveData = MutableLiveData<String>(null)  // Больший размер (для плеера)
-    private val cover60LiveData = MutableLiveData<String>(null)   // Меньший размер (для БД)
     val durationLiveData = MutableLiveData("")
     val audioPreviewLiveData = MutableLiveData("")
     val isLikedLiveData = MutableLiveData(false)
     val isAddedToMediaLiveData = MutableLiveData(false)
-    var trackId: Long = 0
+    val cover100LiveData = MutableLiveData<String>(null)  // Больший размер (для плеера)
+    private val cover60LiveData = MutableLiveData<String>(null)   // Меньший размер (для БД)
+    private var trackId: Long = 0
 
     fun getTrackInfoFromServer(currentId: Long, context: Context) {
         trackId = currentId
@@ -59,7 +60,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         // здесь будет только лайвдата с uiState
         // liveData.value = UIState
 
-        if (hashmap.isEmpty().not()) {          // СОКРАТИТЬ - DATA CLASS?
+        if (hashmap.isEmpty().not()) {
             if (trackNameLiveData.value != hashmap[TRACK_NAME])
                 trackNameLiveData.value = hashmap[TRACK_NAME]
             if (artistNameLiveData.value != hashmap[ARTIST_NAME])
@@ -146,6 +147,12 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
                 }
             }
         }.start()
+    }
+
+    fun getListOfUsersPlaylists(context: Context, callback: (List<Playlist>) -> Unit)  {
+        Thread {
+            Creator.getPlaylistsUseCase.getAllPlaylists(context, callback)
+            }.start()
     }
 
     private fun addToMedia(context: Context, playlistId: Int) {

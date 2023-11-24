@@ -41,9 +41,9 @@ interface PlaylistsDao {
     @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId") // Готово!
     fun getTracksIds(playlistId: Int): List<Long>
 
-    // Получить список треков по id
+    // Получить трек по id
     @Query("SELECT * FROM tracks_table WHERE trackId = :trackId ORDER BY systemTimeMillis asc")
-    fun getAllTracksListById(trackId: Long): List<TrackTable>
+    fun getAllTracksListById(trackId: Long): TrackTable // List?
 
     // Проверить, есть ли трек в медиатеке (везде кроме Избранного (id = -1))
     @Query("SELECT trackId FROM cross_ref WHERE trackId = :trackId AND playlistId != -1") // Готово!

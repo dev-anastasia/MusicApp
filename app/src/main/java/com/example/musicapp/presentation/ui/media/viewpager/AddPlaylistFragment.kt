@@ -28,8 +28,6 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
         vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
         vm.addPlaylistFragmentIsOpen.value = true
 
-        val fr = requireActivity().supportFragmentManager.backStackEntryCount
-
         editText = view.findViewById(R.id.et_new_playlist_name)
 
         val commitBtn: ImageButton = view.findViewById(R.id.btn_add_playlist)

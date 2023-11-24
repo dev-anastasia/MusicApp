@@ -7,12 +7,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.database.PlaylistTable
+import com.example.musicapp.domain.entities.Playlist
 
 class PlaylistsViewModel : ViewModel() {
 
-    val allPlaylists = MutableLiveData<List<PlaylistTable>>() // Список плейлистов в БД
+    val allPlaylists = MutableLiveData<List<Playlist>>() // Список плейлистов в БД
     var addPlaylistFragmentIsOpen = MutableLiveData<Boolean>()
-    private val mainHandler = Handler(Looper.getMainLooper())
+    private val uiHandler = Handler(Looper.getMainLooper())
 
     init {
         addPlaylistFragmentIsOpen.value = false
@@ -26,7 +27,7 @@ class PlaylistsViewModel : ViewModel() {
             start()
             join()
         }
-        getList(context)
+        getListOfUsersPlaylists(context)
     }
 
     fun deletePlaylist(context: Context, id: Int) {
@@ -37,20 +38,19 @@ class PlaylistsViewModel : ViewModel() {
             start()
             join()
         }
-        getList(context)
+        getListOfUsersPlaylists(context)
     }
 
-    fun getList(context: Context) {
-        var list = emptyList<PlaylistTable>()
-        val thread = Thread {
-            list = Creator.getPlaylistsUseCase.getAllPlaylists(context)
-        }
-        thread.apply {
-            start()
-            join()
-        }
-        updateList(list)
+    fun getListOfUsersPlaylists(context: Context) {
+        Thread {
+            Creator.getPlaylistsUseCase.getAllPlaylists(context) {
+                uiHandler.post {
+                    updateList(it)
+                }
+            }
+        }.start()
     }
+
 
     fun getPlaylistTracksCount(playlistId: Int, context: Context, callback: (Int) -> Unit) {
         Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId, context) {
@@ -67,7 +67,7 @@ class PlaylistsViewModel : ViewModel() {
 
     }
 
-    private fun updateList(list: List<PlaylistTable>) {
+    private fun updateList(list: List<Playlist>) {
         this.allPlaylists.value = list
     }
 }

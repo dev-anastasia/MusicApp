@@ -2,11 +2,12 @@ package com.example.musicapp.presentation.ui.media.playlistsAdapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.domain.database.PlaylistTable
+import com.example.musicapp.domain.entities.Playlist
 
 class PlaylistDiffUtilCallback(
-    private val oldList: MutableList<PlaylistTable>,
-    private val newList: List<PlaylistTable>
+
+    private val oldList: MutableList<Playlist>,
+    private val newList: List<Playlist>
 ) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int = oldList.size

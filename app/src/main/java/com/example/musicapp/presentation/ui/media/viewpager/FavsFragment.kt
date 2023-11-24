@@ -2,8 +2,6 @@ package com.example.musicapp.presentation.ui.media.viewpager
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
@@ -32,8 +30,6 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val uiHandler = Handler(Looper.getMainLooper())
-
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.favs_fragment_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
@@ -48,7 +44,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         vm.tracksList.observe(viewLifecycleOwner) {
             tracksAdapter.updateList(it)
 
-            if (it.isEmpty())  // Если плейлист избранных треков пустой
+            if (it.isEmpty())
                 emptyPlaylistMessage.visibility = View.VISIBLE
             else
                 emptyPlaylistMessage.visibility = View.GONE
@@ -56,7 +52,9 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
     }
 
     override fun onResume() {
+
         vm.getTracksList(apContext, -1) // Получаем список треков
+
         super.onResume()
     }
 
@@ -76,6 +74,5 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
     companion object {
         const val TRACK_ID = "track id key"
-        private val MESSAGE_TIMER = 1000L
     }
 }

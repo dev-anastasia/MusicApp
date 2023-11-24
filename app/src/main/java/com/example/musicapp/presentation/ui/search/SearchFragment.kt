@@ -68,38 +68,41 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         tracksAdapter = TracksAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        vm.searchResultsList.observe(viewLifecycleOwner) { list ->
-            tracksAdapter.updateList(list)
-        }
-
-
-        vm.searchUiState.observe(viewLifecycleOwner) {
-            when (it) {
-                (SearchUIState.Loading) -> {
-                    hideNoSuchResults()
-                    hideKeyboard()
-                    showLoadingIcon()
-                }
-
-                (SearchUIState.Error) -> {
-                    showNoSuchResult()
-                }
-
-                (SearchUIState.Success) -> {
-                    hideLoadingIcon()
-                }
-
-                else -> throw IllegalStateException("Wrong uiState!")
-            }
-        }
-
-        // запрос SearchView
+        // Инициализируем lateinit var: запрос в SearchView
         searchQueryRunnable = Runnable {
             if (currentQueryText == null)
                 currentQueryText = ""
 
             if (currentQueryText!!.isEmpty().not()) {
                 vm.onGetTracksListClicked(currentQueryText!!, ENTITY)
+            }
+        }
+
+        // Устанавливаем observers:
+        vm.apply {
+
+            searchResultsList.observe(viewLifecycleOwner) { list ->
+                tracksAdapter.updateList(list)
+            }
+
+            searchUiState.observe(viewLifecycleOwner) {
+                when (it) {
+                    (SearchUIState.Loading) -> {
+                        hideNoSuchResults()
+                        hideKeyboard()
+                        showLoadingIcon()
+                    }
+
+                    (SearchUIState.Error) -> {
+                        showNoSuchResult()
+                    }
+
+                    (SearchUIState.Success) -> {
+                        hideLoadingIcon()
+                    }
+
+                    else -> throw IllegalStateException("Wrong uiState!")
+                }
             }
         }
     }
@@ -147,7 +150,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
             .commit()
     }
 
-    // МЕТОДЫ ДЛЯ ОБНОВЛЕНИЯ UI:
+    // ПРИВАТНЫЕ МЕТОДЫ ДЛЯ ОБНОВЛЕНИЯ UI:
 
     private fun showLoadingIcon() {     // Иконка загрузки
         if (tracksAdapter.getList().isEmpty().not())

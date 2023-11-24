@@ -2,6 +2,7 @@ package com.example.musicapp.presentation
 
 import android.content.Context
 import com.example.musicapp.domain.database.PlaylistTable
+import com.example.musicapp.domain.entities.Playlist
 
 interface PlaylistsRepo {
 
@@ -9,7 +10,7 @@ interface PlaylistsRepo {
 
     fun getPlaylistCover(context: Context, playlistId: Int, callback: (String) -> Unit)
 
-    fun getAllPlaylists(context: Context) : List<PlaylistTable>
+    fun getAllPlaylists(context: Context) : List<Playlist>
 
     fun insertPlaylist(context: Context, playlist: PlaylistTable)
 

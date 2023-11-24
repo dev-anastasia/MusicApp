@@ -46,26 +46,23 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
             LinearLayoutManager.VERTICAL,
             false
         )
-        // Адаптер и ViewModel
+        // Адаптер и ViewModel (observers)
         tracksAdapter = TrackEntityAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        vm.apply {
+        vm.tracksList.observe(viewLifecycleOwner) {
+            tracksAdapter.updateList(it)
 
-            getTracksList(apContext, playlistId)
-
-            tracksList.observe(viewLifecycleOwner) {
-                tracksAdapter.updateList(it)
-
-                if (it!!.isEmpty())
-                    emptyPlaylistMessage.visibility = View.VISIBLE
-                else
-                    emptyPlaylistMessage.visibility = View.GONE
-            }
+            if (it.isEmpty())
+                emptyPlaylistMessage.visibility = View.VISIBLE
+            else
+                emptyPlaylistMessage.visibility = View.GONE
         }
     }
 
     override fun onResume() {
+
+        vm.getTracksList(apContext, playlistId)     // Получаем список треков
 
         requireView().findViewById<ImageButton>(R.id.single_playlist_fragment_btn_go_back)
             .setOnClickListener {

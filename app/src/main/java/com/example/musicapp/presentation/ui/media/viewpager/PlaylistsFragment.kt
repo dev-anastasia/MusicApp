@@ -69,7 +69,7 @@ class PlaylistsFragment :
     }
 
     override fun onResume() {
-        vm.getList(apContext)
+        vm.getListOfUsersPlaylists(apContext)
 
         super.onResume()
     }

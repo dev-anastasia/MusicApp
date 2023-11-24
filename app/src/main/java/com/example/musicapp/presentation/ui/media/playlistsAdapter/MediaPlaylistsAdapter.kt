@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
 import com.example.musicapp.domain.database.PlaylistTable
+import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.squareup.picasso.Picasso
 
@@ -20,7 +21,7 @@ class MediaPlaylistsAdapter(
 ) : Adapter<PlaylistViewHolder>(),
     PopupMenu.OnMenuItemClickListener {
 
-    private val list: MutableList<PlaylistTable> = mutableListOf()
+    private val list: MutableList<Playlist> = mutableListOf()
     private var currPlaylistId = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -75,7 +76,7 @@ class MediaPlaylistsAdapter(
         }
     }
 
-    fun updateList(newList: List<PlaylistTable>) {
+    fun updateList(newList: List<Playlist>) {
         val diffUtil = DiffUtil.calculateDiff(
             PlaylistDiffUtilCallback(
                 list,

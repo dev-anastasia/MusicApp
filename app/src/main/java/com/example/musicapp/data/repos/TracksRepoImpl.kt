@@ -56,7 +56,7 @@ class TracksRepoImpl : TracksRepo {
     ) {
         val res = mutableListOf<TrackTable>()
         for (i in trackIdsList) {
-            res.addAll(PlaylistDatabase.getDatabase(context).dao().getAllTracksListById(i))
+            res.add(PlaylistDatabase.getDatabase(context).dao().getAllTracksListById(i))
         }
         callback(res)
     }

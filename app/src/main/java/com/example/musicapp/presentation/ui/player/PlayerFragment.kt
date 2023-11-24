@@ -17,9 +17,8 @@ import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.musicapp.Creator
 import com.example.musicapp.R
-import com.example.musicapp.domain.database.PlaylistTable
+import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.presenters.PlayerViewModel
 import com.squareup.picasso.Picasso
 
@@ -35,7 +34,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         }
 
     private val vm: PlayerViewModel by viewModels()
-    private val playlistsList = mutableListOf<PlaylistTable>()
+    private val playlistsList = mutableListOf<Playlist>()
 
     private val trackName: TextView
         get() {
@@ -118,13 +117,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
                 seekbar.progress = 0
             uiHandler.postDelayed(setCurrentSeekBarPosition, CURRENT_SEEKBAR_CHECK_TIMER)
         }
-    }
 
-    override fun onResume() {
-
-        vm.apply {
-
-            getTrackInfoFromServer(currentId, apContext)
+        vm.apply {  // устанавливаем observers:
 
             trackNameLiveData.observe(viewLifecycleOwner) {
                 trackName.text = it
@@ -171,6 +165,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
                 }
             }
         }
+    }
+
+    override fun onResume() {
+
+        vm.getTrackInfoFromServer(currentId, apContext)    // Получаем трек с сервера
 
         // Получение списка доступных плейлистов (для дальнейшего добавления в медиатеку)
         getListOfUsersPlaylists()
@@ -344,13 +343,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
     }
 
     private fun getListOfUsersPlaylists() {
-        Thread {
-            playlistsList.clear()
-            playlistsList.addAll(
-                Creator.getPlaylistsUseCase
-                    .getAllPlaylists(apContext)
-            )
-        }.start()
+        playlistsList.clear()
+        vm.getListOfUsersPlaylists(apContext) {
+            playlistsList.addAll(it)
+        }
+
     }
 
     private fun showMenu(view: View) {
