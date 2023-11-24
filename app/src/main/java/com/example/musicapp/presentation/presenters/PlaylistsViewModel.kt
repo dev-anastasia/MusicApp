@@ -11,7 +11,12 @@ import com.example.musicapp.domain.database.PlaylistTable
 class PlaylistsViewModel : ViewModel() {
 
     val allPlaylists = MutableLiveData<List<PlaylistTable>>() // Список плейлистов в БД
+    var addPlaylistFragmentIsOpen = MutableLiveData<Boolean>()
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    init {
+        addPlaylistFragmentIsOpen.value = false
+    }
 
     fun addPlaylist(context: Context, playlist: PlaylistTable) {
         val thread = Thread {
@@ -47,34 +52,19 @@ class PlaylistsViewModel : ViewModel() {
         updateList(list)
     }
 
-    fun getPlaylistTracksCount(playlistId: Int, context: Context): Int {
-        val idsList = mutableListOf<Long>()
-        val thread = Thread {
-            idsList.addAll(
-                Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(
-                    playlistId, context
-                )
-            )
+    fun getPlaylistTracksCount(playlistId: Int, context: Context, callback: (Int) -> Unit) {
+        Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId, context) {
+            callback(it)
         }
-        thread.apply {
-            start()
-            join()
-        }
-        return idsList.size
     }
 
-    fun getPlaylistCover(playlistId: Int, context: Context): String? {
-        var coverString = ""
-        val thread = Thread {
-            coverString = Creator.getPlaylistInfoUseCase.getPlaylistCover(
-                    playlistId, context
-                )
+    fun getPlaylistCover(playlistId: Int, context: Context, callback: (String?) -> Unit) {
+        Creator.getPlaylistInfoUseCase.getPlaylistCover(
+            playlistId, context
+        ) {
+            callback(it.ifEmpty { null })
         }
-        thread.apply {
-            start()
-            join()
-        }
-        return coverString.ifEmpty { null }
+
     }
 
     private fun updateList(list: List<PlaylistTable>) {

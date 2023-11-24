@@ -35,6 +35,7 @@ class TracksRepoImpl : TracksRepo {
                     mapOfSpecs[PlayerViewModel.DURATION] = res.trackTimeMillis.toString()
                     mapOfSpecs[PlayerViewModel.PREVIEW] = res.previewUrl
                     mapOfSpecs[PlayerViewModel.COVER_IMAGE_100] = res.artworkUrl100
+                    mapOfSpecs[PlayerViewModel.COVER_IMAGE_60] = res.artworkUrl60
                 }
             }   // В остальных случаях вернётся пустая мапа
             callback(mapOfSpecs)
@@ -45,12 +46,7 @@ class TracksRepoImpl : TracksRepo {
         context: Context,
         playlistId: Int
     ): List<Long> {
-        return PlaylistDatabase.getDatabase(context).playlistsDao().getTracksIds(playlistId)
-    }
-
-    override fun getPlaylistCover(context: Context, playlistId: Int): String {
-        return PlaylistDatabase.getDatabase(context).playlistsDao()
-            .getPlaylistCover(playlistId, context)
+        return PlaylistDatabase.getDatabase(context).dao().getTracksIds(playlistId)
     }
 
     override fun getTracksList(
@@ -60,7 +56,7 @@ class TracksRepoImpl : TracksRepo {
     ) {
         val res = mutableListOf<TrackTable>()
         for (i in trackIdsList) {
-            res.addAll(PlaylistDatabase.getDatabase(context).playlistsDao().getAllTracksListById(i))
+            res.addAll(PlaylistDatabase.getDatabase(context).dao().getAllTracksListById(i))
         }
         callback(res)
     }
@@ -95,7 +91,7 @@ class TracksRepoImpl : TracksRepo {
         ref: PlaylistTrackCrossRef,
         context: Context
     ) {
-        PlaylistDatabase.getDatabase(context).playlistsDao()
+        PlaylistDatabase.getDatabase(context).dao()
             .addTrackToPlaylist(ref, track)
     }
 
@@ -106,7 +102,7 @@ class TracksRepoImpl : TracksRepo {
         context: Context,
         callback: (List<Long>) -> Unit
     ) {
-        val res = PlaylistDatabase.getDatabase(context).playlistsDao()
+        val res = PlaylistDatabase.getDatabase(context).dao()
             .findTrackInSinglePlaylist(playlistId, trackId)
         callback(res)
     }
@@ -116,7 +112,7 @@ class TracksRepoImpl : TracksRepo {
         context: Context,
         callback: (List<Int>) -> Unit
     ) {
-        val res = PlaylistDatabase.getDatabase(context).playlistsDao()
+        val res = PlaylistDatabase.getDatabase(context).dao()
             .getPlaylistsOfThisTrack(trackId)
         callback(res)
     }
@@ -126,7 +122,7 @@ class TracksRepoImpl : TracksRepo {
         context: Context,
         callback: (List<Long>) -> Unit
     ) {
-        val res = PlaylistDatabase.getDatabase(context).playlistsDao()
+        val res = PlaylistDatabase.getDatabase(context).dao()
             .lookForTrackInPlaylists(trackId)
         callback(res)
     }
@@ -136,7 +132,8 @@ class TracksRepoImpl : TracksRepo {
         playlistId: Int,
         context: Context
     ) {
-        PlaylistDatabase.getDatabase(context).playlistsDao().deleteTrackFromPlaylist(
-            PlaylistTrackCrossRef(playlistId, trackId), trackId)
+        PlaylistDatabase.getDatabase(context).dao().deleteTrackFromPlaylist(
+            PlaylistTrackCrossRef(playlistId, trackId), trackId
+        )
     }
 }

@@ -1,6 +1,8 @@
 package com.example.musicapp.presentation.ui.media.playlistsAdapter
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -20,6 +22,7 @@ class MediaPlaylistsAdapter(
 
     private val list: MutableList<PlaylistTable> = mutableListOf()
     private var currPlaylistId = 0
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
         // Создаём по макету из layout'а холдер для наших вьюшек
@@ -33,16 +36,9 @@ class MediaPlaylistsAdapter(
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
 
+        bindWithDatabase(holder, position)
+
         holder.name.text = list[position].playlistName
-
-        holder.count.text = "Всего треков: " +
-                "${itemIdListener.getPlaylistTracksCount(list[position].playlistId)}"
-
-        val coverString = itemIdListener.getPlaylistCover(list[position].playlistId)
-        Picasso.get()
-            .load(coverString)
-            .placeholder(R.drawable.note_placeholder)
-            .into(holder.cover)
 
         holder.itemView.setOnClickListener {
             onPlaylistClick(list[position].playlistId)
@@ -90,6 +86,28 @@ class MediaPlaylistsAdapter(
         list.addAll(newList)
         diffUtil.dispatchUpdatesTo(this)
         notifyDataSetChanged()  // Хотела использовать NotifyItemInserted, но не могу правильно передать в него position
+    }
+
+    private fun bindWithDatabase(holder: PlaylistViewHolder, position: Int) {
+
+        Thread {
+            itemIdListener.getPlaylistCover(list[position].playlistId) { str ->
+                mainHandler.post {
+                    Picasso.get()
+                        .load(str)
+                        .placeholder(R.drawable.note_placeholder)
+                        .into(holder.cover)
+                }
+            }
+        }.start()
+
+        Thread {
+            itemIdListener.getPlaylistTracksCount(list[position].playlistId) { count ->
+                mainHandler.post {
+                    holder.count.text = "Всего треков: $count"
+                }
+            }
+        }.start()
     }
 
     private fun onPlaylistClick(id: Int) {

@@ -1,5 +1,6 @@
 package com.example.musicapp.presentation.ui.media
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -19,6 +20,10 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
 
     private lateinit var tracksAdapter: TrackEntityAdapter
     private val vm: TracksViewModel by viewModels()
+    private val apContext: Context
+        get() {
+            return requireActivity().applicationContext
+        }
     private val playlistId: Int
         get() {
             if (_playlistId == null)
@@ -47,7 +52,7 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
 
         vm.apply {
 
-            getTracksList(requireActivity().applicationContext, playlistId)
+            getTracksList(apContext, playlistId)
 
             tracksList.observe(viewLifecycleOwner) {
                 tracksAdapter.updateList(it)

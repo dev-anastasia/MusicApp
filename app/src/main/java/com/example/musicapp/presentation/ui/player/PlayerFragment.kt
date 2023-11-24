@@ -1,5 +1,6 @@
 package com.example.musicapp.presentation.ui.player
 
+import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -28,6 +29,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
     private lateinit var setCurrentTimeRunnable: Runnable
     private lateinit var setCurrentSeekBarPosition: Runnable
     private lateinit var uiHandler: Handler
+    private val apContext: Context
+        get() {
+            return requireActivity().applicationContext
+        }
 
     private val vm: PlayerViewModel by viewModels()
     private val playlistsList = mutableListOf<PlaylistTable>()
@@ -119,7 +124,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
         vm.apply {
 
-            getTrackInfoFromServer(currentId, requireActivity().applicationContext)
+            getTrackInfoFromServer(currentId, apContext)
 
             trackNameLiveData.observe(viewLifecycleOwner) {
                 trackName.text = it
@@ -200,7 +205,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         if (item != null) {
             val playlistId = playlistsList[item.itemId].playlistId
-            vm.mediaIconClicked(requireActivity().applicationContext, playlistId)
+            vm.mediaIconClicked(apContext, playlistId)
         }
         return true
     }
@@ -269,15 +274,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
     private fun setIcons() {    // Установка иконок "Избранное" и "Медиа"
         vm.apply {
-            checkIfFavourite(requireActivity().applicationContext)
-            checkIfAddedToMedia(requireActivity().applicationContext)
+            checkIfFavourite(apContext)
+            checkIfAddedToMedia(apContext)
         }
 
         likeIcon.apply {
             isClickable = true
 
             setOnClickListener {
-                vm.likeClicked(requireActivity().applicationContext)
+                vm.likeClicked(apContext)
             }
         }
 
@@ -343,7 +348,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
             playlistsList.clear()
             playlistsList.addAll(
                 Creator.getPlaylistsUseCase
-                    .getAllPlaylists(requireActivity().applicationContext)
+                    .getAllPlaylists(apContext)
             )
         }.start()
     }

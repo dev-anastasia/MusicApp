@@ -6,7 +6,7 @@ interface OnPlaylistClickListener {
 
     fun deletePlaylistClicked(id: Int)
 
-    fun getPlaylistTracksCount(playlistId: Int): Int
+    fun getPlaylistTracksCount(playlistId: Int, callback: (Int) -> Unit)
 
-    fun getPlaylistCover(playlistId: Int): String?
+    fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit)
 }

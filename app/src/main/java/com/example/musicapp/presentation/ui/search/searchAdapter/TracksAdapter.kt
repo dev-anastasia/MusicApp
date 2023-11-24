@@ -50,7 +50,7 @@ class TracksAdapter(
         holder.songName.text = list[position].trackName
         holder.author.text = list[position].artistName
         Picasso.get()
-            .load(list[position].artworkUrl100)
+            .load(list[position].artworkUrl60)
             .into(holder.cover)
 
         holder.itemView.setOnClickListener {

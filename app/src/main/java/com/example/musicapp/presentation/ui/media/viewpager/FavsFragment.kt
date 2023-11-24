@@ -1,6 +1,9 @@
 package com.example.musicapp.presentation.ui.media.viewpager
 
+import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
@@ -21,9 +24,15 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         get() {
             return requireView().findViewById(R.id.ll_favs_playlist_fragment_empty_playlist)
         }
+    private val apContext: Context
+        get() {
+            return requireActivity().applicationContext
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val uiHandler = Handler(Looper.getMainLooper())
 
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.favs_fragment_recycler_view)
@@ -36,7 +45,6 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         tracksAdapter = TrackEntityAdapter(this)
         recyclerView.adapter = tracksAdapter
 
-        vm.getTracksList(requireActivity().applicationContext, -1) // Получаем список треков
         vm.tracksList.observe(viewLifecycleOwner) {
             tracksAdapter.updateList(it)
 
@@ -47,7 +55,13 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         }
     }
 
+    override fun onResume() {
+        vm.getTracksList(apContext, -1) // Получаем список треков
+        super.onResume()
+    }
+
     override fun onItemClick(id: Long) {
+        // Открытие фрагмента со списком треков плейлиста, id передаётся адаптером
         val playerFragment = PlayerFragment()
         val bundle = Bundle()
         bundle.putLong(TRACK_ID, id)
@@ -62,5 +76,6 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
     companion object {
         const val TRACK_ID = "track id key"
+        private val MESSAGE_TIMER = 1000L
     }
 }

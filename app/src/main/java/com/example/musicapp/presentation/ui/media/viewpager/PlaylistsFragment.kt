@@ -1,12 +1,12 @@
 package com.example.musicapp.presentation.ui.media.viewpager
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.example.musicapp.presentation.presenters.PlaylistsViewModel
@@ -20,9 +20,15 @@ class PlaylistsFragment :
 
     private lateinit var mediaAdapter: MediaPlaylistsAdapter
     private lateinit var vm: PlaylistsViewModel  // владелец - MediaActivity
+    private val apContext: Context
+        get() {
+            return requireActivity().applicationContext
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val addFrBtn = view.findViewById<FloatingActionButton>(R.id.fab_add_playlist)
 
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.media_fragment_playlists_recycler_view)
@@ -37,36 +43,38 @@ class PlaylistsFragment :
 
         vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
 
-        vm.allPlaylists.observe(viewLifecycleOwner) { list ->
-            mediaAdapter.updateList(list)
+        vm.apply {
+
+            allPlaylists.observe(viewLifecycleOwner) { list ->
+                mediaAdapter.updateList(list)
+            }
+
+            addPlaylistFragmentIsOpen.observe(viewLifecycleOwner) {
+                if (it == true)
+                    addFrBtn.visibility = View.GONE
+                else
+                    addFrBtn.visibility = View.VISIBLE
+            }
         }
 
-
         // Кнопка добавления плейлиста
-        view.findViewById<FloatingActionButton>(R.id.fab_add_playlist).setOnClickListener {
-
-//            val lastFragment = requireActivity().supportFragmentManager.getBackStackEntryAt(
-//                requireActivity().supportFragmentManager.backStackEntryCount
-//            )
-//            if (lastFragment != AddPlaylistFragment::class) {
-
-            activity?.supportFragmentManager!!.beginTransaction()
-                .add(R.id.media_container_main, AddPlaylistFragment())
-                .addToBackStack("AddPlaylistFragment")
-                .setReorderingAllowed(true)
-                .commit()
-            //}
+        addFrBtn.setOnClickListener {
+            if (vm.addPlaylistFragmentIsOpen.value!!.not())
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .add(R.id.media_container_main, AddPlaylistFragment())
+                    .addToBackStack("AddPlaylistFragment")
+                    .setReorderingAllowed(true)
+                    .commit()
         }
     }
 
     override fun onResume() {
-        vm.getList(requireActivity().applicationContext)
+        vm.getList(apContext)
 
         super.onResume()
     }
 
     override fun openPlaylistClicked(id: Int) {
-
         // Открытие фрагмента со списком треков плейлиста, id передаётся адаптером
         val fr = SinglePlaylistFragment()
         val bundle = Bundle()
@@ -82,15 +90,19 @@ class PlaylistsFragment :
 
 
     override fun deletePlaylistClicked(id: Int) {
-        vm.deletePlaylist(requireActivity().applicationContext, id)
+        vm.deletePlaylist(apContext, id)
     }
 
-    override fun getPlaylistTracksCount(playlistId: Int): Int {
-        return vm.getPlaylistTracksCount(playlistId, requireActivity().applicationContext)
+    override fun getPlaylistTracksCount(playlistId: Int, callback: (Int) -> Unit) {
+        vm.getPlaylistTracksCount(playlistId, apContext) {
+            callback(it)
+        }
     }
 
-    override fun getPlaylistCover(playlistId: Int): String? {
-        return vm.getPlaylistCover(playlistId, requireActivity().applicationContext)
+    override fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit) {
+        vm.getPlaylistCover(playlistId, apContext) {
+            callback(it)
+        }
     }
 
     private companion object {

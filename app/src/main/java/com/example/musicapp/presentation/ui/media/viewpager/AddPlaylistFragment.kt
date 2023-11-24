@@ -1,5 +1,6 @@
 package com.example.musicapp.presentation.ui.media.viewpager
 
+import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -16,11 +17,18 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
     private lateinit var vm: PlaylistsViewModel  // владелец - MediaActivity
     private lateinit var editText: EditText
+    private val apContext: Context
+        get() {
+            return requireActivity().applicationContext
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
+        vm.addPlaylistFragmentIsOpen.value = true
+
+        val fr = requireActivity().supportFragmentManager.backStackEntryCount
 
         editText = view.findViewById(R.id.et_new_playlist_name)
 
@@ -53,6 +61,11 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
         }
     }
 
+    override fun onDestroy() {
+        vm.addPlaylistFragmentIsOpen.value = false
+        super.onDestroy()
+    }
+
     private fun addPlaylist() {
 
         val playlistName =
@@ -61,14 +74,13 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
             else
                 editText.text.toString()
 
-
         val newPlaylist = PlaylistTable(
             0,
             null,
             playlistName,
             System.currentTimeMillis()
         )
-        vm.addPlaylist(requireActivity().applicationContext, newPlaylist)
+        vm.addPlaylist(apContext, newPlaylist)
         requireActivity().supportFragmentManager.popBackStack()
     }
 }

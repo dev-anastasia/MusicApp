@@ -12,11 +12,6 @@ interface TracksRepo {
         playlistId: Int
     ): List<Long>
 
-    fun getPlaylistCover(
-        context: Context,
-        playlistId: Int
-    ): String
-
     fun getTracksList(
         context: Context,
         trackIdsList: List<Long>,

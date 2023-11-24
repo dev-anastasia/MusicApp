@@ -19,11 +19,11 @@ object Creator {
     val getPlaylistsUseCase = GetPlaylistsUseCase(playlistsRepo)
     val insertPlaylistUseCase = InsertPlaylistUseCase(playlistsRepo)
     val deletePlaylistUseCase = DeletePlaylistUseCase(playlistsRepo)
+    val getPlaylistInfoUseCase = GetPlaylistInfoUseCase(playlistsRepo)
 
     private val tracksRepo: TracksRepo = TracksRepoImpl()
     val getTracksListUseCase = GetTracksListUseCase(tracksRepo)
     val insertTrackUseCase = InsertTrackUseCase(tracksRepo)
     val deleteTrackUseCase = DeleteTrackUseCase(tracksRepo)
     val getTrackInfoUseCase = GetTrackInfoUseCase(tracksRepo)
-    val getPlaylistInfoUseCase = GetPlaylistInfoUseCase(tracksRepo)
 }

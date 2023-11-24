@@ -29,7 +29,7 @@ interface PlaylistsDao {
             getTrackCover(idsList[0])
     }
 
-    // Получитть обложку трека
+    // Получить обложку трека
     @Query("SELECT artworkUrl60 FROM tracks_table WHERE trackId = :trackId")
     fun getTrackCover(trackId: Long): String
 
@@ -42,7 +42,7 @@ interface PlaylistsDao {
     fun getTracksIds(playlistId: Int): List<Long>
 
     // Получить список треков по id
-    @Query("SELECT * FROM tracks_table WHERE trackId = :trackId ORDER BY systemTimeMillis desc")
+    @Query("SELECT * FROM tracks_table WHERE trackId = :trackId ORDER BY systemTimeMillis asc")
     fun getAllTracksListById(trackId: Long): List<TrackTable>
 
     // Проверить, есть ли трек в медиатеке (везде кроме Избранного (id = -1))

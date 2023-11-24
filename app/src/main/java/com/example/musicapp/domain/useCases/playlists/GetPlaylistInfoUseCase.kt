@@ -1,15 +1,19 @@
 package com.example.musicapp.domain.useCases.playlists
 
 import android.content.Context
-import com.example.musicapp.domain.TracksRepo
+import com.example.musicapp.presentation.PlaylistsRepo
 
-class GetPlaylistInfoUseCase(private var repo: TracksRepo) {
+class GetPlaylistInfoUseCase(private var repo: PlaylistsRepo) {
 
-    fun getPlaylistTrackCount(playlistId: Int, context: Context): List<Long> {
-        return repo.getTracksIdsInSinglePlaylist(context, playlistId)
+    fun getPlaylistTrackCount(playlistId: Int, context: Context, callback: (Int) -> Unit) {
+        repo.getPlaylistTracksCount(playlistId, context) {
+            callback(it)
+        }
     }
 
-    fun getPlaylistCover(playlistId: Int, context: Context): String {
-        return repo.getPlaylistCover(context, playlistId)
+    fun getPlaylistCover(playlistId: Int, context: Context, callback: (String) -> Unit) {
+        repo.getPlaylistCover(context, playlistId) {
+            callback(it)
+        }
     }
 }

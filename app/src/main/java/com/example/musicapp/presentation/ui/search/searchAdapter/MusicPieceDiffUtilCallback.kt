@@ -21,7 +21,7 @@ class MusicPieceDiffUtilCallback(
                 &&
                 oldList[oldItemPosition].trackName == newList[newItemPosition].trackName
                 &&
-                oldList[oldItemPosition].artworkUrl100 == newList[newItemPosition].artworkUrl100)
+                oldList[oldItemPosition].artworkUrl60 == newList[newItemPosition].artworkUrl60)
     }
 
     override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
@@ -30,8 +30,8 @@ class MusicPieceDiffUtilCallback(
             bundle.putString(NAME, newList[newItemPosition].artistName)
         if (oldList[oldItemPosition].trackName != newList[newItemPosition].trackName)
             bundle.putString(TRACK, newList[newItemPosition].trackName)
-        if (oldList[oldItemPosition].artworkUrl100 != newList[newItemPosition].artworkUrl100)
-            bundle.putString(COVER, newList[newItemPosition].artworkUrl100)
+        if (oldList[oldItemPosition].artworkUrl60 != newList[newItemPosition].artworkUrl60)
+            bundle.putString(COVER, newList[newItemPosition].artworkUrl60)
 
         return bundle
     }

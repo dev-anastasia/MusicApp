@@ -19,8 +19,8 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     val trackNameLiveData = MutableLiveData("")
     val artistNameLiveData = MutableLiveData("")
-    val cover100LiveData = MutableLiveData("")  // Больший размер (для плеера)
-    private val cover60LiveData = MutableLiveData("")   // Меньший размер (для БД)
+    val cover100LiveData = MutableLiveData<String>(null)  // Больший размер (для плеера)
+    private val cover60LiveData = MutableLiveData<String>(null)   // Меньший размер (для БД)
     val durationLiveData = MutableLiveData("")
     val audioPreviewLiveData = MutableLiveData("")
     val isLikedLiveData = MutableLiveData(false)
@@ -66,6 +66,8 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
                 artistNameLiveData.value = hashmap[ARTIST_NAME]
             if (cover100LiveData.value != hashmap[COVER_IMAGE_100])
                 cover100LiveData.value = hashmap[COVER_IMAGE_100]
+            if (cover60LiveData.value != hashmap[COVER_IMAGE_60])
+                cover60LiveData.value = hashmap[COVER_IMAGE_60]
             if (audioPreviewLiveData.value != hashmap[PREVIEW])
                 audioPreviewLiveData.value = hashmap[PREVIEW]
             if (durationLiveData.value != hashmap[DURATION])
@@ -74,12 +76,6 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
             if (playerUiState.value != PlayerUIState.Success)
                 playerUiState.value = PlayerUIState.Success
         } else {
-            trackNameLiveData.value = ""
-            artistNameLiveData.value = ""
-            cover100LiveData.value = ""
-            cover60LiveData.value = ""
-            audioPreviewLiveData.value = ""
-
             playerUiState.value = PlayerUIState.Error
         }
         covertTrackDurationMillisToString()
@@ -118,7 +114,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
                     trackId,
                     artistNameLiveData.value.toString(),
                     trackNameLiveData.value.toString(),
-                    cover60LiveData.value.toString(),
+                    cover100LiveData.value.toString(),
                     System.currentTimeMillis()
                 )
                 Creator.insertTrackUseCase.addTrackToPlaylist(track, crossRef, context)
@@ -159,7 +155,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
                 trackId,
                 artistNameLiveData.value.toString(),
                 trackNameLiveData.value.toString(),
-                cover100LiveData.value.toString(),
+                cover60LiveData.value.toString(),
                 System.currentTimeMillis()
             )
             Creator.insertTrackUseCase.addTrackToPlaylist(track, crossRef, context)
@@ -187,6 +183,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         const val TRACK_NAME = "track name key"
         const val DURATION = "duration key"
         const val PREVIEW = "preview key"
-        const val COVER_IMAGE_100 = "cover image key"
+        const val COVER_IMAGE_100 = "cover image big key"
+        const val COVER_IMAGE_60 = "cover image small key"
     }
 }

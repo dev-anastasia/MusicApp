@@ -47,6 +47,7 @@ class TrackEntityAdapter(
         holder.author.text = list[position].artistName
         Picasso.get()
             .load(list[position].artworkUrl60)
+            .placeholder(R.drawable.note_placeholder)
             .into(holder.cover)
 
         holder.itemView.setOnClickListener {

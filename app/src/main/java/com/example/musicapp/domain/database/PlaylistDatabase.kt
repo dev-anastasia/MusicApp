@@ -14,7 +14,7 @@ import androidx.room.RoomDatabase
 )
 abstract class PlaylistDatabase : RoomDatabase() {
 
-    abstract fun playlistsDao(): PlaylistsDao
+    abstract fun dao(): PlaylistsDao
 
     companion object {
         @Volatile   // Чтобы избежать рассинхрона в разных потоках
