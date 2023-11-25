@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.TracksViewModel
@@ -63,6 +64,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         val playerFragment = PlayerFragment()
         val bundle = Bundle()
         bundle.putLong(TRACK_ID, id)
+        bundle.putInt(PLAYLIST_ID, Creator.favsPlaylistId)
         playerFragment.arguments = bundle
 
         activity?.supportFragmentManager!!.beginTransaction()
@@ -74,5 +76,6 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
     companion object {
         const val TRACK_ID = "track id key"
+        private const val PLAYLIST_ID = "playlist id key"
     }
 }

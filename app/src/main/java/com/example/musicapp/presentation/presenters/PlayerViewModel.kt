@@ -13,7 +13,6 @@ import com.example.musicapp.presentation.ui.player.PlayerUIState
 
 class PlayerViewModel : ViewModel(), TrackInfoListener {
 
-    private val mainHandler = Handler(Looper.getMainLooper())
     private val uiHandler = Handler(Looper.getMainLooper())
     val playerUiState = MutableLiveData<PlayerUIState<Int>>()
 
@@ -23,16 +22,18 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     val audioPreviewLiveData = MutableLiveData("")
     val isLikedLiveData = MutableLiveData(false)
     val isAddedToMediaLiveData = MutableLiveData(false)
+    val tracksInThisPlaylistList = MutableLiveData<List<MusicTrack>>(emptyList())
     val cover100LiveData = MutableLiveData<String>(null)  // Больший размер (для плеера)
     private val cover60LiveData = MutableLiveData<String>(null)   // Меньший размер (для БД)
     private var trackId: Long = 0
+
 
     fun getTrackInfoFromServer(currentId: Long, context: Context) {
         trackId = currentId
 
         Thread {
             Creator.getTrackInfoUseCase.getTrackInfo(trackId, context) {
-                mainHandler.post {
+                uiHandler.post {
                     updateLiveData(it)
                 }
             }
@@ -85,7 +86,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     fun checkIfFavourite(context: Context) {
         Thread {                                            // "-1" - номер плейлиста избранных треков
             Creator.getTracksListUseCase.lookForTrackInPlaylist(trackId, -1, context) {
-                mainHandler.post {
+                uiHandler.post {
                     isLikedLiveData.value = it.isNotEmpty() // список непустой = true, в избранном
                 }
             }
@@ -95,7 +96,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     fun checkIfAddedToMedia(context: Context) {
         Thread {
             Creator.getTracksListUseCase.lookForTrackInMedia(trackId, context) {
-                mainHandler.post {
+                uiHandler.post {
                     isAddedToMediaLiveData.value =
                         it.isNotEmpty() // список непустой = true, в избранном
                 }
@@ -119,7 +120,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
                 Creator.insertTrackUseCase.addTrackToPlaylist(
                     track, Creator.favsPlaylistId, context
                 )
-                mainHandler.post {
+                uiHandler.post {
                     isLikedLiveData.value = true
                 }
             }.start()
@@ -129,7 +130,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
                 Creator.deleteTrackUseCase.deleteTrackFromPlaylist(
                     trackId, Creator.favsPlaylistId, context
                 )
-                mainHandler.post {
+                uiHandler.post {
                     isLikedLiveData.value = false
                 }
             }.start()
@@ -157,6 +158,16 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         }.start()
     }
 
+    fun getTracksList(context: Context, playlistId: Int) {
+        Thread {
+            Creator.getTracksListUseCase.getPlaylistTracksList(context, playlistId) {
+                uiHandler.post {
+                    updateList(it)
+                }
+            }
+        }.start()
+    }
+
     private fun addToMedia(context: Context, playlistId: Int) {
         Thread {
             val track = MusicTrack(
@@ -168,7 +179,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
                 cover100LiveData.value.toString()
             )
             Creator.insertTrackUseCase.addTrackToPlaylist(track, playlistId, context)
-            mainHandler.post {
+            uiHandler.post {
                 isAddedToMediaLiveData.value = true
             }
         }.start()
@@ -179,12 +190,16 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
             Creator.deleteTrackUseCase.deleteTrackFromPlaylist(trackId, playlistId, context)
             // Обновляем иконку "Медиа" (проверяем, есть ли все еще трек в медиатеке)
             Creator.getTracksListUseCase.lookForTrackInMedia(trackId, context) {
-                mainHandler.post {
+                uiHandler.post {
                     isAddedToMediaLiveData.value =
                         it.isNotEmpty()  // Если список пуст - трек есть в Медиатеке (true)
                 }
             }
         }.start()
+    }
+
+    private fun updateList(list: List<MusicTrack>) {
+        this.tracksInThisPlaylistList.value = list
     }
 
     companion object {

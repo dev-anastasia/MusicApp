@@ -76,6 +76,7 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         val playerFragment = PlayerFragment()
         val bundle = Bundle()
         bundle.putLong(TRACK_ID, id)
+        bundle.putInt(PLAYLIST_ID, playlistId)
         playerFragment.arguments = bundle
 
         activity?.supportFragmentManager!!.beginTransaction()
@@ -92,5 +93,6 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     private companion object {
         const val ID_KEY = "id key"
         const val TRACK_ID = "track id key"
+        const val PLAYLIST_ID = "playlist id key"
     }
 }

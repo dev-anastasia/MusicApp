@@ -142,7 +142,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         bundle.putLong(TRACK_ID, id)
         playerFragment.arguments = bundle
 
-        activity?.supportFragmentManager!!.beginTransaction()
+        requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.search_container, playerFragment)
             .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)
