@@ -8,7 +8,7 @@ import com.example.musicapp.presentation.PlaylistsRepo
 
 class PlaylistsRepoImpl : PlaylistsRepo {
 
-    val mapper = Mapper()
+    private val mapper = Mapper()
 
     override fun getPlaylistTracksCount(
         playlistId: Int,

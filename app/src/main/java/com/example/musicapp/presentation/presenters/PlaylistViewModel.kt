@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.entities.Playlist
 
-class PlaylistsViewModel : ViewModel() {
+class PlaylistViewModel : ViewModel() {
 
     val allPlaylists = MutableLiveData<List<Playlist>>() // Список плейлистов в БД
     var addPlaylistFragmentIsOpen = MutableLiveData<Boolean>()

@@ -1,16 +1,36 @@
 package com.example.musicapp.data
 
 import com.example.musicapp.domain.database.PlaylistTable
+import com.example.musicapp.domain.database.TrackTable
+import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
 
 class Mapper {
+    // Конвертирует сущности базы данных в дата-классы для domain и ui слоёв, и наоборот
 
-    fun trackTableToTrack() {
-
+    fun trackTableListToMusicTrackList(list: List<TrackTable>): List<MusicTrack> {
+        val listOfTracks = mutableListOf<MusicTrack>()
+        for (i in list.indices) {
+            listOfTracks.add(MusicTrack(
+                list[i].trackId,
+                list[i].artistName,
+                list[i].trackName,
+                null,
+                list[i].artworkUrl60,
+                null
+            ))
+        }
+        return listOfTracks
     }
 
-    fun trackToTrackTable() {
-
+    fun musicTrackToTrackTable(track: MusicTrack): TrackTable {
+        return TrackTable(
+            track.trackId,
+            track.artistName,
+            track.trackName,
+            track.artworkUrl60!!,
+            System.currentTimeMillis()
+        )
     }
 
     fun playlistTableListToPlaylistList(list: List<PlaylistTable>): List<Playlist> {

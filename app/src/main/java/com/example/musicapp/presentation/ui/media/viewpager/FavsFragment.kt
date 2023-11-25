@@ -11,12 +11,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.TracksViewModel
-import com.example.musicapp.presentation.ui.media.tracksAdapter.TrackEntityAdapter
 import com.example.musicapp.presentation.ui.player.PlayerFragment
+import com.example.musicapp.presentation.ui.trackAdapter.TrackAdapter
 
 class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
-    private lateinit var tracksAdapter: TrackEntityAdapter
+    private lateinit var trackAdapter: TrackAdapter
     private val vm: TracksViewModel by viewModels()
     private val emptyPlaylistMessage: LinearLayout
         get() {
@@ -38,11 +38,11 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
             false
         )
         // Адаптер и ViewModel
-        tracksAdapter = TrackEntityAdapter(this)
-        recyclerView.adapter = tracksAdapter
+        trackAdapter = TrackAdapter(this)
+        recyclerView.adapter = trackAdapter
 
         vm.tracksList.observe(viewLifecycleOwner) {
-            tracksAdapter.updateList(it)
+            trackAdapter.updateList(it)
 
             if (it.isEmpty())
                 emptyPlaylistMessage.visibility = View.VISIBLE

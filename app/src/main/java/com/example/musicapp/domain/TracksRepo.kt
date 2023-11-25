@@ -1,8 +1,6 @@
 package com.example.musicapp.domain
 
 import android.content.Context
-import com.example.musicapp.domain.database.PlaylistTrackCrossRef
-import com.example.musicapp.domain.database.TrackTable
 import com.example.musicapp.domain.entities.MusicTrack
 
 interface TracksRepo {
@@ -15,7 +13,7 @@ interface TracksRepo {
     fun getTracksList(
         context: Context,
         trackIdsList: List<Long>,
-        callback: (List<TrackTable>) -> Unit
+        callback: (List<MusicTrack>) -> Unit
     )
 
     fun getSearchResult(
@@ -50,8 +48,8 @@ interface TracksRepo {
     )
 
     fun addTrackInPlaylist(
-        track: TrackTable,
-        ref: PlaylistTrackCrossRef,
+        track: MusicTrack,
+        playlistId: Int,
         context: Context
     )
 

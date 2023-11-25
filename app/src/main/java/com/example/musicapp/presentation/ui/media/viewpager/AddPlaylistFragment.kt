@@ -11,11 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.musicapp.R
 import com.example.musicapp.domain.entities.Playlist
-import com.example.musicapp.presentation.presenters.PlaylistsViewModel
+import com.example.musicapp.presentation.presenters.PlaylistViewModel
 
 class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
-    private lateinit var vm: PlaylistsViewModel  // владелец - MediaActivity
+    private lateinit var vm: PlaylistViewModel  // владелец - MediaActivity
     private lateinit var editText: EditText
     private val apContext: Context
         get() {
@@ -25,7 +25,7 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
+        vm = ViewModelProvider(requireActivity())[PlaylistViewModel::class.java]
         vm.addPlaylistFragmentIsOpen.value = true
 
         editText = view.findViewById(R.id.et_new_playlist_name)

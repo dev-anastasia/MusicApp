@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.media.playlistsAdapter
+package com.example.musicapp.presentation.ui.playlistAdapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil

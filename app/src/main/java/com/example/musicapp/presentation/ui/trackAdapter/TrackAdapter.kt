@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.search.searchAdapter
+package com.example.musicapp.presentation.ui.trackAdapter
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.squareup.picasso.Picasso
 
-class TracksAdapter(
+class TrackAdapter(
     private val itemIdListener: OnTrackClickListener    // Интерфейс для выбора item'а из RV
 ) : Adapter<MusicPieceViewHolder>() {
 

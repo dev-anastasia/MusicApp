@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.search.searchAdapter
+package com.example.musicapp.presentation.ui.trackAdapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil

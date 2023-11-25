@@ -1,6 +1,7 @@
 package com.example.musicapp.data.repos
 
 import android.content.Context
+import com.example.musicapp.data.Mapper
 import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.TracksRepo
 import com.example.musicapp.domain.database.PlaylistDatabase
@@ -13,6 +14,8 @@ import com.example.musicapp.presentation.presenters.PlayerViewModel
 import retrofit2.Call
 
 class TracksRepoImpl : TracksRepo {
+
+    private val mapper = Mapper()
 
     override fun getTrackInfo(
         currentId: Long,
@@ -52,13 +55,14 @@ class TracksRepoImpl : TracksRepo {
     override fun getTracksList(
         context: Context,
         trackIdsList: List<Long>,
-        callback: (List<TrackTable>) -> Unit
+        callback: (List<MusicTrack>) -> Unit
     ) {
-        val res = mutableListOf<TrackTable>()
+        val list = mutableListOf<TrackTable>()
         for (i in trackIdsList) {
-            res.add(PlaylistDatabase.getDatabase(context).dao().getAllTracksListById(i))
+            list.add(PlaylistDatabase.getDatabase(context).dao().getAllTracksListById(i))
         }
-        callback(res)
+        val result = mapper.trackTableListToMusicTrackList(list)
+        callback(result)
     }
 
     override fun getSearchResult(
@@ -87,12 +91,13 @@ class TracksRepoImpl : TracksRepo {
     }
 
     override fun addTrackInPlaylist(
-        track: TrackTable,
-        ref: PlaylistTrackCrossRef,
+        track: MusicTrack,
+        playlistId: Int,
         context: Context
     ) {
-        PlaylistDatabase.getDatabase(context).dao()
-            .addTrackToPlaylist(ref, track)
+        val trackTable = mapper.musicTrackToTrackTable(track)
+        PlaylistDatabase.getDatabase(context).dao().addTrackToPlaylist(
+            PlaylistTrackCrossRef(playlistId, track.trackId), trackTable)
     }
 
 

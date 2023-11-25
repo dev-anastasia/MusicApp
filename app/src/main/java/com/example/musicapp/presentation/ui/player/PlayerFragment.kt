@@ -119,6 +119,24 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         }
 
         vm.apply {  // устанавливаем observers:
+            playerUiState.observe(viewLifecycleOwner) {
+                when (it) {
+
+                    (PlayerUIState.Success) -> {
+                        updateUI()
+                    }
+
+                    (PlayerUIState.Error) -> {
+                        Toast.makeText(
+                            activity,
+                            "Ошибка: не удалось связаться с сервером",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    else -> throw IllegalStateException("Illegal UI State")
+                }
+            }
 
             trackNameLiveData.observe(viewLifecycleOwner) {
                 trackName.text = it
@@ -144,25 +162,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
                     mediaIcon.setBackgroundResource(R.drawable.icon_media_added)
                 else
                     mediaIcon.setBackgroundResource(R.drawable.icon_media_empty)
-            }
-
-            playerUiState.observe(viewLifecycleOwner) {
-                when (it) {
-
-                    (PlayerUIState.Success) -> {
-                        updateUI()
-                    }
-
-                    (PlayerUIState.Error) -> {
-                        Toast.makeText(
-                            activity,
-                            "Ошибка: не удалось связаться с сервером",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    else -> throw IllegalStateException("Illegal UI State")
-                }
             }
         }
     }
@@ -312,7 +311,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         }
     }
 
-
     private fun setSeekbar() {
         seekbar.apply {
             isClickable = true      // Теперь можно перематывать время трека
@@ -347,7 +345,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         vm.getListOfUsersPlaylists(apContext) {
             playlistsList.addAll(it)
         }
-
     }
 
     private fun showMenu(view: View) {

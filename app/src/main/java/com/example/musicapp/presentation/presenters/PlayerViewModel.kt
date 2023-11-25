@@ -7,8 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.TrackInfoListener
-import com.example.musicapp.domain.database.PlaylistTrackCrossRef
-import com.example.musicapp.domain.database.TrackTable
+import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.ui.player.PlayerUIState
 
@@ -85,7 +84,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     //Проверка статуса "Нравится"/"Не нравится" (иконка с сердечком)
     fun checkIfFavourite(context: Context) {
         Thread {                                            // "-1" - номер плейлиста избранных треков
-            Creator.getTracksListUseCase.findTrackInSinglePlaylist(trackId, -1, context) {
+            Creator.getTracksListUseCase.lookForTrackInPlaylist(trackId, -1, context) {
                 mainHandler.post {
                     isLikedLiveData.value = it.isNotEmpty() // список непустой = true, в избранном
                 }
@@ -109,16 +108,17 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         if (isLikedLiveData.value == false) {
             // Добавляем в избранное:
             Thread {
-                val crossRef =
-                    PlaylistTrackCrossRef(-1, trackId) // "-1" - номер плейлиста избранных треков
-                val track = TrackTable(
+                val track = MusicTrack(
                     trackId,
                     artistNameLiveData.value.toString(),
                     trackNameLiveData.value.toString(),
-                    cover100LiveData.value.toString(),
-                    System.currentTimeMillis()
+                    audioPreviewLiveData.value.toString(),
+                    cover60LiveData.value.toString(),
+                    cover100LiveData.value.toString()
                 )
-                Creator.insertTrackUseCase.addTrackToPlaylist(track, crossRef, context)
+                Creator.insertTrackUseCase.addTrackToPlaylist(
+                    track, Creator.favsPlaylistId, context
+                )
                 mainHandler.post {
                     isLikedLiveData.value = true
                 }
@@ -126,7 +126,9 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         } else {
             // Удаляем из избранного:
             Thread {
-                Creator.deleteTrackUseCase.deleteTrackFromPlaylist(trackId, -1, context)
+                Creator.deleteTrackUseCase.deleteTrackFromPlaylist(
+                    trackId, Creator.favsPlaylistId, context
+                )
                 mainHandler.post {
                     isLikedLiveData.value = false
                 }
@@ -137,35 +139,35 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     // Логика нажатия на иконку "Медиа"
     fun mediaIconClicked(context: Context, playlistId: Int) {
         Thread {    // Ищем: есть ли уже трек в выбранном плейлисте? (по аналогии с Яндекс.Музыкой)
-            Creator.getTracksListUseCase.findTrackInSinglePlaylist(
+            Creator.getTracksListUseCase.lookForTrackInPlaylist(
                 trackId, playlistId, context
             ) {
-                if (it.isEmpty()) {   // Если трека нет в этом плейлисте - добавляем
+                if (it.isEmpty()) {                 // Если трека нет в этом плейлисте - добавляем
                     addToMedia(context, playlistId)
-                } else {       // Если трек уже есть в этом плейлисте - удаляем
+                } else {                        // Если трек уже есть в этом плейлисте - удаляем
                     deleteFromMedia(context, playlistId)
                 }
             }
         }.start()
     }
 
-    fun getListOfUsersPlaylists(context: Context, callback: (List<Playlist>) -> Unit)  {
+    fun getListOfUsersPlaylists(context: Context, callback: (List<Playlist>) -> Unit) {
         Thread {
             Creator.getPlaylistsUseCase.getAllPlaylists(context, callback)
-            }.start()
+        }.start()
     }
 
     private fun addToMedia(context: Context, playlistId: Int) {
         Thread {
-            val crossRef = PlaylistTrackCrossRef(playlistId, trackId)
-            val track = TrackTable(
+            val track = MusicTrack(
                 trackId,
                 artistNameLiveData.value.toString(),
                 trackNameLiveData.value.toString(),
+                audioPreviewLiveData.value.toString(),
                 cover60LiveData.value.toString(),
-                System.currentTimeMillis()
+                cover100LiveData.value.toString()
             )
-            Creator.insertTrackUseCase.addTrackToPlaylist(track, crossRef, context)
+            Creator.insertTrackUseCase.addTrackToPlaylist(track, playlistId, context)
             mainHandler.post {
                 isAddedToMediaLiveData.value = true
             }

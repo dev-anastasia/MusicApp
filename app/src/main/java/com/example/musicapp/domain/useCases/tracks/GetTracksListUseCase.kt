@@ -2,15 +2,14 @@ package com.example.musicapp.domain.useCases.tracks
 
 import android.content.Context
 import com.example.musicapp.domain.TracksRepo
-import com.example.musicapp.domain.database.TrackTable
 import com.example.musicapp.domain.entities.MusicTrack
 
 class GetTracksListUseCase(private val repo: TracksRepo) {
 
-    fun getTracksList(
+    fun getPlaylistTracksList(
         context: Context,
         playlistId: Int,
-        callback: (List<TrackTable>) -> Unit
+        callback: (List<MusicTrack>) -> Unit
     ) {
         val idsList = repo.getTracksIdsInSinglePlaylist(context, playlistId)
         repo.getTracksList(context, idsList, callback)
@@ -24,7 +23,7 @@ class GetTracksListUseCase(private val repo: TracksRepo) {
         repo.getSearchResult(queryText, entity, callback)
     }
 
-    fun findTrackInSinglePlaylist(
+    fun lookForTrackInPlaylist(
         trackId: Long,
         playlistId: Int,
         context: Context,

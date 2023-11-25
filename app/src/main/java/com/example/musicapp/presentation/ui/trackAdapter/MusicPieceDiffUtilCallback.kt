@@ -1,12 +1,12 @@
-package com.example.musicapp.presentation.ui.media.tracksAdapter
+package com.example.musicapp.presentation.ui.trackAdapter
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.example.musicapp.domain.database.TrackTable
+import com.example.musicapp.domain.entities.MusicTrack
 
-class TrackEntityDiffUtilCallback(
-    private val oldList: List<TrackTable>,
-    private val newList: List<TrackTable>) : DiffUtil.Callback() {
+class MusicPieceDiffUtilCallback(
+    private val oldList: List<MusicTrack>,
+    private val newList: List<MusicTrack>) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int = oldList.size
 

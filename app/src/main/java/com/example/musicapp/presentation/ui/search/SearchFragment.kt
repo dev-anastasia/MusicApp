@@ -1,6 +1,5 @@
 package com.example.musicapp.presentation.ui.search
 
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,7 +17,7 @@ import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.player.PlayerFragment
-import com.example.musicapp.presentation.ui.search.searchAdapter.TracksAdapter
+import com.example.musicapp.presentation.ui.trackAdapter.TrackAdapter
 
 class SearchFragment : Fragment(R.layout.fragment_search),
     OnTrackClickListener {
@@ -26,7 +25,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
     private val vm: SearchViewModel by viewModels()
 
     private lateinit var searchQueryRunnable: Runnable
-    private lateinit var tracksAdapter: TracksAdapter
+    private lateinit var trackAdapter: TrackAdapter
     private lateinit var uiHandler: Handler
     private var currentQueryText: String? = ""  // текущий текст запроса
 
@@ -65,8 +64,8 @@ class SearchFragment : Fragment(R.layout.fragment_search),
             false
         )
         // Адаптер
-        tracksAdapter = TracksAdapter(this)
-        recyclerView.adapter = tracksAdapter
+        trackAdapter = TrackAdapter(this)
+        recyclerView.adapter = trackAdapter
 
         // Инициализируем lateinit var: запрос в SearchView
         searchQueryRunnable = Runnable {
@@ -82,7 +81,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         vm.apply {
 
             searchResultsList.observe(viewLifecycleOwner) { list ->
-                tracksAdapter.updateList(list)
+                trackAdapter.updateList(list)
             }
 
             searchUiState.observe(viewLifecycleOwner) {
@@ -153,8 +152,8 @@ class SearchFragment : Fragment(R.layout.fragment_search),
     // ПРИВАТНЫЕ МЕТОДЫ ДЛЯ ОБНОВЛЕНИЯ UI:
 
     private fun showLoadingIcon() {     // Иконка загрузки
-        if (tracksAdapter.getList().isEmpty().not())
-            tracksAdapter.updateList(emptyList())
+        if (trackAdapter.getList().isEmpty().not())
+            trackAdapter.updateList(emptyList())
         loadingImage.visibility = View.VISIBLE
         errorLayout.visibility = View.GONE
     }
@@ -164,8 +163,8 @@ class SearchFragment : Fragment(R.layout.fragment_search),
     }
 
     private fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
-        if (tracksAdapter.getList().isEmpty().not())
-            tracksAdapter.updateList(emptyList())
+        if (trackAdapter.getList().isEmpty().not())
+            trackAdapter.updateList(emptyList())
         errorLayout.visibility = View.VISIBLE
         loadingImage.visibility = View.GONE
         errorText.text = "Ничего не найдено :("

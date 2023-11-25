@@ -1,4 +1,4 @@
-package com.example.musicapp.presentation.ui.media.playlistsAdapter
+package com.example.musicapp.presentation.ui.playlistAdapter
 
 import android.os.Bundle
 import android.os.Handler
@@ -11,12 +11,11 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
-import com.example.musicapp.domain.database.PlaylistTable
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.squareup.picasso.Picasso
 
-class MediaPlaylistsAdapter(
+class PlaylistAdapter(
     private val itemIdListener: OnPlaylistClickListener    // Интерфейс для выбора item'а из RV
 ) : Adapter<PlaylistViewHolder>(),
     PopupMenu.OnMenuItemClickListener {
@@ -122,7 +121,7 @@ class MediaPlaylistsAdapter(
         pMenu.apply {
             inflate(R.menu.menu)
             pMenu.menu.add("Удалить")
-            setOnMenuItemClickListener(this@MediaPlaylistsAdapter)
+            setOnMenuItemClickListener(this@PlaylistAdapter)
             show()
         }
     }

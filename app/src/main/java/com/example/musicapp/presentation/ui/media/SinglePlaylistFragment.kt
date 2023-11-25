@@ -12,13 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.TracksViewModel
-import com.example.musicapp.presentation.ui.media.tracksAdapter.TrackEntityAdapter
 import com.example.musicapp.presentation.ui.player.PlayerFragment
+import com.example.musicapp.presentation.ui.trackAdapter.TrackAdapter
 
 class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     OnTrackClickListener {
 
-    private lateinit var tracksAdapter: TrackEntityAdapter
+    private lateinit var trackAdapter: TrackAdapter
     private val vm: TracksViewModel by viewModels()
     private val apContext: Context
         get() {
@@ -38,7 +38,6 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         val emptyPlaylistMessage: LinearLayout =
             view.findViewById(R.id.ll_single_playlist_fragment_empty_playlist)
 
-        // Адаптер - ДОЛЖЕН использоваться тот же, что в поисковике (маппинг TrackEntity в Track!)
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.single_playlist_fragment_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
@@ -47,11 +46,11 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
             false
         )
         // Адаптер и ViewModel (observers)
-        tracksAdapter = TrackEntityAdapter(this)
-        recyclerView.adapter = tracksAdapter
+        trackAdapter = TrackAdapter(this)
+        recyclerView.adapter = trackAdapter
 
         vm.tracksList.observe(viewLifecycleOwner) {
-            tracksAdapter.updateList(it)
+            trackAdapter.updateList(it)
 
             if (it.isEmpty())
                 emptyPlaylistMessage.visibility = View.VISIBLE

@@ -9,17 +9,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnPlaylistClickListener
-import com.example.musicapp.presentation.presenters.PlaylistsViewModel
+import com.example.musicapp.presentation.presenters.PlaylistViewModel
 import com.example.musicapp.presentation.ui.media.SinglePlaylistFragment
-import com.example.musicapp.presentation.ui.media.playlistsAdapter.MediaPlaylistsAdapter
+import com.example.musicapp.presentation.ui.playlistAdapter.PlaylistAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class PlaylistsFragment :
+class MediaPlaylistListFragment :
     Fragment(R.layout.fragment_playlists),
     OnPlaylistClickListener {
 
-    private lateinit var mediaAdapter: MediaPlaylistsAdapter
-    private lateinit var vm: PlaylistsViewModel  // владелец - MediaActivity
+    private lateinit var mediaAdapter: PlaylistAdapter
+    private lateinit var vm: PlaylistViewModel  // владелец - MediaActivity
     private val apContext: Context
         get() {
             return requireActivity().applicationContext
@@ -38,10 +38,10 @@ class PlaylistsFragment :
             false
         )
         // Адаптер и ViewModel
-        mediaAdapter = MediaPlaylistsAdapter(this)
+        mediaAdapter = PlaylistAdapter(this)
         recyclerView.adapter = mediaAdapter
 
-        vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
+        vm = ViewModelProvider(requireActivity())[PlaylistViewModel::class.java]
 
         vm.apply {
 
