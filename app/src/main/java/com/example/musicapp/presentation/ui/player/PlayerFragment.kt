@@ -202,7 +202,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         super.onPause()
     }
 
-    override fun onDestroy() {  // Проблема при перевороте экрана!!!
+    override fun onDestroy() {
         uiHandler.apply {
             removeCallbacks(setCurrentSeekBarPosition)
             removeCallbacks(setCurrentTimeRunnable)
@@ -213,7 +213,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         if (item != null) {
             val playlistId = playlistsList[item.itemId].playlistId
-            vm.mediaIconClicked(apContext, playlistId)
+            vm.mediaIconClicked(playlistId, apContext)
         }
         return true
     }
@@ -237,7 +237,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
                 prepareAsync()
             }
         }
-
 
         // Кнопка play
         playBtn.apply {
@@ -295,6 +294,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         }
 
         likeIcon.apply {
+
             isClickable = true
 
             setOnClickListener {
@@ -303,6 +303,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         }
 
         mediaIcon.apply {
+
             isClickable = true
 
             setOnClickListener {
@@ -330,7 +331,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
     }
 
     private fun setPrevAndNextBtns() {
-        vm.getTracksList(apContext, playlistId!!)
+        vm.getTracksList(playlistId!!, apContext)
 
         vm.tracksInThisPlaylistList.observe(viewLifecycleOwner) { list ->
             var currentTrackPosition = 0
@@ -417,13 +418,14 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
         releasePlayer()
 
-        requireActivity().supportFragmentManager.popBackStack()
-
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.media_container_main, playerFragment)
-            .addToBackStack("added PlayerFragment")
-            .setReorderingAllowed(true)
-            .commit()
+        requireActivity().supportFragmentManager.apply {
+            popBackStack()
+            beginTransaction()
+                .replace(R.id.media_container_main, playerFragment)
+                .addToBackStack("added PlayerFragment")
+                .setReorderingAllowed(true)
+                .commit()
+        }
     }
 
 
@@ -455,9 +457,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
     private companion object {
         const val CURRENT_TIME_CHECK_TIMER = 1000L
+        const val CURRENT_SEEKBAR_CHECK_TIMER = 600L
         const val TRACK_ID = "track id key"
         const val PLAYLIST_ID = "playlist id key"
-        const val CURRENT_SEEKBAR_CHECK_TIMER = 600L
         var mediaPlayer = MediaPlayer()
     }
 }

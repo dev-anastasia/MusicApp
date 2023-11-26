@@ -6,10 +6,7 @@ import com.example.musicapp.presentation.PlaylistsRepo
 
 class InsertPlaylistUseCase(private var repo: PlaylistsRepo) {
 
-    fun insertPlaylist(
-        context: Context,
-        playlist: Playlist
-    ) {
+    fun insertPlaylist(context: Context, playlist: Playlist) {
         repo.insertPlaylist(context, playlist)
     }
 }

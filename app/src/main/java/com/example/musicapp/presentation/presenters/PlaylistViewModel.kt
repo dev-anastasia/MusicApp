@@ -10,13 +10,9 @@ import com.example.musicapp.domain.entities.Playlist
 
 class PlaylistViewModel : ViewModel() {
 
-    val allPlaylists = MutableLiveData<List<Playlist>>() // Список плейлистов в БД
-    var addPlaylistFragmentIsOpen = MutableLiveData<Boolean>()
+    val allPlaylists = MutableLiveData<List<Playlist>>(emptyList()) // Список плейлистов в БД
+    var addPlaylistFragmentIsOpen = MutableLiveData(false)
     private val uiHandler = Handler(Looper.getMainLooper())
-
-    init {
-        addPlaylistFragmentIsOpen.value = false
-    }
 
     fun addPlaylist(context: Context, playlist: Playlist) {
         Thread {
@@ -26,14 +22,10 @@ class PlaylistViewModel : ViewModel() {
     }
 
     fun deletePlaylist(context: Context, id: Int) {
-        val thread = Thread {
+        Thread {
             Creator.deletePlaylistUseCase.deletePlaylist(context, id)
-        }
-        thread.apply {
-            start()
-            join()
-        }
-        getListOfUsersPlaylists(context)
+            getListOfUsersPlaylists(context)
+        }.start()
     }
 
     fun getListOfUsersPlaylists(context: Context) {

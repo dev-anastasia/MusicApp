@@ -1,14 +1,14 @@
 package com.example.musicapp.data
 
-import com.example.musicapp.domain.database.PlaylistTable
-import com.example.musicapp.domain.database.TrackTable
+import com.example.musicapp.domain.database.PlaylistEntity
+import com.example.musicapp.domain.database.TrackEntity
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
 
 class Mapper {
     // Конвертирует сущности базы данных в дата-классы для domain и ui слоёв, и наоборот
 
-    fun trackTableListToMusicTrackList(list: List<TrackTable>): List<MusicTrack> {
+    fun trackTableListToMusicTrackList(list: List<TrackEntity>): List<MusicTrack> {
         val listOfTracks = mutableListOf<MusicTrack>()
         for (i in list.indices) {
             listOfTracks.add(MusicTrack(
@@ -23,8 +23,8 @@ class Mapper {
         return listOfTracks
     }
 
-    fun musicTrackToTrackTable(track: MusicTrack): TrackTable {
-        return TrackTable(
+    fun musicTrackToTrackTable(track: MusicTrack): TrackEntity {
+        return TrackEntity(
             track.trackId,
             track.artistName,
             track.trackName,
@@ -33,7 +33,7 @@ class Mapper {
         )
     }
 
-    fun playlistTableListToPlaylistList(list: List<PlaylistTable>): List<Playlist> {
+    fun playlistTableListToPlaylistList(list: List<PlaylistEntity>): List<Playlist> {
         val playlistList = mutableListOf<Playlist>()
         for (i in list.indices) {
             playlistList.add(
@@ -48,8 +48,8 @@ class Mapper {
         return playlistList
     }
 
-    fun playlistToPlaylistTable(playlist: Playlist): PlaylistTable {
-        return PlaylistTable(
+    fun playlistToPlaylistTable(playlist: Playlist): PlaylistEntity {
+        return PlaylistEntity(
             playlist.playlistId,
             playlist.playlistName,
             playlist.playlistCover,

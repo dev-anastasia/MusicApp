@@ -11,8 +11,8 @@ class GetTracksListUseCase(private val repo: TracksRepo) {
         playlistId: Int,
         callback: (List<MusicTrack>) -> Unit
     ) {
-        val idsList = repo.getTracksIdsInSinglePlaylist(context, playlistId)
-        repo.getTracksList(context, idsList, callback)
+        val idsList = repo.getTracksIdsInSinglePlaylist(playlistId, context)
+        repo.getTracksList(idsList, context, callback)
     }
 
     fun getSearchResults(

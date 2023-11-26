@@ -29,6 +29,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
 
 
     fun getTrackInfoFromServer(currentId: Long, context: Context) {
+
         trackId = currentId
 
         Thread {
@@ -41,6 +42,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     }
 
     private fun covertTrackDurationMillisToString() {
+
         if (durationLiveData.value!! != "0:00") {
             val dur = durationLiveData.value!!.toLong()
             val durationInMinutes = (dur / 1000 / 60).toString()
@@ -54,12 +56,6 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     }
 
     override fun updateLiveData(hashmap: HashMap<String, String>) {
-        // Обновить данные лайвдаты согласно хэшмапе после ответа из сети
-
-        // Перенести эти состояния(hashmap) в UIState,
-        // здесь будет только лайвдата с uiState
-        // liveData.value = UIState
-
         if (hashmap.isEmpty().not()) {
             if (trackNameLiveData.value != hashmap[TRACK_NAME])
                 trackNameLiveData.value = hashmap[TRACK_NAME]
@@ -84,7 +80,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     //Проверка статуса "Нравится"/"Не нравится" (иконка с сердечком)
     fun checkIfFavourite(context: Context) {
-        Thread {                                            // "-1" - номер плейлиста избранных треков
+        Thread {
             Creator.getTracksListUseCase.lookForTrackInPlaylist(trackId, -1, context) {
                 uiHandler.post {
                     isLikedLiveData.value = it.isNotEmpty() // список непустой = true, в избранном
@@ -138,15 +134,15 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     }
 
     // Логика нажатия на иконку "Медиа"
-    fun mediaIconClicked(context: Context, playlistId: Int) {
+    fun mediaIconClicked( playlistId: Int, context: Context) {
         Thread {    // Ищем: есть ли уже трек в выбранном плейлисте? (по аналогии с Яндекс.Музыкой)
             Creator.getTracksListUseCase.lookForTrackInPlaylist(
                 trackId, playlistId, context
             ) {
                 if (it.isEmpty()) {                 // Если трека нет в этом плейлисте - добавляем
-                    addToMedia(context, playlistId)
+                    addToMedia(playlistId, context)
                 } else {                        // Если трек уже есть в этом плейлисте - удаляем
-                    deleteFromMedia(context, playlistId)
+                    deleteFromMedia(playlistId, context)
                 }
             }
         }.start()
@@ -158,7 +154,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         }.start()
     }
 
-    fun getTracksList(context: Context, playlistId: Int) {
+    fun getTracksList(playlistId: Int, context: Context) {
         Thread {
             Creator.getTracksListUseCase.getPlaylistTracksList(context, playlistId) {
                 uiHandler.post {
@@ -168,7 +164,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         }.start()
     }
 
-    private fun addToMedia(context: Context, playlistId: Int) {
+    private fun addToMedia(playlistId: Int, context: Context) {
         Thread {
             val track = MusicTrack(
                 trackId,
@@ -185,7 +181,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         }.start()
     }
 
-    private fun deleteFromMedia(context: Context, playlistId: Int) {
+    private fun deleteFromMedia(playlistId: Int, context: Context) {
         Thread {
             Creator.deleteTrackUseCase.deleteTrackFromPlaylist(trackId, playlistId, context)
             // Обновляем иконку "Медиа" (проверяем, есть ли все еще трек в медиатеке)

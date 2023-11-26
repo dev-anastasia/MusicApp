@@ -8,7 +8,7 @@ import com.example.musicapp.presentation.presenters.PlaylistViewModel
 
 class MediaActivity : AppCompatActivity() {
 
-    val vm: PlaylistViewModel by viewModels()
+    val vm: PlaylistViewModel by viewModels() // Используется фрагментами!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

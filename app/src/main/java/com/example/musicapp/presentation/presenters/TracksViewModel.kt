@@ -10,12 +10,8 @@ import com.example.musicapp.domain.entities.MusicTrack
 
 class TracksViewModel : ViewModel() {
 
-    val tracksList = MutableLiveData<List<MusicTrack>>()
+    val tracksList = MutableLiveData<List<MusicTrack>>(emptyList())
     private val mainHandler = Handler(Looper.getMainLooper())
-
-    init {
-        tracksList.value = emptyList()
-    }
 
     fun getTracksList(context: Context, playlistId: Int) {
         Thread {

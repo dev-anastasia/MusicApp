@@ -15,7 +15,7 @@ import com.example.musicapp.presentation.PlaylistsRepo
 
 object Creator {
 
-    val favsPlaylistId: Int = -1
+    const val favsPlaylistId: Int = -1
 
     private val playlistsRepo: PlaylistsRepo = PlaylistsRepoImpl()
     val getPlaylistsUseCase = GetPlaylistsUseCase(playlistsRepo)

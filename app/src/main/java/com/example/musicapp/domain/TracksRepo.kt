@@ -6,13 +6,13 @@ import com.example.musicapp.domain.entities.MusicTrack
 interface TracksRepo {
 
     fun getTracksIdsInSinglePlaylist(
-        context: Context,
-        playlistId: Int
+        playlistId: Int,
+        context: Context
     ): List<Long>
 
     fun getTracksList(
-        context: Context,
         trackIdsList: List<Long>,
+        context: Context,
         callback: (List<MusicTrack>) -> Unit
     )
 

@@ -11,12 +11,8 @@ import com.example.musicapp.presentation.ui.search.SearchUIState
 class SearchViewModel : ViewModel() {
 
     val searchUiState = MutableLiveData<SearchUIState<Int>>()
-    val searchResultsList = MutableLiveData<List<MusicTrack>>()
+    val searchResultsList = MutableLiveData<List<MusicTrack>>(emptyList())
     private val mainHandler = Handler(Looper.getMainLooper())
-
-    init {
-        searchResultsList.value = emptyList()
-    }
 
     fun onGetTracksListClicked(queryText: String, entity: String) {
         searchUiState.value = SearchUIState.Loading

@@ -187,7 +187,6 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         activity?.onBackPressedDispatcher?.onBackPressed()
     }
 
-
     companion object {
         const val BASE_URL = "https://itunes.apple.com/"
         const val TRACK_ID = "track id key"

@@ -6,7 +6,7 @@ import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.TracksRepo
 import com.example.musicapp.domain.database.PlaylistDatabase
 import com.example.musicapp.domain.database.PlaylistTrackCrossRef
-import com.example.musicapp.domain.database.TrackTable
+import com.example.musicapp.domain.database.TrackEntity
 import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.TracksList
@@ -46,18 +46,18 @@ class TracksRepoImpl : TracksRepo {
     }
 
     override fun getTracksIdsInSinglePlaylist(
-        context: Context,
-        playlistId: Int
+        playlistId: Int,
+        context: Context
     ): List<Long> {
         return PlaylistDatabase.getDatabase(context).dao().getTracksIds(playlistId)
     }
 
     override fun getTracksList(
-        context: Context,
         trackIdsList: List<Long>,
+        context: Context,
         callback: (List<MusicTrack>) -> Unit
     ) {
-        val list = mutableListOf<TrackTable>()
+        val list = mutableListOf<TrackEntity>()
         for (i in trackIdsList) {
             list.add(PlaylistDatabase.getDatabase(context).dao().getAllTracksListById(i))
         }
@@ -97,7 +97,8 @@ class TracksRepoImpl : TracksRepo {
     ) {
         val trackTable = mapper.musicTrackToTrackTable(track)
         PlaylistDatabase.getDatabase(context).dao().addTrackToPlaylist(
-            PlaylistTrackCrossRef(playlistId, track.trackId), trackTable)
+            PlaylistTrackCrossRef(playlistId, track.trackId), trackTable
+        )
     }
 
 
