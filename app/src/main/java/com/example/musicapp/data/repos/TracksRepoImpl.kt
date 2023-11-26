@@ -61,7 +61,7 @@ class TracksRepoImpl : TracksRepo {
         for (i in trackIdsList) {
             list.add(PlaylistDatabase.getDatabase(context).dao().getAllTracksListById(i))
         }
-        val result = mapper.trackTableListToMusicTrackList(list)
+        val result = mapper.trackEntityListToMusicTrackList(list)
         callback(result)
     }
 
@@ -95,7 +95,7 @@ class TracksRepoImpl : TracksRepo {
         playlistId: Int,
         context: Context
     ) {
-        val trackTable = mapper.musicTrackToTrackTable(track)
+        val trackTable = mapper.musicTrackToTrackEntity(track)
         PlaylistDatabase.getDatabase(context).dao().addTrackToPlaylist(
             PlaylistTrackCrossRef(playlistId, track.trackId), trackTable
         )

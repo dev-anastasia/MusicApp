@@ -8,7 +8,7 @@ import com.example.musicapp.domain.entities.Playlist
 class Mapper {
     // Конвертирует сущности базы данных в дата-классы для domain и ui слоёв, и наоборот
 
-    fun trackTableListToMusicTrackList(list: List<TrackEntity>): List<MusicTrack> {
+    fun trackEntityListToMusicTrackList(list: List<TrackEntity>): List<MusicTrack> {
         val listOfTracks = mutableListOf<MusicTrack>()
         for (i in list.indices) {
             listOfTracks.add(MusicTrack(
@@ -23,7 +23,7 @@ class Mapper {
         return listOfTracks
     }
 
-    fun musicTrackToTrackTable(track: MusicTrack): TrackEntity {
+    fun musicTrackToTrackEntity(track: MusicTrack): TrackEntity {
         return TrackEntity(
             track.trackId,
             track.artistName,
@@ -33,7 +33,7 @@ class Mapper {
         )
     }
 
-    fun playlistTableListToPlaylistList(list: List<PlaylistEntity>): List<Playlist> {
+    fun playlistEntityListToPlaylistList(list: List<PlaylistEntity>): List<Playlist> {
         val playlistList = mutableListOf<Playlist>()
         for (i in list.indices) {
             playlistList.add(
@@ -48,7 +48,7 @@ class Mapper {
         return playlistList
     }
 
-    fun playlistToPlaylistTable(playlist: Playlist): PlaylistEntity {
+    fun playlistToPlaylistEntity(playlist: Playlist): PlaylistEntity {
         return PlaylistEntity(
             playlist.playlistId,
             playlist.playlistName,

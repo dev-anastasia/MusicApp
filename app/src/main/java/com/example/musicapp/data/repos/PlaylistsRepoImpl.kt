@@ -27,11 +27,11 @@ class PlaylistsRepoImpl : PlaylistsRepo {
 
     override fun getAllPlaylists(context: Context): List<Playlist> {
         val list = PlaylistDatabase.getDatabase(context).dao().getAllPlaylists()
-        return mapper.playlistTableListToPlaylistList(list)
+        return mapper.playlistEntityListToPlaylistList(list)
     }
 
     override fun insertPlaylist(context: Context, playlist: Playlist) {
-        val playlistTable = mapper.playlistToPlaylistTable(playlist)
+        val playlistTable = mapper.playlistToPlaylistEntity(playlist)
         PlaylistDatabase.getDatabase(context).dao().insertPlaylist(playlistTable)
     }
 
