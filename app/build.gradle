@@ -43,13 +43,17 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     // Fragments
-    def nav_version = "2.7.4"
+    def nav_version = "2.7.5"
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
     // Retrofit, Gson
     def retrofit_version = "2.9.0"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    // RxJava
+    def rx_java_version = "2.1.1"
+    implementation "com.sqareup.retrofit2:adapter-rxjava2:${retrofit_version}"
+    implementation "io.reactivex.rxjava2:rxandroid:${rx_java_version}"
     // Ok Http
     def http_version = "4.7.2"
     implementation "com.squareup.okhttp3:logging-interceptor:$http_version"
@@ -58,10 +62,11 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.8'
     // ViewModel
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
-    implementation 'androidx.activity:activity-ktx:1.8.0'
+    implementation 'androidx.activity:activity-ktx:1.8.1'
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
     // Room
-    def room_version = "2.6.0"
+    def room_version = "2.6.1"
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+
 }
