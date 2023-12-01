@@ -48,16 +48,16 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
     // Retrofit, Gson
     def retrofit_version = "2.9.0"
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
+    implementation("com.squareup.retrofit2:converter-gson:$retrofit_version")
+    // Адаптер для взаимодействия RxJava и Retrifit
+    implementation("com.squareup.retrofit2:adapter-rxjava2:${retrofit_version}")
     // RxJava
-    def rx_java_version = "2.1.1"
-    implementation "com.sqareup.retrofit2:adapter-rxjava2:${retrofit_version}"
-    implementation "io.reactivex.rxjava2:rxandroid:${rx_java_version}"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     // Ok Http
     def http_version = "4.7.2"
-    implementation "com.squareup.okhttp3:logging-interceptor:$http_version"
-    implementation "com.squareup.okhttp3:okhttp:$http_version"
+    implementation("com.squareup.okhttp3:logging-interceptor:$http_version")
+    implementation("com.squareup.okhttp3:okhttp:$http_version")
     // Picasso
     implementation 'com.squareup.picasso:picasso:2.8'
     // ViewModel
@@ -66,7 +66,6 @@ dependencies {
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
     // Room
     def room_version = "2.6.1"
-    implementation "androidx.room:room-ktx:$room_version"
+    implementation("androidx.room:room-ktx:$room_version")
     kapt "androidx.room:room-compiler:$room_version"
-
 }
