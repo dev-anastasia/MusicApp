@@ -10,8 +10,8 @@ import com.example.musicapp.domain.database.TrackEntity
 import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.TracksList
-import com.example.musicapp.presentation.presenters.PlayerViewModel
-import retrofit2.Call
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 class TracksRepoImpl : TracksRepo {
 
@@ -19,30 +19,10 @@ class TracksRepoImpl : TracksRepo {
 
     override fun getTrackInfo(
         currentId: Long,
-        context: Context,
-        callback: (HashMap<String, String>) -> Unit
-    ) {
-
-        val mapOfSpecs = HashMap<String, String>()
-
-        Thread {
-            val searchObject: Call<TracksList> =
-                RetrofitUtils.musicService.getTrackInfoById(currentId)
-            val responseBody = searchObject.execute().body()
-
-            if (responseBody != null) {
-                if (responseBody.resultCount != 0) {
-                    val res = responseBody.results[0]
-                    mapOfSpecs[PlayerViewModel.ARTIST_NAME] = res.artistName
-                    mapOfSpecs[PlayerViewModel.TRACK_NAME] = res.trackName
-                    mapOfSpecs[PlayerViewModel.DURATION] = res.trackTimeMillis.toString()
-                    mapOfSpecs[PlayerViewModel.PREVIEW] = res.previewUrl
-                    mapOfSpecs[PlayerViewModel.COVER_IMAGE_100] = res.artworkUrl100
-                    mapOfSpecs[PlayerViewModel.COVER_IMAGE_60] = res.artworkUrl60
-                }
-            }   // В остальных случаях вернётся пустая мапа
-            callback(mapOfSpecs)
-        }.start()
+        context: Context
+    ): Single<TracksList> {
+        return RetrofitUtils.musicService.getTrackInfoById(currentId)
+            .subscribeOn(Schedulers.io())
     }
 
     override fun getTracksIdsInSinglePlaylist(
@@ -67,27 +47,13 @@ class TracksRepoImpl : TracksRepo {
 
     override fun getSearchResult(
         queryText: String,
-        entity: String,
-        callback: (List<MusicTrack>) -> Unit
-    ) {
+        entity: String
+    ): Single<Music> {
 
-        var responseBody: Music?
-
-        val thread = Thread {
-            val searchObject: Call<Music> = RetrofitUtils.musicService.getSearchResult(
-                queryText,
-                entity
-            )
-            responseBody = searchObject.execute().body()
-            var res = emptyList<MusicTrack>()
-
-            if (responseBody != null) {
-                if (responseBody!!.resultCount != 0)
-                    res = responseBody!!.results
-            }
-            callback(res)
-        }
-        thread.start()
+        return RetrofitUtils.musicService.getSearchResult(
+            queryText,
+            entity
+        ).subscribeOn(Schedulers.io())
     }
 
     override fun addTrackInPlaylist(
@@ -105,12 +71,10 @@ class TracksRepoImpl : TracksRepo {
     override fun findTrackInSinglePlaylist(
         trackId: Long,
         playlistId: Int,
-        context: Context,
-        callback: (List<Long>) -> Unit
-    ) {
-        val res = PlaylistDatabase.getDatabase(context).dao()
+        context: Context
+    ): List<Long> {
+        return PlaylistDatabase.getDatabase(context).dao()
             .findTrackInSinglePlaylist(playlistId, trackId)
-        callback(res)
     }
 
     override fun getPlaylistsOfThisTrack(

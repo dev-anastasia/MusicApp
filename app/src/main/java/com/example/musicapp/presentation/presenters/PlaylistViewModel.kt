@@ -40,18 +40,21 @@ class PlaylistViewModel : ViewModel() {
 
 
     fun getPlaylistTracksCount(playlistId: Int, context: Context, callback: (Int) -> Unit) {
-        Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId, context) {
-            callback(it)
+        Thread {
+            Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId, context) {
+                callback(it)
+            }
         }
     }
 
     fun getPlaylistCover(playlistId: Int, context: Context, callback: (String?) -> Unit) {
-        Creator.getPlaylistInfoUseCase.getPlaylistCover(
-            playlistId, context
-        ) {
-            callback(it.ifEmpty { null })
-        }
-
+        Thread {
+            Creator.getPlaylistInfoUseCase.getPlaylistCover(playlistId, context) {
+                uiHandler.post {
+                    callback(it.ifEmpty { null })
+                }
+            }
+        }.start()
     }
 
     private fun updateList(list: List<Playlist>) {

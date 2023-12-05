@@ -2,7 +2,9 @@ package com.example.musicapp.domain.useCases.tracks
 
 import android.content.Context
 import com.example.musicapp.domain.TracksRepo
+import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicTrack
+import io.reactivex.Single
 
 class GetTracksListUseCase(private val repo: TracksRepo) {
 
@@ -17,10 +19,9 @@ class GetTracksListUseCase(private val repo: TracksRepo) {
 
     fun getSearchResults(
         queryText: String,
-        entity: String,
-        callback: (List<MusicTrack>) -> Unit
-    ) {
-        repo.getSearchResult(queryText, entity, callback)
+        entity: String
+    ): Single<Music> {
+        return repo.getSearchResult(queryText, entity)
     }
 
     fun lookForTrackInPlaylist(
@@ -29,7 +30,7 @@ class GetTracksListUseCase(private val repo: TracksRepo) {
         context: Context,
         callback: (List<Long>) -> Unit
     ) {
-        repo.findTrackInSinglePlaylist(trackId, playlistId, context, callback)
+        callback(repo.findTrackInSinglePlaylist(trackId, playlistId, context))
     }
 
     fun lookForTrackInMedia(

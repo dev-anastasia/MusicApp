@@ -6,5 +6,7 @@ sealed class SearchUIState<out Int> {
 
     object Loading : SearchUIState<Nothing>()
 
+    object NoResults : SearchUIState<Nothing>()
+
     object Error : SearchUIState<Nothing>()
 }

@@ -3,6 +3,7 @@ package com.example.musicapp.presentation.presenters
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
@@ -10,6 +11,7 @@ import com.example.musicapp.domain.TrackInfoListener
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.ui.player.PlayerUIState
+import io.reactivex.android.schedulers.AndroidSchedulers
 
 class PlayerViewModel : ViewModel(), TrackInfoListener {
 
@@ -18,7 +20,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     val trackNameLiveData = MutableLiveData("")
     val artistNameLiveData = MutableLiveData("")
-    val durationLiveData = MutableLiveData("")
+    val durationLiveData = MutableLiveData("0")
     val audioPreviewLiveData = MutableLiveData("")
     val isLikedLiveData = MutableLiveData(false)
     val isAddedToMediaLiveData = MutableLiveData(false)
@@ -27,18 +29,31 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     private val cover60LiveData = MutableLiveData<String>(null)   // Меньший размер (для БД)
     private var trackId: Long = 0
 
-
     fun getTrackInfoFromServer(currentId: Long, context: Context) {
 
         trackId = currentId
+        val mapOfSpecs = HashMap<String, String>()
 
-        Thread {
-            Creator.getTrackInfoUseCase.getTrackInfo(trackId, context) {
-                uiHandler.post {
-                    updateLiveData(it)
+        val observable = Creator.getTrackInfoUseCase.getTrackInfo(trackId, context)
+
+        observable
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { response ->
+                    val res = response.results[0]
+                    mapOfSpecs[ARTIST_NAME] = res.artistName
+                    mapOfSpecs[TRACK_NAME] = res.trackName
+                    mapOfSpecs[DURATION] = res.trackTimeMillis.toString()
+                    mapOfSpecs[PREVIEW] = res.previewUrl
+                    mapOfSpecs[COVER_IMAGE_100] = res.artworkUrl100
+                    mapOfSpecs[COVER_IMAGE_60] = res.artworkUrl60
+                    updateLiveData(mapOfSpecs)
+                },
+                { error ->
+                    Log.e("RxJava", "getTrackInfo fun problem: $error")
+                    playerUiState.value = PlayerUIState.Error
                 }
-            }
-        }.start()
+            )
     }
 
     private fun covertTrackDurationMillisToString() {
@@ -86,7 +101,7 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
                     isLikedLiveData.value = it.isNotEmpty() // список непустой = true, в избранном
                 }
             }
-        }.start()
+        }
     }
 
     fun checkIfAddedToMedia(context: Context) {
@@ -134,18 +149,17 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
     }
 
     // Логика нажатия на иконку "Медиа"
-    fun mediaIconClicked( playlistId: Int, context: Context) {
-        Thread {    // Ищем: есть ли уже трек в выбранном плейлисте? (по аналогии с Яндекс.Музыкой)
-            Creator.getTracksListUseCase.lookForTrackInPlaylist(
-                trackId, playlistId, context
-            ) {
-                if (it.isEmpty()) {                 // Если трека нет в этом плейлисте - добавляем
-                    addToMedia(playlistId, context)
-                } else {                        // Если трек уже есть в этом плейлисте - удаляем
-                    deleteFromMedia(playlistId, context)
-                }
+    fun mediaIconClicked(playlistId: Int, context: Context) {
+        // Ищем: есть ли уже трек в выбранном плейлисте? (по аналогии с Яндекс.Музыкой)
+        val observable = Creator.getTracksListUseCase.lookForTrackInPlaylist(
+            trackId, playlistId, context
+        ) {
+            if (it.isEmpty()) {                 // Если трека нет в этом плейлисте - добавляем
+                addToMedia(playlistId, context)
+            } else {                        // Если трек уже есть в этом плейлисте - удаляем
+                deleteFromMedia(playlistId, context)
             }
-        }.start()
+        }
     }
 
     fun getListOfUsersPlaylists(context: Context, callback: (List<Playlist>) -> Unit) {

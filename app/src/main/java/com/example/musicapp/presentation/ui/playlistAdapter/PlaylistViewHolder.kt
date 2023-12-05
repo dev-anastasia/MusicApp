@@ -23,7 +23,7 @@ class PlaylistViewHolder(itemView: View) :
         this.count.text = count.toString()
     }
 
-    fun updatePlaylistCoverImage(link: String) {
+    fun updatePlaylistCoverImage(link: String?) {
         Picasso.get()
             .load(link)
             .placeholder(R.drawable.note_placeholder)

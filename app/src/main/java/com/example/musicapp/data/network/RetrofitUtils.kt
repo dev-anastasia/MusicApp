@@ -4,6 +4,7 @@ import com.example.musicapp.presentation.ui.search.SearchFragment
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitUtils {
@@ -18,7 +19,7 @@ object RetrofitUtils {
                 .build()
         )
         .addConverterFactory(GsonConverterFactory.create())
-        //.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .build()
         .create(MusicService::class.java)
 }

@@ -50,8 +50,9 @@ dependencies {
     def retrofit_version = "2.9.0"
     implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
     implementation("com.squareup.retrofit2:converter-gson:$retrofit_version")
-    // Адаптер для взаимодействия RxJava и Retrifit
+    // Адаптер для взаимодействия других библиотек с RxJava
     implementation("com.squareup.retrofit2:adapter-rxjava2:${retrofit_version}")
+    implementation("androidx.room:room-rxjava2:2.6.1")
     // RxJava
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     // Ok Http

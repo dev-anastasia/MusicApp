@@ -12,8 +12,6 @@ class GetPlaylistInfoUseCase(private var repo: PlaylistsRepo) {
     }
 
     fun getPlaylistCover(playlistId: Int, context: Context, callback: (String) -> Unit) {
-        repo.getPlaylistCover(context, playlistId) {
-            callback(it)
-        }
+        repo.getPlaylistCover(context, playlistId, callback)
     }
 }

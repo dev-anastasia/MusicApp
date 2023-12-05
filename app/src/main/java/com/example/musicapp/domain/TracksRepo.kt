@@ -1,7 +1,10 @@
 package com.example.musicapp.domain
 
 import android.content.Context
+import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicTrack
+import com.example.musicapp.domain.entities.TracksList
+import io.reactivex.Single
 
 interface TracksRepo {
 
@@ -18,16 +21,14 @@ interface TracksRepo {
 
     fun getSearchResult(
         queryText: String,
-        entity: String,
-        callback: (List<MusicTrack>) -> Unit
-    )
+        entity: String
+    ): Single<Music>
 
     fun findTrackInSinglePlaylist(
         trackId: Long,
         playlistId: Int,
-        context: Context,
-        callback: (List<Long>) -> Unit
-    )
+        context: Context
+    ): List<Long>
 
     fun getPlaylistsOfThisTrack(
         trackId: Long,
@@ -43,9 +44,8 @@ interface TracksRepo {
 
     fun getTrackInfo(
         currentId: Long,
-        context: Context,
-        callback: (HashMap<String, String>) -> Unit
-    )
+        context: Context
+    ): Single<TracksList>
 
     fun addTrackInPlaylist(
         track: MusicTrack,

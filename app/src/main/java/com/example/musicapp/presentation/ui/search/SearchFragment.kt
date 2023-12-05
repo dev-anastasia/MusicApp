@@ -87,20 +87,25 @@ class SearchFragment : Fragment(R.layout.fragment_search),
             searchUiState.observe(viewLifecycleOwner) {
                 when (it) {
                     (SearchUIState.Loading) -> {
-                        hideNoSuchResults()
+                        hideMessageLayout()
                         hideKeyboard()
                         showLoadingIcon()
                     }
 
                     (SearchUIState.Error) -> {
-                        showNoSuchResult()
+                        showSomeSearchProblem()
                     }
 
                     (SearchUIState.Success) -> {
+                        hideKeyboard()
                         hideLoadingIcon()
                     }
 
-                    else -> throw IllegalStateException("Wrong uiState!")
+                    (SearchUIState.NoResults) -> {
+                        showNoSuchResult()
+                    }
+
+                    else -> throw IllegalStateException("Unknown SearchUiState!")
                 }
             }
         }
@@ -152,26 +157,34 @@ class SearchFragment : Fragment(R.layout.fragment_search),
     // ПРИВАТНЫЕ МЕТОДЫ ДЛЯ ОБНОВЛЕНИЯ UI:
 
     private fun showLoadingIcon() {     // Иконка загрузки
+        hideMessageLayout()
         if (trackAdapter.getList().isEmpty().not())
             trackAdapter.updateList(emptyList())
         loadingImage.visibility = View.VISIBLE
+    }
+
+    private fun showSomeSearchProblem() {
+        hideMessageLayout()
+        hideLoadingIcon()
+        if (trackAdapter.getList().isEmpty().not())
+            trackAdapter.updateList(emptyList())
+        errorText.text = "Возникла непредвиденная ошибка"
+    }
+
+    private fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
+        hideMessageLayout()
+        hideLoadingIcon()
+        if (trackAdapter.getList().isEmpty().not())
+            trackAdapter.updateList(emptyList())
+        errorText.text = "Ничего не найдено :("
+    }
+
+    private fun hideMessageLayout() {
         errorLayout.visibility = View.GONE
     }
 
     private fun hideLoadingIcon() {
         loadingImage.visibility = View.GONE
-    }
-
-    private fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
-        if (trackAdapter.getList().isEmpty().not())
-            trackAdapter.updateList(emptyList())
-        errorLayout.visibility = View.VISIBLE
-        loadingImage.visibility = View.GONE
-        errorText.text = "Ничего не найдено :("
-    }
-
-    private fun hideNoSuchResults() {
-        errorLayout.visibility = View.GONE
     }
 
     private fun hideKeyboard() {    // При работе с сервером убирает клавиатуру

@@ -20,9 +20,7 @@ class PlaylistsRepoImpl : PlaylistsRepo {
     }
 
     override fun getPlaylistCover(context: Context, playlistId: Int, callback: (String) -> Unit) {
-        val string = PlaylistDatabase.getDatabase(context).dao()
-            .getPlaylistCover(playlistId, context)
-        callback(string)
+        callback(PlaylistDatabase.getDatabase(context).dao().getPlaylistCover(playlistId, context))
     }
 
     override fun getAllPlaylists(context: Context): List<Playlist> {

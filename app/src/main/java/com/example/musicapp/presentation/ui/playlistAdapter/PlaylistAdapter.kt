@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.OnPlaylistClickListener
-import com.squareup.picasso.Picasso
 
 class PlaylistAdapter(
     private val itemIdListener: OnPlaylistClickListener    // Интерфейс для выбора item'а из RV
@@ -93,18 +92,16 @@ class PlaylistAdapter(
         Thread {
             itemIdListener.getPlaylistCover(list[position].playlistId) { str ->
                 mainHandler.post {
-                    Picasso.get()
-                        .load(str)
-                        .placeholder(R.drawable.note_placeholder)
-                        .into(holder.cover)
+                    holder.updatePlaylistCoverImage(str)
                 }
             }
         }.start()
 
+
         Thread {
             itemIdListener.getPlaylistTracksCount(list[position].playlistId) { count ->
                 mainHandler.post {
-                    holder.count.text = "Всего треков: $count"
+                    holder.updateTracksCount(count)
                 }
             }
         }.start()

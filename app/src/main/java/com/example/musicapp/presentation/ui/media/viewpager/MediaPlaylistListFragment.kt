@@ -100,7 +100,7 @@ class MediaPlaylistListFragment :
     }
 
     override fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit) {
-        vm.getPlaylistCover(playlistId, apContext) {
+        return vm.getPlaylistCover(playlistId, apContext) {
             callback(it)
         }
     }
