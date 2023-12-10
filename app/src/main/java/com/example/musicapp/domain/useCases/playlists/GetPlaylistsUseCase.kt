@@ -1,13 +1,11 @@
 package com.example.musicapp.domain.useCases.playlists
 
-import android.content.Context
 import com.example.musicapp.domain.entities.Playlist
-import com.example.musicapp.presentation.PlaylistsRepo
+import com.example.musicapp.domain.PlaylistsRepo
 
 class GetPlaylistsUseCase(private var repo: PlaylistsRepo) {
 
-    fun getAllPlaylists(context: Context, callback: (List<Playlist>) -> Unit)  {
-        val list = repo.getAllPlaylists(context)
-        callback(list)
+    fun getAllPlaylists(callback: (List<Playlist>) -> Unit)  {
+        repo.getAllPlaylists(callback)
     }
 }

@@ -1,5 +1,6 @@
 package com.example.musicapp
 
+import android.content.Context
 import com.example.musicapp.data.repos.PlaylistsRepoImpl
 import com.example.musicapp.data.repos.TracksRepoImpl
 import com.example.musicapp.domain.TracksRepo
@@ -11,11 +12,15 @@ import com.example.musicapp.domain.useCases.tracks.DeleteTrackUseCase
 import com.example.musicapp.domain.useCases.tracks.GetTrackInfoUseCase
 import com.example.musicapp.domain.useCases.tracks.GetTracksListUseCase
 import com.example.musicapp.domain.useCases.tracks.InsertTrackUseCase
-import com.example.musicapp.presentation.PlaylistsRepo
+import com.example.musicapp.domain.PlaylistsRepo
+import com.example.musicapp.domain.database.MyDao
+import com.example.musicapp.domain.database.PlaylistDatabase
 
 object Creator {
 
     const val favsPlaylistId: Int = -1
+
+    var dao: MyDao? = null
 
     private val playlistsRepo: PlaylistsRepo = PlaylistsRepoImpl()
     val getPlaylistsUseCase = GetPlaylistsUseCase(playlistsRepo)

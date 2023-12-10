@@ -1,6 +1,5 @@
 package com.example.musicapp.domain.useCases.tracks
 
-import android.content.Context
 import com.example.musicapp.domain.TracksRepo
 import com.example.musicapp.domain.entities.TracksList
 import io.reactivex.Single
@@ -8,9 +7,8 @@ import io.reactivex.Single
 class GetTrackInfoUseCase(private val repo: TracksRepo) {
 
     fun getTrackInfo(
-        currentId: Long,
-        context: Context
+        currentId: Long
     ): Single<TracksList> {
-        return repo.getTrackInfo(currentId, context)
+        return repo.getTrackInfo(currentId)
     }
 }

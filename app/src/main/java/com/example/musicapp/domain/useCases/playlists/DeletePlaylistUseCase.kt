@@ -1,11 +1,10 @@
 package com.example.musicapp.domain.useCases.playlists
 
-import android.content.Context
-import com.example.musicapp.presentation.PlaylistsRepo
+import com.example.musicapp.domain.PlaylistsRepo
 
 class DeletePlaylistUseCase(private var repo: PlaylistsRepo) {
 
-    fun deletePlaylist(context: Context, id: Int) {
-        repo.deletePlaylist(context, id)
+    fun deletePlaylist(id: Int) {
+        repo.deletePlaylist(id)
     }
 }

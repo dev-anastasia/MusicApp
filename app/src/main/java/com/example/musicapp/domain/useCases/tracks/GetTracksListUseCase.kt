@@ -1,43 +1,46 @@
 package com.example.musicapp.domain.useCases.tracks
 
-import android.content.Context
+import android.util.Log
 import com.example.musicapp.domain.TracksRepo
 import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicTrack
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 class GetTracksListUseCase(private val repo: TracksRepo) {
 
     fun getPlaylistTracksList(
-        context: Context,
         playlistId: Int,
         callback: (List<MusicTrack>) -> Unit
     ) {
-        val idsList = repo.getTracksIdsInSinglePlaylist(playlistId, context)
-        repo.getTracksList(idsList, context, callback)
+        repo.getTracksIdsInSinglePlaylist(playlistId)
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                { list ->
+                    repo.getTracksList(list, callback)
+                },
+                { error ->
+                    Log.e("RxJava", "getPlaylistTracksList fun problem: $error")
+                }
+            )
     }
 
     fun getSearchResults(
-        queryText: String,
-        entity: String
+        queryText: String
     ): Single<Music> {
-        return repo.getSearchResult(queryText, entity)
+        return repo.getSearchResult(queryText)
     }
 
     fun lookForTrackInPlaylist(
         trackId: Long,
-        playlistId: Int,
-        context: Context,
-        callback: (List<Long>) -> Unit
-    ) {
-        callback(repo.findTrackInSinglePlaylist(trackId, playlistId, context))
+        playlistId: Int
+    ): Single<List<Long>> {
+        return repo.findTrackInSinglePlaylist(trackId, playlistId)
     }
 
     fun lookForTrackInMedia(
-        trackId: Long,
-        context: Context,
-        callback: (List<Long>) -> Unit
-    ) {
-        repo.findTrackInMedia(trackId, context, callback)
+        trackId: Long
+    ): Single<List<Long>> {
+        return repo.lookForTrackInMedia(trackId)
     }
 }

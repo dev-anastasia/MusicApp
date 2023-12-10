@@ -21,6 +21,7 @@ import com.example.musicapp.R
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.presenters.PlayerViewModel
 import com.squareup.picasso.Picasso
+import java.util.concurrent.Executors
 
 class PlayerFragment : Fragment(R.layout.fragment_player),
     PopupMenu.OnMenuItemClickListener {
@@ -29,70 +30,12 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
     private lateinit var setCurrentSeekBarPosition: Runnable
     private lateinit var uiHandler: Handler
     private var playlistId: Int? = null
+    private val vm: PlayerViewModel by viewModels()
+    private val playlistsList = mutableListOf<Playlist>()
     private val apContext: Context
         get() {
             return requireActivity().applicationContext
         }
-    private val vm: PlayerViewModel by viewModels()
-    private val playlistsList = mutableListOf<Playlist>()
-
-    private val trackName: TextView
-        get() {
-            return requireView().findViewById(R.id.player_fragment_tv_song_name)
-        }
-    private val artistName: TextView
-        get() {
-            return requireView().findViewById(R.id.player_fragment_tv_artist_name)
-        }
-    private val duration: TextView
-        get() {
-            return requireView().findViewById(R.id.player_fragment_tv_duration)
-        }
-    private val currentTime: TextView
-        get() {
-            return requireView().findViewById(R.id.player_fragment_tv_current_time)
-        }
-    private val playBtn: ImageButton
-        get() {
-            return requireView().findViewById(R.id.player_fragment_iv_icon_play)
-        }
-    private val likeIcon: ImageButton
-        get() {
-            return requireView().findViewById(R.id.player_fragment_iv_icon_fav)
-        }
-    private val mediaIcon: ImageButton
-        get() {
-            return requireView().findViewById(R.id.player_fragment_iv_icon_media)
-        }
-    private val seekbar: SeekBar
-        get() {
-            return requireView().findViewById(R.id.player_fragment_seekbar)
-        }
-    private val goBackBtn: ImageButton
-        get() {
-            return requireView().findViewById(R.id.player_fragment_btn_go_back)
-        }
-    private val prevBtn: ImageButton
-        get() {
-            return requireView().findViewById(R.id.player_fragment_iv_icon_prev)
-        }
-    private val nextBtn: ImageButton
-        get() {
-            return requireView().findViewById(R.id.player_fragment_iv_icon_next)
-        }
-    private val coverImage: ImageView
-        get() {
-            return requireView().findViewById(R.id.player_fragment_iv_cover)
-        }
-
-    private val currentTrackId: Long
-        get() {
-            if (_currentTrackId == null)
-                _currentTrackId = this.requireArguments().getLong(TRACK_ID)
-            return _currentTrackId!!
-        }
-    private var _currentTrackId: Long? = null    // packing property
-
 
     // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
 
@@ -103,18 +46,24 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         uiHandler = Handler(Looper.getMainLooper())
         playlistId = this@PlayerFragment.arguments?.getInt(PLAYLIST_ID)
 
+        val trackName: TextView = view.findViewById(R.id.player_fragment_tv_song_name)
+        val artistName: TextView = view.findViewById(R.id.player_fragment_tv_artist_name)
+        val currentTime: TextView = view.findViewById(R.id.player_fragment_tv_current_time)
+        val likeIcon: ImageButton = view.findViewById(R.id.player_fragment_iv_icon_fav)
+        val mediaIcon: ImageButton = view.findViewById(R.id.player_fragment_iv_icon_media)
+        val seekbar: SeekBar = view.findViewById(R.id.player_fragment_seekbar)
+
         setCurrentTimeRunnable = Runnable {     // Runnable для установки текущего времени:
             if (vm.durationLiveData.value == "0:00")
                 currentTime.text = vm.durationLiveData.value
             else {
-                val currentTimeInMinutes: String =
-                    (mediaPlayer.currentPosition / 1000 / 60).toString()
-                var currentTimeInSeconds: String =
+                val currTimeInMinutes = mediaPlayer.currentPosition / 1000 / 60
+                var currTimeInSeconds =
                     (mediaPlayer.currentPosition / 1000 % 60).toString()
-                if (currentTimeInSeconds.length < 2)
-                    currentTimeInSeconds = "0$currentTimeInSeconds"     // вместо "1:7" -> "1:07"
+                if (currTimeInSeconds.length < 2)
+                    currTimeInSeconds = "0$currTimeInSeconds"     // вместо "1:7" -> "1:07"
 
-                currentTime.text = "$currentTimeInMinutes:$currentTimeInSeconds"
+                currentTime.text = "$currTimeInMinutes:$currTimeInSeconds"
                 uiHandler.postDelayed(setCurrentTimeRunnable, CURRENT_TIME_CHECK_TIMER)
             }
         }
@@ -155,10 +104,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
                 artistName.text = it
             }
 
-            durationLiveData.observe(viewLifecycleOwner) {
-                duration.text = it
-            }
-
             isLikedLiveData.observe(viewLifecycleOwner) {
                 if (it == true)
                     likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
@@ -177,16 +122,17 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
     override fun onResume() {
 
-        vm.getTrackInfoFromServer(currentTrackId, apContext)    // Получаем трек с сервера
+        vm.getTrackInfoFromServer(this.requireArguments().getLong(TRACK_ID), apContext)    // Получаем трек с сервера
 
         // Получение списка доступных плейлистов (для работы с Медиатекой)
         getListOfUsersPlaylists()
 
         // Иконка "Вернуться назад"
-        goBackBtn.setOnClickListener {
-            releasePlayer()
-            requireActivity().supportFragmentManager.popBackStack()
-        }
+        requireView().findViewById<ImageButton>(R.id.player_fragment_btn_go_back)
+            .setOnClickListener {
+                releasePlayer()
+                requireActivity().supportFragmentManager.popBackStack()
+            }
 
         super.onResume()
     }
@@ -225,7 +171,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         setSeekbar()
         setIcons()
         if (playlistId != null) {
-            setPrevAndNextBtns()
+            setPrevAndNextBtns(playlistId!!)
         }
     }
 
@@ -239,7 +185,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         }
 
         // Кнопка play
-        playBtn.apply {
+        requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play).apply {
 
             isClickable = true
 
@@ -255,17 +201,25 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
                     playPlayer()
             }
         }
+
+        requireView().findViewById<TextView>(R.id.player_fragment_tv_duration).text =
+            countDuration()
     }
 
     private fun playPlayer() {
-        mediaPlayer.apply {
-            start()
-            setOnCompletionListener {   // При завершении трека:
-                onStop()
-                playBtn.setBackgroundResource(R.drawable.icon_play_active)
+        val playBtn = requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
+        Executors.newSingleThreadExecutor().execute {
+            mediaPlayer.apply {
+                start()
+                setOnCompletionListener {   // При завершении трека:
+                    onStop()
+                    uiHandler.post {
+                        playBtn.setBackgroundResource(R.drawable.icon_play_active)
+                    }
+                }
             }
+            playBtn.setBackgroundResource(R.drawable.icon_pause)
         }
-        playBtn.setBackgroundResource(R.drawable.icon_pause)
 
         uiHandler.apply {
             post(setCurrentTimeRunnable)
@@ -275,7 +229,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
     private fun pausePlayer() {
         mediaPlayer.pause()
-        playBtn.setBackgroundResource(R.drawable.icon_play_active)
+        requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
+            .setBackgroundResource(R.drawable.icon_play_active)
     }
 
     private fun stopPlayer() {
@@ -293,7 +248,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
             checkIfAddedToMedia(apContext)
         }
 
-        likeIcon.apply {
+        requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_fav).apply {
 
             isClickable = true
 
@@ -302,7 +257,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
             }
         }
 
-        mediaIcon.apply {
+        requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_media).apply {
 
             isClickable = true
 
@@ -319,30 +274,30 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         }
 
         // Для автопрокрутки текста:
-        trackName.isSelected = true
-        artistName.isSelected = true
+        requireView().findViewById<TextView>(R.id.player_fragment_tv_song_name).isSelected = true
+        requireView().findViewById<TextView>(R.id.player_fragment_tv_artist_name).isSelected = true
 
         vm.cover100LiveData.observe(viewLifecycleOwner) { cover ->
             Picasso.get()
                 .load(Uri.parse(cover))
                 .placeholder(R.drawable.note_placeholder)
-                .into(coverImage)
+                .into(requireView().findViewById<ImageView>(R.id.player_fragment_iv_cover))
         }
     }
 
-    private fun setPrevAndNextBtns() {
-        vm.getTracksList(playlistId!!, apContext)
+    private fun setPrevAndNextBtns(id: Int) {
+        vm.getTracksList(id)
 
         vm.tracksInThisPlaylistList.observe(viewLifecycleOwner) { list ->
             var currentTrackPosition = 0
 
             for (element in list) {
-                if (element.trackId == currentTrackId)
+                if (element.trackId == this.requireArguments().getLong(TRACK_ID))
                     currentTrackPosition = list.indexOf(element)
             }
 
             if (currentTrackPosition > 0) {    // Доступна кнопка "пред"
-                prevBtn.apply {
+                requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_prev).apply {
 
                     isClickable = true
 
@@ -357,7 +312,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
             }
 
             if (currentTrackPosition < vm.tracksInThisPlaylistList.value!!.size - 1) {  // Доступна кнопка "след"
-                nextBtn.apply {
+                requireView().findViewById<ImageView>(R.id.player_fragment_iv_icon_next).apply {
 
                     isClickable = true
 
@@ -374,7 +329,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
     }
 
     private fun setSeekbar() {
-        seekbar.apply {
+        requireView().findViewById<SeekBar>(R.id.player_fragment_seekbar).apply {
             isClickable = true      // Теперь можно перематывать время трека
 
             setOnSeekBarChangeListener(
@@ -402,6 +357,22 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         }
     }
 
+    private fun countDuration(): String {
+        val millis = mediaPlayer.duration
+
+        if (millis == -1) {
+            return "0:00"
+        }
+
+        val mins = millis / 1000 / 60
+        var currSecs = millis / 1000 % 60
+        var secs = currSecs.toString()
+        if (currSecs.toString().length < 2) {
+            secs = "0$secs"
+        }
+        return "$mins:$secs"
+    }
+
     private fun getListOfUsersPlaylists() {
         playlistsList.clear()
         vm.getListOfUsersPlaylists(apContext) {
@@ -419,9 +390,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         releasePlayer()
 
         requireActivity().supportFragmentManager.apply {
-            popBackStack()
+            //popBackStack()
             beginTransaction()
-                .replace(R.id.media_container_main, playerFragment)
+                .replace(R.id.main_container, playerFragment)
                 .addToBackStack("added PlayerFragment")
                 .setReorderingAllowed(true)
                 .commit()

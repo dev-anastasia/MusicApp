@@ -1,6 +1,5 @@
 package com.example.musicapp.presentation.ui.media.viewpager
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -22,10 +21,6 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
     private val emptyPlaylistMessage: LinearLayout
         get() {
             return requireView().findViewById(R.id.ll_favs_playlist_fragment_empty_playlist)
-        }
-    private val apContext: Context
-        get() {
-            return requireActivity().applicationContext
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,7 +49,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
     override fun onResume() {
 
-        vm.getTracksList(apContext, -1) // Получаем список треков
+        vm.getTracksList(-1) // Получаем список треков
 
         super.onResume()
     }
@@ -68,7 +63,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         playerFragment.arguments = bundle
 
         activity?.supportFragmentManager!!.beginTransaction()
-            .replace(R.id.media_container_main, playerFragment)
+            .replace(R.id.main_container, playerFragment)
             .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)
             .commit()

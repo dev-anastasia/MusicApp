@@ -1,6 +1,8 @@
 package com.example.musicapp.domain
 
+import com.example.musicapp.presentation.ui.player.TrackInfoSpecs
+
 interface TrackInfoListener {
 
-    fun updateLiveData(hashmap: HashMap<String, String>)
+    fun updateSuccessUiState(info: TrackInfoSpecs)
 }

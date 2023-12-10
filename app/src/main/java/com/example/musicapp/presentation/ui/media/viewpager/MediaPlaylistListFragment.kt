@@ -1,6 +1,5 @@
 package com.example.musicapp.presentation.ui.media.viewpager
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -13,6 +12,7 @@ import com.example.musicapp.presentation.presenters.PlaylistViewModel
 import com.example.musicapp.presentation.ui.media.SinglePlaylistFragment
 import com.example.musicapp.presentation.ui.playlistAdapter.PlaylistAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import io.reactivex.Single
 
 class MediaPlaylistListFragment :
     Fragment(R.layout.fragment_playlists),
@@ -20,10 +20,6 @@ class MediaPlaylistListFragment :
 
     private lateinit var mediaAdapter: PlaylistAdapter
     private lateinit var vm: PlaylistViewModel  // владелец - MediaActivity
-    private val apContext: Context
-        get() {
-            return requireActivity().applicationContext
-        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -61,7 +57,7 @@ class MediaPlaylistListFragment :
         addFrBtn.setOnClickListener {
             if (vm.addPlaylistFragmentIsOpen.value!!.not())
                 requireActivity().supportFragmentManager.beginTransaction()
-                    .add(R.id.media_container_main, AddPlaylistFragment())
+                    .add(R.id.main_container, AddPlaylistFragment())
                     .addToBackStack("AddPlaylistFragment")
                     .setReorderingAllowed(true)
                     .commit()
@@ -69,7 +65,7 @@ class MediaPlaylistListFragment :
     }
 
     override fun onResume() {
-        vm.getListOfUsersPlaylists(apContext)
+        vm.getListOfUsersPlaylists()
 
         super.onResume()
     }
@@ -82,25 +78,22 @@ class MediaPlaylistListFragment :
         fr.arguments = bundle
 
         requireActivity().supportFragmentManager.beginTransaction()
-            .add(R.id.media_container_main, fr)
+            .add(R.id.main_container, fr)
             .addToBackStack("SinglePlaylistFragment")
             .setReorderingAllowed(true)
             .commit()
     }
 
-
     override fun deletePlaylistClicked(id: Int) {
-        vm.deletePlaylist(apContext, id)
+        vm.deletePlaylist(id)
     }
 
-    override fun getPlaylistTracksCount(playlistId: Int, callback: (Int) -> Unit) {
-        vm.getPlaylistTracksCount(playlistId, apContext) {
-            callback(it)
-        }
+    override fun getPlaylistTracksCount(playlistId: Int): Single<List<Long>> {
+        return vm.getPlaylistTracksCount(playlistId)
     }
 
     override fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit) {
-        return vm.getPlaylistCover(playlistId, apContext) {
+        vm.getPlaylistCover(playlistId) {
             callback(it)
         }
     }

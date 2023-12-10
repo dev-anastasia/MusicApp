@@ -1,6 +1,5 @@
 package com.example.musicapp.presentation.ui.media
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -20,10 +19,7 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
 
     private lateinit var trackAdapter: TrackAdapter
     private val vm: TracksViewModel by viewModels()
-    private val apContext: Context
-        get() {
-            return requireActivity().applicationContext
-        }
+
     private val playlistId: Int
         get() {
             if (_playlistId == null)
@@ -61,7 +57,7 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
 
     override fun onResume() {
 
-        vm.getTracksList(apContext, playlistId)     // Получаем список треков
+        vm.getTracksList(playlistId)     // Получаем список треков
 
         requireView().findViewById<ImageButton>(R.id.single_playlist_fragment_btn_go_back)
             .setOnClickListener {
@@ -80,14 +76,14 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         playerFragment.arguments = bundle
 
         activity?.supportFragmentManager!!.beginTransaction()
-            .replace(R.id.media_container_main, playerFragment)
+            .replace(R.id.main_container, playerFragment)
             .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)
             .commit()
     }
 
     private fun onBackPressed() {
-        activity?.onBackPressedDispatcher?.onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private companion object {

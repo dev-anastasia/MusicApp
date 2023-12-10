@@ -9,8 +9,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitUtils {
 
+    private const val BASE_URL = "https://itunes.apple.com/"
+
     val musicService: MusicService = Retrofit.Builder()
-        .baseUrl(SearchFragment.BASE_URL)
+        .baseUrl(BASE_URL)
         .client(
             OkHttpClient.Builder()
                 .addInterceptor(interceptor = HttpLoggingInterceptor().apply {

@@ -1,12 +1,15 @@
 package com.example.musicapp.presentation.presenters
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.entities.Playlist
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.Executors
 
 class PlaylistViewModel : ViewModel() {
 
@@ -14,50 +17,44 @@ class PlaylistViewModel : ViewModel() {
     var addPlaylistFragmentIsOpen = MutableLiveData(false)
     private val uiHandler = Handler(Looper.getMainLooper())
 
-    fun addPlaylist(context: Context, playlist: Playlist) {
-        Thread {
-            Creator.insertPlaylistUseCase.insertPlaylist(context, playlist)
-            getListOfUsersPlaylists(context)
-        }.start()
+    fun addPlaylist(playlist: Playlist) {
+        Creator.insertPlaylistUseCase.insertPlaylist(playlist).subscribeOn(Schedulers.io())
+            .subscribe({
+                getListOfUsersPlaylists()
+            }, { error ->
+                Log.e("RxJava", "mediaIconClicked fun problem: $error")
+            })
     }
 
-    fun deletePlaylist(context: Context, id: Int) {
-        Thread {
-            Creator.deletePlaylistUseCase.deletePlaylist(context, id)
-            getListOfUsersPlaylists(context)
-        }.start()
+    fun deletePlaylist(id: Int) {
+        Executors.newSingleThreadExecutor().execute {
+            Creator.deletePlaylistUseCase.deletePlaylist(id)
+            getListOfUsersPlaylists()
+        }
     }
 
-    fun getListOfUsersPlaylists(context: Context) {
-        Thread {
-            Creator.getPlaylistsUseCase.getAllPlaylists(context) {
+    fun getListOfUsersPlaylists() {
+        Executors.newSingleThreadExecutor().execute {
+            Creator.getPlaylistsUseCase.getAllPlaylists {
                 uiHandler.post {
                     updateList(it)
                 }
             }
-        }.start()
-    }
-
-
-    fun getPlaylistTracksCount(playlistId: Int, context: Context, callback: (Int) -> Unit) {
-        Thread {
-            Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId, context) {
-                callback(it)
-            }
         }
     }
 
-    fun getPlaylistCover(playlistId: Int, context: Context, callback: (String?) -> Unit) {
-        Thread {
-            Creator.getPlaylistInfoUseCase.getPlaylistCover(playlistId, context) {
-                uiHandler.post {
-                    callback(it.ifEmpty { null })
-                }
-            }
-        }.start()
+
+    fun getPlaylistTracksCount(playlistId: Int): Single<List<Long>> {
+        return Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId)
+    }
+
+    fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit) {
+        Creator.getPlaylistInfoUseCase.getPlaylistCover(playlistId) {
+            callback(it)
+        }
     }
 
     private fun updateList(list: List<Playlist>) {
-        this.allPlaylists.value = list
+        allPlaylists.postValue(list)
     }
 }

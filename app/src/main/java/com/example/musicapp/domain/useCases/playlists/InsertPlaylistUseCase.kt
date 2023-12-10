@@ -1,12 +1,12 @@
 package com.example.musicapp.domain.useCases.playlists
 
-import android.content.Context
 import com.example.musicapp.domain.entities.Playlist
-import com.example.musicapp.presentation.PlaylistsRepo
+import com.example.musicapp.domain.PlaylistsRepo
+import io.reactivex.Completable
 
 class InsertPlaylistUseCase(private var repo: PlaylistsRepo) {
 
-    fun insertPlaylist(context: Context, playlist: Playlist) {
-        repo.insertPlaylist(context, playlist)
+    fun insertPlaylist(playlist: Playlist): Completable {
+        return repo.insertPlaylist(playlist)
     }
 }

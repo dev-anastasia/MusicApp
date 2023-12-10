@@ -1,39 +1,39 @@
 package com.example.musicapp.data.repos
 
-import android.content.Context
+import com.example.musicapp.Creator
 import com.example.musicapp.data.Mapper
-import com.example.musicapp.domain.database.PlaylistDatabase
+import com.example.musicapp.domain.PlaylistsRepo
 import com.example.musicapp.domain.entities.Playlist
-import com.example.musicapp.presentation.PlaylistsRepo
+import io.reactivex.Completable
+import io.reactivex.Single
 
 class PlaylistsRepoImpl : PlaylistsRepo {
 
     private val mapper = Mapper()
+    private val dao = Creator.dao!!
 
     override fun getPlaylistTracksCount(
-        playlistId: Int,
-        context: Context,
-        callback: (Int) -> Unit
-    ) {
-        val list = PlaylistDatabase.getDatabase(context).dao().getTracksIds(playlistId)
-        callback(list.size)
+        playlistId: Int
+    ): Single<List<Long>> {
+        return dao.getTracksIds(playlistId)
     }
 
-    override fun getPlaylistCover(context: Context, playlistId: Int, callback: (String) -> Unit) {
-        callback(PlaylistDatabase.getDatabase(context).dao().getPlaylistCover(playlistId, context))
+    override fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit) {
+        val str = dao.getPlaylistCover(playlistId)
+        callback(str.ifEmpty { null })
     }
 
-    override fun getAllPlaylists(context: Context): List<Playlist> {
-        val list = PlaylistDatabase.getDatabase(context).dao().getAllPlaylists()
-        return mapper.playlistEntityListToPlaylistList(list)
+    override fun getAllPlaylists(callback: (List<Playlist>) -> Unit) {
+        val list = dao.getAllPlaylists()
+        callback(mapper.playlistEntityListToPlaylistList(list))
     }
 
-    override fun insertPlaylist(context: Context, playlist: Playlist) {
+    override fun insertPlaylist(playlist: Playlist): Completable {
         val playlistTable = mapper.playlistToPlaylistEntity(playlist)
-        PlaylistDatabase.getDatabase(context).dao().insertPlaylist(playlistTable)
+        return dao.insertPlaylist(playlistTable)
     }
 
-    override fun deletePlaylist(context: Context, id: Int) {
-        PlaylistDatabase.getDatabase(context).dao().deletePlaylist(id)
+    override fun deletePlaylist(id: Int) {
+        dao.deletePlaylist(id)
     }
 }

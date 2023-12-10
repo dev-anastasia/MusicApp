@@ -1,6 +1,5 @@
 package com.example.musicapp.presentation.ui.media.viewpager
 
-import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -17,10 +16,6 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
     private lateinit var vm: PlaylistViewModel  // владелец - MediaActivity
     private lateinit var editText: EditText
-    private val apContext: Context
-        get() {
-            return requireActivity().applicationContext
-        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -78,7 +73,7 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
             null,
             System.currentTimeMillis()
         )
-        vm.addPlaylist(apContext, newPlaylist)
+        vm.addPlaylist(newPlaylist)
         requireActivity().supportFragmentManager.popBackStack()
     }
 }

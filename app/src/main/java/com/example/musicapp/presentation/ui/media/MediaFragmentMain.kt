@@ -38,6 +38,6 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
     }
 
     private fun onBackPressed() {
-        activity?.onBackPressedDispatcher?.onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 }

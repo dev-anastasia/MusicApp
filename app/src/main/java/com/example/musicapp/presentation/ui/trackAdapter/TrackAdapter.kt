@@ -17,7 +17,7 @@ class TrackAdapter(
     private val list: MutableList<MusicTrack> = mutableListOf()
 
     fun getList(): MutableList<MusicTrack> {
-        return this.list
+        return list
     }
 
     fun updateList(newList: List<MusicTrack>) {
@@ -30,10 +30,6 @@ class TrackAdapter(
         list.clear()
         list.addAll(newList)
         diffUtil.dispatchUpdatesTo(this)
-    }
-
-    private fun onClick(id: Long) {
-        itemIdListener.onItemClick(id)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicPieceViewHolder {
@@ -54,7 +50,7 @@ class TrackAdapter(
             .into(holder.cover)
 
         holder.itemView.setOnClickListener {
-            onClick(list[position].trackId)
+            itemIdListener.onItemClick(list[position].trackId)
         }
     }
 

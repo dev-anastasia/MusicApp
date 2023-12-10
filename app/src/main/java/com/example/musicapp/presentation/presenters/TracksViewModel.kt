@@ -13,17 +13,15 @@ class TracksViewModel : ViewModel() {
     val tracksList = MutableLiveData<List<MusicTrack>>(emptyList())
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    fun getTracksList(context: Context, playlistId: Int) {
-        Thread {
-            Creator.getTracksListUseCase.getPlaylistTracksList(context, playlistId) {
-                mainHandler.post {
-                    updateList(it)
-                }
+    fun getTracksList(playlistId: Int) {
+        Creator.getTracksListUseCase.getPlaylistTracksList(playlistId) {
+            mainHandler.post {
+                updateList(it)
             }
-        }.start()
+        }
     }
 
     private fun updateList(list: List<MusicTrack>) {
-        this.tracksList.value = list
+        tracksList.postValue(list)
     }
 }

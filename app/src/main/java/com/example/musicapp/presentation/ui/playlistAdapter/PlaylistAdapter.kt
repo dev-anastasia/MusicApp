@@ -3,6 +3,7 @@ package com.example.musicapp.presentation.ui.playlistAdapter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.OnPlaylistClickListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class PlaylistAdapter(
     private val itemIdListener: OnPlaylistClickListener    // Интерфейс для выбора item'а из RV
@@ -97,14 +100,17 @@ class PlaylistAdapter(
             }
         }.start()
 
-
-        Thread {
-            itemIdListener.getPlaylistTracksCount(list[position].playlistId) { count ->
-                mainHandler.post {
-                    holder.updateTracksCount(count)
+        itemIdListener.getPlaylistTracksCount(list[position].playlistId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { list ->
+                    holder.updateTracksCount(list.size)
+                },
+                { error ->
+                    Log.e("RxJava", "mediaIconClicked fun problem: $error")
                 }
-            }
-        }.start()
+            )
     }
 
     private fun onPlaylistClick(id: Int) {
