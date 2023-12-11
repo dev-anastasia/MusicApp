@@ -64,7 +64,6 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
         activity?.supportFragmentManager!!.beginTransaction()
             .replace(R.id.main_container, playerFragment)
-            .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)
             .commit()
     }

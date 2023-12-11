@@ -1,8 +1,8 @@
 package com.example.musicapp.domain
 
-import com.example.musicapp.presentation.ui.player.TrackInfoSpecs
+import com.example.musicapp.presentation.ui.player.SuccessTrackInfo
 
 interface TrackInfoListener {
 
-    fun updateSuccessUiState(info: TrackInfoSpecs)
+    fun updateTrackInfoIfServerRepliedSuccessfully(info: SuccessTrackInfo)
 }

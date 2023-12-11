@@ -52,10 +52,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun onBackPressed() {
-        if (parentFragmentManager.backStackEntryCount > 0)
-            parentFragmentManager.popBackStack()
-        else
-            activity?.onBackPressedDispatcher?.onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private companion object {

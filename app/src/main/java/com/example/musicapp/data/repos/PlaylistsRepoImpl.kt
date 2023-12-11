@@ -10,30 +10,29 @@ import io.reactivex.Single
 class PlaylistsRepoImpl : PlaylistsRepo {
 
     private val mapper = Mapper()
-    private val dao = Creator.dao!!
 
     override fun getPlaylistTracksCount(
         playlistId: Int
     ): Single<List<Long>> {
-        return dao.getTracksIds(playlistId)
+        return Creator.dao.getTracksIds(playlistId)
     }
 
     override fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit) {
-        val str = dao.getPlaylistCover(playlistId)
+        val str = Creator.dao.getPlaylistCover(playlistId)
         callback(str.ifEmpty { null })
     }
 
     override fun getAllPlaylists(callback: (List<Playlist>) -> Unit) {
-        val list = dao.getAllPlaylists()
+        val list = Creator.dao.getAllPlaylists()
         callback(mapper.playlistEntityListToPlaylistList(list))
     }
 
     override fun insertPlaylist(playlist: Playlist): Completable {
         val playlistTable = mapper.playlistToPlaylistEntity(playlist)
-        return dao.insertPlaylist(playlistTable)
+        return Creator.dao.insertPlaylist(playlistTable)
     }
 
     override fun deletePlaylist(id: Int) {
-        dao.deletePlaylist(id)
+        Creator.dao.deletePlaylist(id)
     }
 }

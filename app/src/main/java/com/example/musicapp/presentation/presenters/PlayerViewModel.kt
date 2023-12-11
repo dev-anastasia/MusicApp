@@ -10,78 +10,71 @@ import com.example.musicapp.domain.TrackInfoListener
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.ui.player.PlayerUIState
-import com.example.musicapp.presentation.ui.player.TrackInfoSpecs
+import com.example.musicapp.presentation.ui.player.SuccessTrackInfo
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.concurrent.Executors
 
 class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     private val uiHandler = Handler(Looper.getMainLooper())
-    val playerUiState = MutableLiveData<PlayerUIState<Any>>()
+    private var trackId: Long = 0
 
-    //    val trackNameLiveData = MutableLiveData("")
-//    val artistNameLiveData = MutableLiveData("")
-//    val durationLiveData = MutableLiveData("0")
-//    val audioPreviewLiveData = MutableLiveData("")
-//    val cover100LiveData = MutableLiveData<String>(null)  // Больший размер (для плеера)
-//    private val cover60LiveData = MutableLiveData<String>(null)   // Меньший размер (для БД)
+    val playerUiState = MutableLiveData<PlayerUIState<Int>>()
+    val trackInfoLiveData = MutableLiveData<SuccessTrackInfo>()
+    val durationStringLiveData = MutableLiveData("0")
     val isLikedLiveData = MutableLiveData(false)
     val isAddedToMediaLiveData = MutableLiveData(false)
     val tracksInThisPlaylistList = MutableLiveData<List<MusicTrack>>(emptyList())
-
-    private var trackId: Long = 0
 
     fun getTrackInfoFromServer(currentId: Long) {
 
         trackId = currentId
 
         Creator.getTrackInfoUseCase.getTrackInfo(trackId)
-            .observeOn(AndroidSchedulers.mainThread()).subscribe({ response ->
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ response ->
                 val res = response.results[0]
-                updateSuccessUiState(
-                    TrackInfoSpecs(
-                        res.artistName,
-                        res.artistName,
-                        res.previewUrl,
-                        res.trackTimeMillis.toString(),
-                        res.artworkUrl100,
-                        res.artworkUrl60
-                    )
+                val trackInfo = SuccessTrackInfo(
+                    trackName = MutableLiveData(res.artistName),
+                    artistName = MutableLiveData(res.artistName),
+                    audioPreview = MutableLiveData(res.previewUrl),
+                    artworkUrl100 = MutableLiveData(res.artworkUrl100),
+                    artworkUrl60 = MutableLiveData(res.artworkUrl60)
                 )
+                trackInfoLiveData.postValue(trackInfo)
+                updateTrackInfoIfServerRepliedSuccessfully(trackInfo)
             }, { error ->
                 Log.e("RxJava", "getTrackInfo fun problem: $error")
                 playerUiState.postValue(PlayerUIState.Error)
-            })
+            }).dispose()
     }
 
     private fun covertTrackDurationMillisToString() {
 
-        if (durationLiveData.value!! != "0:00") {
-            val dur = durationLiveData.value!!.toLong()
+        if (durationStringLiveData.value!! != "0:00") {
+            val dur = durationStringLiveData.value!!.toLong()
             val durationInMinutes = (dur / 1000 / 60).toString()
             var durationInSeconds = (dur / 1000 % 60).toString()
 
             if (durationInSeconds.length < 2) durationInSeconds =
                 "0$durationInSeconds"   // вместо "1:7" -> "1:07"
 
-            durationLiveData.postValue("$durationInMinutes:$durationInSeconds")
+            durationStringLiveData.postValue("$durationInMinutes:$durationInSeconds")
         }
     }
 
-    override fun updateSuccessUiState(info: TrackInfoSpecs) {
-        playerUiState.postValue(PlayerUIState.Success)
-        if (playerUiState.!= info . trackName)
-            trackNameLiveData.value = info.trackName
-        if (artistNameLiveData.value != info.artistName)
-            artistNameLiveData.value = info.artistName
-        if (cover100LiveData.value != info.artworkUrl100)
-            cover100LiveData.value = info.trackTimeMillis
-        if (cover60LiveData.value != info.artwork60)
-            cover60LiveData.value = info.trackTimeMillis
-        if (audioPreviewLiveData.value != info.previewUrl)
-            audioPreviewLiveData.value = info.trackTimeMillis
-        if (durationLiveData.value != info.trackTimeMillis)
-            durationLiveData.value = info.trackTimeMillis
+    override fun updateTrackInfoIfServerRepliedSuccessfully(info: SuccessTrackInfo) {
+        val value = trackInfoLiveData.value!!
+        if (value.trackName != info.trackName)
+            value.trackName = info.trackName
+        if (value.artistName != info.artistName)
+            value.artistName = info.artistName
+        if (value.artworkUrl100 != info.artworkUrl100)
+            value.artworkUrl100 = info.artworkUrl100
+        if (value.artworkUrl60 != info.artworkUrl60)
+            value.artworkUrl60 = info.artworkUrl60
+        if (value.audioPreview != info.audioPreview)
+            value.audioPreview = info.audioPreview
 
         if (playerUiState.value != PlayerUIState.Success)
             playerUiState.postValue(PlayerUIState.Success)
@@ -116,13 +109,14 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
         Executors.newSingleThreadExecutor().execute {
             if (isLikedLiveData.value == false) {
                 // Добавляем в избранное:
+                val ld = trackInfoLiveData.value!!
                 val track = MusicTrack(
-                    trackId,
-                    artistNameLiveData.value.toString(),
-                    trackNameLiveData.value.toString(),
-                    audioPreviewLiveData.value.toString(),
-                    cover60LiveData.value.toString(),
-                    cover100LiveData.value.toString()
+                    trackId = trackId,
+                    trackName = ld.trackName.value!!,
+                    artistName = ld.artistName.value!!,
+                    previewUrl = ld.audioPreview.value,
+                    artworkUrl100 = ld.artworkUrl100.value,
+                    artworkUrl60 = ld.artworkUrl60.value
                 )
                 Creator.insertTrackUseCase.addTrackToPlaylist(
                     track, Creator.favsPlaylistId
@@ -176,13 +170,14 @@ class PlayerViewModel : ViewModel(), TrackInfoListener {
 
     // Запускается из fun mediaIconClicked уже в io-потоке!
     private fun addToMedia(playlistId: Int) {
+        val ld = trackInfoLiveData.value!!
         val track = MusicTrack(
-            trackId,
-            artistNameLiveData.value.toString(),
-            trackNameLiveData.value.toString(),
-            audioPreviewLiveData.value.toString(),
-            cover60LiveData.value.toString(),
-            cover100LiveData.value.toString()
+            trackId = trackId,
+            trackName = ld.trackName.value!!,
+            artistName = ld.artistName.value!!,
+            previewUrl = ld.audioPreview.value,
+            artworkUrl100 = ld.artworkUrl100.value,
+            artworkUrl60 = ld.artworkUrl60.value
         )
         Creator.insertTrackUseCase.addTrackToPlaylist(track, playlistId)
         uiHandler.post {

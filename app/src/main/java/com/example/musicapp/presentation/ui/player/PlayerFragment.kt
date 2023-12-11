@@ -54,8 +54,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         val seekbar: SeekBar = view.findViewById(R.id.player_fragment_seekbar)
 
         setCurrentTimeRunnable = Runnable {     // Runnable для установки текущего времени:
-            if (vm.durationLiveData.value == "0:00")
-                currentTime.text = vm.durationLiveData.value
+            if (vm.durationStringLiveData.value == "0:00")
+                currentTime.text = vm.durationStringLiveData.value
             else {
                 val currTimeInMinutes = mediaPlayer.currentPosition / 1000 / 60
                 var currTimeInSeconds =
@@ -69,7 +69,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         }
 
         setCurrentSeekBarPosition = Runnable {     // Runnable для установки прогресса seekbar'a:
-            if (vm.durationLiveData.value != "0:00")
+            if (vm.durationStringLiveData.value != "0:00")
                 seekbar.progress = mediaPlayer.currentPosition * 100 / mediaPlayer.duration
             else
                 seekbar.progress = 0
@@ -96,11 +96,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
                 }
             }
 
-            trackNameLiveData.observe(viewLifecycleOwner) {
+            trackInfoLiveData.value?.trackName?.observe(viewLifecycleOwner) {
                 trackName.text = it
             }
 
-            artistNameLiveData.observe(viewLifecycleOwner) {
+            trackInfoLiveData.value?.artistName?.observe(viewLifecycleOwner) {
                 artistName.text = it
             }
 
@@ -122,7 +122,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
     override fun onResume() {
 
-        vm.getTrackInfoFromServer(this.requireArguments().getLong(TRACK_ID), apContext)    // Получаем трек с сервера
+        vm.getTrackInfoFromServer(requireArguments().getLong(TRACK_ID))    // Получаем трек с сервера
 
         // Получение списка доступных плейлистов (для работы с Медиатекой)
         getListOfUsersPlaylists()
@@ -159,7 +159,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         if (item != null) {
             val playlistId = playlistsList[item.itemId].playlistId
-            vm.mediaIconClicked(playlistId, apContext)
+            vm.mediaIconClicked(playlistId)
         }
         return true
     }
@@ -179,7 +179,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
         mediaPlayer.apply {
             if (this.isPlaying.not()) {
-                setDataSource(vm.audioPreviewLiveData.value)
+                setDataSource(vm.trackInfoLiveData.value!!.audioPreview.value)
                 prepareAsync()
             }
         }
@@ -244,8 +244,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
     private fun setIcons() {    // Установка иконок "Избранное" и "Медиа"
         vm.apply {
-            checkIfFavourite(apContext)
-            checkIfAddedToMedia(apContext)
+            checkIfFavourite()
+            checkIfAddedToMedia()
         }
 
         requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_fav).apply {
@@ -253,7 +253,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
             isClickable = true
 
             setOnClickListener {
-                vm.likeClicked(apContext)
+                vm.likeClicked()
             }
         }
 
@@ -277,7 +277,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         requireView().findViewById<TextView>(R.id.player_fragment_tv_song_name).isSelected = true
         requireView().findViewById<TextView>(R.id.player_fragment_tv_artist_name).isSelected = true
 
-        vm.cover100LiveData.observe(viewLifecycleOwner) { cover ->
+        vm.trackInfoLiveData.value!!.artworkUrl100.observe(viewLifecycleOwner) { cover ->
             Picasso.get()
                 .load(Uri.parse(cover))
                 .placeholder(R.drawable.note_placeholder)
@@ -375,7 +375,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
 
     private fun getListOfUsersPlaylists() {
         playlistsList.clear()
-        vm.getListOfUsersPlaylists(apContext) {
+        vm.getListOfUsersPlaylists() {
             playlistsList.addAll(it)
         }
     }
@@ -390,10 +390,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player),
         releasePlayer()
 
         requireActivity().supportFragmentManager.apply {
-            //popBackStack()
             beginTransaction()
                 .replace(R.id.main_container, playerFragment)
-                .addToBackStack("added PlayerFragment")
                 .setReorderingAllowed(true)
                 .commit()
         }

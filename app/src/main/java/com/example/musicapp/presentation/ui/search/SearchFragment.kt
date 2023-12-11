@@ -3,7 +3,6 @@ package com.example.musicapp.presentation.ui.search
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
@@ -135,7 +134,6 @@ class SearchFragment : Fragment(R.layout.fragment_search),
 
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.main_container, playerFragment)
-            .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)
             .commit()
     }
