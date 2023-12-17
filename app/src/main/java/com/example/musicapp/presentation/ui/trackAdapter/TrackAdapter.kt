@@ -16,20 +16,12 @@ class TrackAdapter(
 
     private val list: MutableList<MusicTrack> = mutableListOf()
 
-    fun getList(): MutableList<MusicTrack> {
-        return list
-    }
-
     fun updateList(newList: List<MusicTrack>) {
-        val diffUtil = DiffUtil.calculateDiff(
-            MusicPieceDiffUtilCallback(
-                list,
-                newList
-            )
-        )
+        val diffUtilCallback = MusicPieceDiffUtilCallback(list, newList)
+        val diffUtilResult = DiffUtil.calculateDiff(diffUtilCallback)
         list.clear()
         list.addAll(newList)
-        diffUtil.dispatchUpdatesTo(this)
+        diffUtilResult.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicPieceViewHolder {
@@ -59,9 +51,9 @@ class TrackAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        if (payloads.isEmpty())
+        if (payloads.isEmpty()) {
             super.onBindViewHolder(holder, position, payloads)
-        else {
+        } else {
             val bundle = payloads.first() as Bundle
             for (key in bundle.keySet()) {
                 when (key) {

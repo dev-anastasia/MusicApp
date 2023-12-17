@@ -10,13 +10,14 @@ import androidx.room.RoomDatabase
         PlaylistEntity::class,
         TrackEntity::class,
         PlaylistTrackCrossRef::class
-    ], version = 1
+    ], version = 1, exportSchema = false
 )
 abstract class PlaylistDatabase : RoomDatabase() {
 
     abstract fun dao(): MyDao
 
     companion object {
+
         @Volatile   // Чтобы избежать рассинхрона в разных потоках
         private var DB_INSTANCE: PlaylistDatabase? = null
 

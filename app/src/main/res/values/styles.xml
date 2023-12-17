@@ -26,8 +26,4 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="FloatingActionButton" parent="TextAppearance.AppCompat">
-        <item name="android:background">@drawable/add_new_playlist</item>
-    </style>
-
 </resources>

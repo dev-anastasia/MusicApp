@@ -13,22 +13,29 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.player.PlayerFragment
 import com.example.musicapp.presentation.ui.trackAdapter.TrackAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment(R.layout.fragment_search),
     OnTrackClickListener {
 
     private val vm: SearchViewModel by viewModels()
-
+    private var currentQueryText: String? = ""  // текущий текст запроса
     private lateinit var searchQueryRunnable: Runnable
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var uiHandler: Handler
-    private var currentQueryText: String? = ""  // текущий текст запроса
+    private lateinit var recyclerView: RecyclerView
 
+    var corChange: Job? = null
 
     // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
 
@@ -37,7 +44,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
 
         uiHandler = Handler(Looper.getMainLooper())
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.search_fragment_recycler_view)
+        recyclerView = view.findViewById(R.id.search_fragment_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
@@ -47,7 +54,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         trackAdapter = TrackAdapter(this)
         recyclerView.adapter = trackAdapter
 
-        // Инициализируем lateinit var: запрос в SearchView
+        // Инициализируем lateinit vars
         searchQueryRunnable = Runnable {
             if (currentQueryText.isNullOrEmpty().not()) {
                 vm.onGetTracksListClicked(currentQueryText!!)
@@ -101,17 +108,21 @@ class SearchFragment : Fragment(R.layout.fragment_search),
                 object : SearchView.OnQueryTextListener {     // тот самый требуемый listener
 
                     override fun onQueryTextSubmit(query: String?): Boolean {
-                        uiHandler.apply {
-                            removeCallbacks(searchQueryRunnable)
-                            post(searchQueryRunnable)
+                        corChange?.cancel()
+                        CoroutineScope(Dispatchers.Main).launch() {
+                            searchQueryRunnable.run()
                         }
                         return true
                     }
 
+
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        uiHandler.removeCallbacks(searchQueryRunnable)
                         currentQueryText = newText
-                        uiHandler.postDelayed(searchQueryRunnable, TIMER)
+                        corChange?.cancel()
+                        corChange = CoroutineScope(Dispatchers.Main).launch {
+                            delay(TIMER)
+                            searchQueryRunnable.run()
+                        }
                         return true
                     }
                 }
@@ -125,15 +136,21 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         super.onResume()
     }
 
+    override fun onDestroy() {
+        recyclerView.adapter = null
+        super.onDestroy()
+    }
+
     override fun onItemClick(id: Long) {
 
-        val playerFragment = PlayerFragment()
+        val playerFragment = PlayerFragment(Creator.playerClass)
         val bundle = Bundle()
         bundle.putLong(TRACK_ID, id)
         playerFragment.arguments = bundle
 
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.main_container, playerFragment)
+            .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)
             .commit()
     }
@@ -151,7 +168,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         requireView().findViewById<FrameLayout>(R.id.search_fragment_fl_error)
             .visibility = View.VISIBLE
         requireView().findViewById<TextView>(R.id.search_fragment_tv_error)
-            .text = "Возникла непредвиденная ошибка"
+            .text = R.string.unexpected_error_message.toString()
     }
 
     private fun showNoSuchResult() {    // Сообщение при 0 найденных результатов
@@ -159,7 +176,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         requireView().findViewById<FrameLayout>(R.id.search_fragment_fl_error)
             .visibility = View.VISIBLE
         requireView().findViewById<TextView>(R.id.search_fragment_tv_error)
-            .text = "Ничего не найдено :("
+            .text = R.string.nothing_found_message.toString()
     }
 
     private fun hideMessageLayout() {
@@ -185,7 +202,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
         requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
-    companion object {
+    private companion object {
         const val TRACK_ID = "track id key"
         const val TIMER = 2000L
     }

@@ -7,12 +7,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
+import com.example.musicapp.domain.entities.PlaylistInfo
 import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.example.musicapp.presentation.presenters.PlaylistViewModel
 import com.example.musicapp.presentation.ui.media.SinglePlaylistFragment
 import com.example.musicapp.presentation.ui.playlistAdapter.PlaylistAdapter
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import io.reactivex.Single
+import java.util.concurrent.Executors
 
 class MediaPlaylistListFragment :
     Fragment(R.layout.fragment_playlists),
@@ -20,14 +20,13 @@ class MediaPlaylistListFragment :
 
     private lateinit var mediaAdapter: PlaylistAdapter
     private lateinit var vm: PlaylistViewModel  // владелец - MediaActivity
+    private lateinit var recyclerView: RecyclerView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val addFrBtn = view.findViewById<FloatingActionButton>(R.id.fab_add_playlist)
-
-        val recyclerView =
-            view.findViewById<RecyclerView>(R.id.media_fragment_playlists_recycler_view)
+        recyclerView =
+            view.findViewById(R.id.media_fragment_playlists_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
@@ -39,35 +38,19 @@ class MediaPlaylistListFragment :
 
         vm = ViewModelProvider(requireActivity())[PlaylistViewModel::class.java]
 
-        vm.apply {
-
-            allPlaylists.observe(viewLifecycleOwner) { list ->
-                mediaAdapter.updateList(list)
-            }
-
-            addPlaylistFragmentIsOpen.observe(viewLifecycleOwner) {
-                if (it == true)
-                    addFrBtn.visibility = View.GONE
-                else
-                    addFrBtn.visibility = View.VISIBLE
-            }
-        }
-
-        // Кнопка добавления плейлиста
-        addFrBtn.setOnClickListener {
-            if (vm.addPlaylistFragmentIsOpen.value!!.not())
-                requireActivity().supportFragmentManager.beginTransaction()
-                    .add(R.id.main_container, AddPlaylistFragment())
-                    .addToBackStack("AddPlaylistFragment")
-                    .setReorderingAllowed(true)
-                    .commit()
+        vm.allPlaylists.observe(viewLifecycleOwner) { list ->
+            mediaAdapter.updateList(list)
         }
     }
 
     override fun onResume() {
         vm.getListOfUsersPlaylists()
-
         super.onResume()
+    }
+
+    override fun onDestroy() {
+        recyclerView.adapter = null
+        super.onDestroy()
     }
 
     override fun openPlaylistClicked(id: Int) {
@@ -88,13 +71,14 @@ class MediaPlaylistListFragment :
         vm.deletePlaylist(id)
     }
 
-    override fun getPlaylistTracksCount(playlistId: Int): Single<List<Long>> {
-        return vm.getPlaylistTracksCount(playlistId)
-    }
-
-    override fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit) {
-        vm.getPlaylistCover(playlistId) {
-            callback(it)
+    override fun getPlaylistInfo(
+        playlistId: Int,
+        callback: (PlaylistInfo) -> Unit
+    ) {
+        Executors.newSingleThreadExecutor().execute {
+            val playlistCover = vm.getPlaylistCover(playlistId)
+            val tracksCount = vm.getPlaylistTracksCount(playlistId)
+            callback(PlaylistInfo(playlistCover, tracksCount.size))
         }
     }
 

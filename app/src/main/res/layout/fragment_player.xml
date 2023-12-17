@@ -48,7 +48,7 @@
         android:layout_height="32dp"
         android:layout_marginStart="48dp"
         android:layout_marginTop="50dp"
-        android:background="@drawable/icon_media_empty"
+        android:background="@drawable/icon_media_added"
         android:clickable="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/player_fragment_iv_cover" />
@@ -94,13 +94,15 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="40dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/zero_time"
+        app:layout_constraintEnd_toStartOf="@id/player_fragment_seekbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/player_fragment_tv_artist_name" />
 
     <SeekBar
         android:id="@+id/player_fragment_seekbar"
-        android:layout_width="295dp"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="40dp"
@@ -108,6 +110,7 @@
         android:progressBackgroundTint="@color/grey_dark"
         android:progressTint="@color/yellow"
         android:thumb="@drawable/icon_circle"
+        app:layout_constraintEnd_toStartOf="@id/player_fragment_tv_duration"
         app:layout_constraintStart_toEndOf="@id/player_fragment_tv_current_time"
         app:layout_constraintTop_toBottomOf="@id/player_fragment_tv_artist_name" />
 
@@ -115,10 +118,12 @@
         android:id="@+id/player_fragment_tv_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="32dp"
         android:text="@string/zero_time"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/player_fragment_seekbar"
         app:layout_constraintTop_toBottomOf="@id/player_fragment_tv_artist_name" />
 
     <ImageButton

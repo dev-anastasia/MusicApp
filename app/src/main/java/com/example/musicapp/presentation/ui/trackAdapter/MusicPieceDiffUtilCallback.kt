@@ -6,7 +6,8 @@ import com.example.musicapp.domain.entities.MusicTrack
 
 class MusicPieceDiffUtilCallback(
     private val oldList: List<MusicTrack>,
-    private val newList: List<MusicTrack>) : DiffUtil.Callback() {
+    private val newList: List<MusicTrack>
+) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int = oldList.size
 
@@ -26,12 +27,15 @@ class MusicPieceDiffUtilCallback(
 
     override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
         val bundle = Bundle()
-        if (oldList[oldItemPosition].artistName != newList[newItemPosition].artistName)
+        if (oldList[oldItemPosition].artistName != newList[newItemPosition].artistName) {
             bundle.putString(NAME, newList[newItemPosition].artistName)
-        if (oldList[oldItemPosition].trackName != newList[newItemPosition].trackName)
+        }
+        if (oldList[oldItemPosition].trackName != newList[newItemPosition].trackName) {
             bundle.putString(TRACK, newList[newItemPosition].trackName)
-        if (oldList[oldItemPosition].artworkUrl60 != newList[newItemPosition].artworkUrl60)
+        }
+        if (oldList[oldItemPosition].artworkUrl60 != newList[newItemPosition].artworkUrl60) {
             bundle.putString(COVER, newList[newItemPosition].artworkUrl60)
+        }
 
         return bundle
     }

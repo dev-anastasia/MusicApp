@@ -1,27 +1,29 @@
 package com.example.musicapp.presentation.presenters
 
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.entities.MusicTrack
+import com.example.musicapp.presentation.ui.media.viewpager.TracksListUiState
 
 class TracksViewModel : ViewModel() {
 
     val tracksList = MutableLiveData<List<MusicTrack>>(emptyList())
-    private val mainHandler = Handler(Looper.getMainLooper())
+    val uiState = MutableLiveData<TracksListUiState<Int>>()
 
     fun getTracksList(playlistId: Int) {
+        uiState.postValue(TracksListUiState.Loading)
         Creator.getTracksListUseCase.getPlaylistTracksList(playlistId) {
-            mainHandler.post {
-                updateList(it)
-            }
+            updateList(it)
         }
     }
 
     private fun updateList(list: List<MusicTrack>) {
         tracksList.postValue(list)
+        if (list.isEmpty()) {
+            uiState.postValue(TracksListUiState.NoResults)
+        } else {
+            uiState.postValue(TracksListUiState.Success)
+        }
     }
 }

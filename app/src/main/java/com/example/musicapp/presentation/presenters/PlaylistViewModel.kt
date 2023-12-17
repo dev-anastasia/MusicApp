@@ -1,29 +1,38 @@
 package com.example.musicapp.presentation.presenters
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.entities.Playlist
-import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Executors
 
 class PlaylistViewModel : ViewModel() {
 
-    val allPlaylists = MutableLiveData<List<Playlist>>(emptyList()) // Список плейлистов в БД
-    var addPlaylistFragmentIsOpen = MutableLiveData(false)
-    private val uiHandler = Handler(Looper.getMainLooper())
+    val addPlaylistFragmentIsOpen: LiveData<Boolean> // Открыт ли фрагмент с добавлением плейлиста
+        get() {
+            return _addPlaylistFragmentIsOpen
+        }
+    private val _addPlaylistFragmentIsOpen = MutableLiveData(false)
+
+    val allPlaylists: LiveData<List<Playlist>> // Список плейлистов в БД
+        get() {
+            return _allPlaylists
+        }
+    private val _allPlaylists = MutableLiveData<List<Playlist>>(emptyList())
 
     fun addPlaylist(playlist: Playlist) {
-        Creator.insertPlaylistUseCase.insertPlaylist(playlist).subscribeOn(Schedulers.io())
-            .subscribe({
-                getListOfUsersPlaylists()
-            }, { error ->
-                Log.e("RxJava", "mediaIconClicked fun problem: $error")
-            })
+        Creator.insertPlaylistUseCase.insertPlaylist(playlist)
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                {
+                    getListOfUsersPlaylists()
+                },
+                { error ->
+                    Log.e("RxJava", "mediaIconClicked fun problem: $error")
+                })
     }
 
     fun deletePlaylist(id: Int) {
@@ -36,25 +45,24 @@ class PlaylistViewModel : ViewModel() {
     fun getListOfUsersPlaylists() {
         Executors.newSingleThreadExecutor().execute {
             Creator.getPlaylistsUseCase.getAllPlaylists {
-                uiHandler.post {
-                    updateList(it)
-                }
+                updateList(it)
             }
         }
     }
 
-
-    fun getPlaylistTracksCount(playlistId: Int): Single<List<Long>> {
+    fun getPlaylistTracksCount(playlistId: Int): List<Long> {
         return Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId)
     }
 
-    fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit) {
-        Creator.getPlaylistInfoUseCase.getPlaylistCover(playlistId) {
-            callback(it)
-        }
+    fun getPlaylistCover(playlistId: Int): String? {
+        return Creator.getPlaylistInfoUseCase.getPlaylistCover(playlistId)
+    }
+
+    fun changeAddPlaylistFragmentIsOpen(value: Boolean) {
+        _addPlaylistFragmentIsOpen.postValue(value)
     }
 
     private fun updateList(list: List<Playlist>) {
-        allPlaylists.postValue(list)
+        _allPlaylists.postValue(list)
     }
 }

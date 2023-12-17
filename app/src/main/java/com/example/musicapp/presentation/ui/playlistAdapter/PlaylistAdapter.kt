@@ -3,7 +3,6 @@ package com.example.musicapp.presentation.ui.playlistAdapter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -14,8 +13,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.musicapp.R
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.OnPlaylistClickListener
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
 class PlaylistAdapter(
     private val itemIdListener: OnPlaylistClickListener    // Интерфейс для выбора item'а из RV
@@ -39,8 +36,6 @@ class PlaylistAdapter(
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
 
         bindWithDatabase(holder, position)
-
-        holder.name.text = list[position].playlistName
 
         holder.itemView.setOnClickListener {
             onPlaylistClick(list[position].playlistId)
@@ -87,30 +82,17 @@ class PlaylistAdapter(
         list.clear()
         list.addAll(newList)
         diffUtil.dispatchUpdatesTo(this)
-        notifyDataSetChanged()  // Хотела использовать NotifyItemInserted, но не могу правильно передать в него position
     }
 
     private fun bindWithDatabase(holder: PlaylistViewHolder, position: Int) {
+        holder.name.text = list[position].playlistName
 
-        Thread {
-            itemIdListener.getPlaylistCover(list[position].playlistId) { str ->
-                mainHandler.post {
-                    holder.updatePlaylistCoverImage(str)
-                }
+        itemIdListener.getPlaylistInfo(list[position].playlistId) { info ->
+            mainHandler.post {
+                holder.updatePlaylistCoverImage(info.cover)
+                holder.updateTracksCount(info.tracksCount)
             }
-        }.start()
-
-        itemIdListener.getPlaylistTracksCount(list[position].playlistId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { list ->
-                    holder.updateTracksCount(list.size)
-                },
-                { error ->
-                    Log.e("RxJava", "mediaIconClicked fun problem: $error")
-                }
-            )
+        }
     }
 
     private fun onPlaylistClick(id: Int) {
@@ -123,7 +105,7 @@ class PlaylistAdapter(
         val pMenu = PopupMenu(view.context, view)
         pMenu.apply {
             inflate(R.menu.menu)
-            pMenu.menu.add("Удалить")
+            pMenu.menu.add(R.string.context_menu_delete)
             setOnMenuItemClickListener(this@PlaylistAdapter)
             show()
         }

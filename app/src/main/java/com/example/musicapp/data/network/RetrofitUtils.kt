@@ -1,6 +1,5 @@
 package com.example.musicapp.data.network
 
-import com.example.musicapp.presentation.ui.search.SearchFragment
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

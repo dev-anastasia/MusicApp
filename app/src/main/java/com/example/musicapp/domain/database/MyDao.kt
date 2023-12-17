@@ -1,6 +1,5 @@
 package com.example.musicapp.domain.database
 
-import android.util.Log
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -13,6 +12,8 @@ import io.reactivex.Single
 @Dao
 interface MyDao {
 
+    fun favsPlaylistId() = -1
+
     // Получить список всех плейлистов
     @Query("SELECT * FROM playlists_table ORDER BY systemTimeMillis desc")
     fun getAllPlaylists(): List<PlaylistEntity>
@@ -22,37 +23,30 @@ interface MyDao {
     fun insertPlaylist(playlist: PlaylistEntity): Completable
 
     // Получить обложку плейлиста (последний трек в коллекции)
-    @Transaction
     fun getPlaylistCover(playlistId: Int): String {
         var result = ""
-        val observable = getTracksIds(playlistId)
-        observable
-            .subscribe(
-                { list ->
-                    if (list.isEmpty().not())
-                        getTrackCover(list[0]).subscribe(
-                            {
-                                result = it
-                            },
-                            {
-                                Log.e("RxJava", "@Transaction getPlaylistCover fun problem: $it")
-                            }
-                        )
-                },
-                { error ->
-                    Log.e("RxJava", "@Transaction getPlaylistCover fun problem: $error")
-                }
-            )
+        val tracksIdsList = getTracksIdsList(playlistId)
+        if (tracksIdsList.isEmpty().not()) {
+            result = getTrackCoverString(tracksIdsList[0])
+        }
         return result
     }
 
     // Получить список id треков в конкретном плейлисте
     @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId")
-    fun getTracksIds(playlistId: Int): Single<List<Long>>
+    fun getTracksIdsSingle(playlistId: Int): Single<List<Long>>
 
-    // Получить обложку трека
+    // Получить список id треков в конкретном плейлисте
+    @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId")
+    fun getTracksIdsList(playlistId: Int): List<Long>
+
+    // Получить обложку трека (Single)
     @Query("SELECT artworkUrl60 FROM tracks_table WHERE trackId = :trackId")
-    fun getTrackCover(trackId: Long): Single<String>
+    fun getTrackCoverSingle(trackId: Long): Single<String>
+
+    // Получить обложку трека (String)
+    @Query("SELECT artworkUrl60 FROM tracks_table WHERE trackId = :trackId")
+    fun getTrackCoverString(trackId: Long): String
 
     // Удалить плейлист из БД
     @Query("DELETE FROM playlists_table WHERE playlistId = :playlistId")
@@ -66,7 +60,6 @@ interface MyDao {
     @Query("SELECT trackId FROM cross_ref WHERE trackId = :trackId AND playlistId != -1")
     fun lookForTrackInPlaylists(trackId: Long): Single<List<Long>>
 
-
     // Проверить, есть ли трек в медиатеке в КОНКРЕТНОМ плейлисте
     @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId AND trackId = :trackId")
     fun findTrackInSinglePlaylist(playlistId: Int, trackId: Long): Single<List<Long>>
@@ -77,8 +70,9 @@ interface MyDao {
 
     // Добавить трек в плейлист и в БД
     @Transaction
-    fun addTrackToPlaylist(ref: PlaylistTrackCrossRef, track: TrackEntity) {
-        addPlaylistTrackRef(ref)
+    fun addTrackToPlaylist(track: TrackEntity, playlistId: Int) {
+        val crossRef = PlaylistTrackCrossRef(playlistId, track.trackId)
+        addPlaylistTrackRef(crossRef)
         addTrackToDB(track)
     }
 
@@ -90,8 +84,10 @@ interface MyDao {
 
     // Удалить трек из плейлиста и из БД (при условии что его нет в других плейлистах)
     @Transaction
-    fun deleteTrackFromPlaylist(ref: PlaylistTrackCrossRef, trackId: Long) {
-        deletePlaylistTrackCrossRef(ref)
+    fun deleteTrackFromPlaylist(playlistId: Int, trackId: Long) {
+        val crossRef = PlaylistTrackCrossRef(playlistId, trackId)
+        deletePlaylistTrackCrossRef(crossRef)
+
         // Если трека нет в других плейлистах - удаляем его из таблицы треков
         val list = lookForTrackInDatabase(trackId)
         if (list.isEmpty())

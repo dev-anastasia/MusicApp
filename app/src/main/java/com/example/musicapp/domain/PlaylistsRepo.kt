@@ -2,13 +2,12 @@ package com.example.musicapp.domain
 
 import com.example.musicapp.domain.entities.Playlist
 import io.reactivex.Completable
-import io.reactivex.Single
 
 interface PlaylistsRepo {
 
-    fun getPlaylistTracksCount(playlistId: Int): Single<List<Long>>
+    fun getPlaylistTracksCount(playlistId: Int): List<Long>
 
-    fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit)
+    fun getPlaylistCover(playlistId: Int): String?
 
     fun getAllPlaylists(callback: (List<Playlist>) -> Unit)
 

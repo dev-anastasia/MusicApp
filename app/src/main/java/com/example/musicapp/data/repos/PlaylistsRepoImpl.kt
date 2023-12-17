@@ -1,11 +1,11 @@
 package com.example.musicapp.data.repos
 
+import android.util.Log
 import com.example.musicapp.Creator
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.domain.PlaylistsRepo
 import com.example.musicapp.domain.entities.Playlist
 import io.reactivex.Completable
-import io.reactivex.Single
 
 class PlaylistsRepoImpl : PlaylistsRepo {
 
@@ -13,13 +13,12 @@ class PlaylistsRepoImpl : PlaylistsRepo {
 
     override fun getPlaylistTracksCount(
         playlistId: Int
-    ): Single<List<Long>> {
-        return Creator.dao.getTracksIds(playlistId)
+    ): List<Long> {
+        return Creator.dao.getTracksIdsList(playlistId)
     }
 
-    override fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit) {
-        val str = Creator.dao.getPlaylistCover(playlistId)
-        callback(str.ifEmpty { null })
+    override fun getPlaylistCover(playlistId: Int): String? {
+        return Creator.dao.getPlaylistCover(playlistId).ifEmpty { null }
     }
 
     override fun getAllPlaylists(callback: (List<Playlist>) -> Unit) {
@@ -33,6 +32,19 @@ class PlaylistsRepoImpl : PlaylistsRepo {
     }
 
     override fun deletePlaylist(id: Int) {
-        Creator.dao.deletePlaylist(id)
+        // 1) Удаляем треки плейлиста из БД
+        Creator.dao.getTracksIdsSingle(id)
+            .subscribe(
+                { list ->
+                    for (trackId in list) {
+                        Creator.dao.deleteTrackFromPlaylist(id, trackId)
+                    }
+                    // Удаляем плелист из БД
+                    Creator.dao.deletePlaylist(id)
+                },
+                { error ->
+                    Log.e("RxJava", "fun deletePlaylist problem: $error")
+                }
+            )
     }
 }

@@ -1,6 +1,6 @@
 package com.example.musicapp.presentation
 
-import io.reactivex.Single
+import com.example.musicapp.domain.entities.PlaylistInfo
 
 interface OnPlaylistClickListener {
 
@@ -8,7 +8,5 @@ interface OnPlaylistClickListener {
 
     fun deletePlaylistClicked(id: Int)
 
-    fun getPlaylistTracksCount(playlistId: Int): Single<List<Long>>
-
-    fun getPlaylistCover(playlistId: Int, callback: (String?) -> Unit)
+    fun getPlaylistInfo(playlistId: Int, callback: (PlaylistInfo) -> Unit)
 }

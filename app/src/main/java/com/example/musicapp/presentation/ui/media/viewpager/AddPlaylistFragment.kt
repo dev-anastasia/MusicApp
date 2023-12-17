@@ -21,7 +21,7 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
         super.onViewCreated(view, savedInstanceState)
 
         vm = ViewModelProvider(requireActivity())[PlaylistViewModel::class.java]
-        vm.addPlaylistFragmentIsOpen.value = true
+        vm.changeAddPlaylistFragmentIsOpen(true)
 
         editText = view.findViewById(R.id.et_new_playlist_name)
 
@@ -55,18 +55,18 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
     }
 
     override fun onDestroy() {
-        vm.addPlaylistFragmentIsOpen.value = false
+        vm.changeAddPlaylistFragmentIsOpen(false)
         super.onDestroy()
     }
 
     private fun addPlaylist() {
 
         val playlistName =
-            if (editText.text.isEmpty())
-                "My Playlist"
-            else
+            if (editText.text.isEmpty()) {
+                R.string.new_playlist_default_name.toString()
+            } else {
                 editText.text.toString()
-
+            }
         val newPlaylist = Playlist(
             0,
             playlistName,

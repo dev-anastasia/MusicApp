@@ -1,12 +1,12 @@
 package com.example.musicapp.presentation.ui.player
 
 import androidx.lifecycle.MutableLiveData
-
-
-data class SuccessTrackInfo(
-    var trackName: MutableLiveData<String>,
-    var artistName: MutableLiveData<String>,
-    var audioPreview: MutableLiveData<String>,
-    var artworkUrl100: MutableLiveData<String>,  // Больший размер (для плеера)
-    var artworkUrl60: MutableLiveData<String>  // Меньший размер (для БД)
-)
+//
+//data class SuccessTrackInfo(
+//    val trackName: MutableLiveData<String>,
+//    val artistName: MutableLiveData<String>,
+//    val audioPreview: MutableLiveData<String>,
+//    val durationString: MutableLiveData<String>,
+//    val artworkUrl100: MutableLiveData<String>,  // Больший размер (для плеера)
+//    val artworkUrl60: MutableLiveData<String>  // Меньший размер (для БД)
+//)

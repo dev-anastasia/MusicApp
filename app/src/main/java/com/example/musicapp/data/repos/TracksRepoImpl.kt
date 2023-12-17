@@ -4,7 +4,6 @@ import com.example.musicapp.Creator
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.TracksRepo
-import com.example.musicapp.domain.database.PlaylistTrackCrossRef
 import com.example.musicapp.domain.database.TrackEntity
 import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicTrack
@@ -26,7 +25,7 @@ class TracksRepoImpl : TracksRepo {
     override fun getTracksIdsInSinglePlaylist(
         playlistId: Int
     ): Single<List<Long>> {
-        return Creator.dao.getTracksIds(playlistId)
+        return Creator.dao.getTracksIdsSingle(playlistId)
     }
 
     override fun getTracksList(
@@ -36,6 +35,7 @@ class TracksRepoImpl : TracksRepo {
         for (i in trackIdsList) {
             list.add(Creator.dao.getAllTracksListById(i))
         }
+
         val result = mapper.trackEntityListToMusicTrackList(list)
         callback(result)
     }
@@ -43,7 +43,6 @@ class TracksRepoImpl : TracksRepo {
     override fun getSearchResult(
         queryText: String
     ): Single<Music> {
-
         return RetrofitUtils.musicService.getSearchResult(queryText, ENTITY)
             .subscribeOn(Schedulers.io())
     }
@@ -52,16 +51,14 @@ class TracksRepoImpl : TracksRepo {
         track: MusicTrack, playlistId: Int
     ) {
         val trackTable = mapper.musicTrackToTrackEntity(track)
-        Creator.dao.addTrackToPlaylist(
-            PlaylistTrackCrossRef(playlistId, track.trackId), trackTable
-        )
+        Creator.dao.addTrackToPlaylist(trackTable, playlistId)
     }
 
     override fun findTrackInSinglePlaylist(
         trackId: Long, playlistId: Int
     ): Single<List<Long>> {
-        return Creator.dao
-            .findTrackInSinglePlaylist(playlistId, trackId).subscribeOn(Schedulers.io())
+        return Creator.dao.findTrackInSinglePlaylist(playlistId, trackId)
+            .subscribeOn(Schedulers.io())
     }
 
     override fun getPlaylistsOfThisTrack(
@@ -81,9 +78,7 @@ class TracksRepoImpl : TracksRepo {
     override fun deleteTrackFromPlaylist(
         trackId: Long, playlistId: Int
     ) {
-        Creator.dao.deleteTrackFromPlaylist(
-            PlaylistTrackCrossRef(playlistId, trackId), trackId
-        )
+        Creator.dao.deleteTrackFromPlaylist(playlistId, trackId)
     }
 
     private companion object {

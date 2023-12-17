@@ -4,14 +4,18 @@
     <string name="fl_search_text">Поиск</string>
     <string name="fl_text_media">Медиатека</string>
     <string name="fl_settings_text">Настройки</string>
+
     <string name="player_fragment_tv_top_info">Играет сейчас</string>
     <string name="zero_time">0:00</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="add_playlist">Название нового плейлиста:</string>
     <string name="favs_playlist_name">Избранное</string>
     <string name="add_new_playlist">Добавить новый плейлист…</string>
-    <string name="empty_playlist_message">Плейлист пока пуст...</string>
-    <string name="context_menu_delete">Удалить</string>
-    <string name="menu_delete_text">Delete</string>
+    <string name="empty_playlist_message">Плейлист пока пуст…</string>
+    <string name="new_playlist_default_name">Новый плейлист</string>
 
+    <string name="context_menu_delete">Удалить</string>
+
+    <string name="unexpected_error_message">Возникла непредвиденная ошибка</string>
+    <string name="nothing_found_message">Ничего не найдено :(</string>
 </resources>

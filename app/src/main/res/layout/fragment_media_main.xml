@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/theme_background"
     android:orientation="vertical">
 
@@ -14,19 +14,36 @@
         android:layout_marginTop="24dp"
         android:background="@drawable/icon_go_back" />
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/fragment_media_tab_layout"
-        app:tabTextColor="@color/black"
-        app:tabRippleColor="@color/red_light"
-        app:tabIndicatorColor="@color/red_light"
-        android:layout_width="match_parent"
-        android:background="@color/theme_background"
-        android:layout_height="wrap_content" />
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/media_fragment_toolbar"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_gravity="end"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/ic_add_playlist_active"
+        android:backgroundTint="@color/grey_dark" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/fragment_media_pager"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="52dp"
+        android:orientation="vertical">
 
-</LinearLayout>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/fragment_media_tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/theme_background"
+            app:tabIndicatorColor="@color/red_light"
+            app:tabRippleColor="@color/red_light"
+            app:tabTextColor="@color/black" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/fragment_media_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+</FrameLayout>

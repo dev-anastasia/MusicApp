@@ -20,7 +20,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         val moonIcon = view.findViewById<ImageView>(R.id.iv_moon)
         val goBackBtn = view.findViewById<ImageButton>(R.id.settings_fragment_btn_go_back)
 
-        val pref = activity?.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE)
+        val pref = requireActivity().getSharedPreferences(SETTINGS, Context.MODE_PRIVATE)
         val editor = pref?.edit()
 
         if (pref?.getString(UI_MODE, LIGHT) == LIGHT) {
@@ -38,8 +38,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 moonIcon.setBackgroundResource(R.drawable.icon_moon)
                 sunIcon.setBackgroundResource(R.drawable.icon_sun_disabled)
             } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 editor?.putString(UI_MODE, LIGHT)
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 sunIcon.setBackgroundResource(R.drawable.icon_sun)
                 moonIcon.setBackgroundResource(R.drawable.icon_moon_disabled)
             }
@@ -56,7 +56,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private companion object {
-
         const val UI_MODE = "UI_MODE"
         const val DARK = "DARK"
         const val LIGHT = "LIGHT"
