@@ -6,9 +6,6 @@ import com.example.musicapp.domain.useCases.playlists.DeletePlaylistUseCase
 import com.example.musicapp.domain.useCases.playlists.GetPlaylistInfoUseCase
 import com.example.musicapp.domain.useCases.playlists.GetPlaylistsUseCase
 import com.example.musicapp.domain.useCases.playlists.InsertPlaylistUseCase
-import com.example.musicapp.domain.useCases.tracks.GetTracksListUseCase
-import com.example.musicapp.presentation.presenters.PlaylistViewModel
-import com.example.musicapp.presentation.presenters.SearchViewModel
 import dagger.Module
 import dagger.Provides
 

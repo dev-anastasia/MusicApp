@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.example.musicapp.R
-import com.example.musicapp.presentation.presenters.PlaylistViewModel
+import com.example.musicapp.application.component
+import com.example.musicapp.presentation.presenters.factories.PlaylistsVMFactory
+import com.example.musicapp.presentation.presenters.PlaylistsViewModel
 import com.example.musicapp.presentation.ui.media.viewpager.AddPlaylistFragment
 import com.example.musicapp.presentation.ui.media.viewpager.viewPagerAdapter.PlaylistsPagerAdapter
 import com.google.android.material.tabs.TabLayout
@@ -22,11 +24,21 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
     private lateinit var adapter: PlaylistsPagerAdapter
     private lateinit var viewPager: ViewPager2
     @Inject
-    lateinit var vm: PlaylistViewModel  // владелец - MediaActivity
+    lateinit var vmFactory: PlaylistsVMFactory
+    private lateinit var vm: PlaylistsViewModel
+
+    // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        requireActivity().applicationContext.component.inject(this)
+        vm = ViewModelProvider(requireActivity(), vmFactory)[PlaylistsViewModel::class.java]
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        vm = ViewModelProvider(requireActivity())[PlaylistViewModel::class.java]
+        vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
         val toolbar = view.findViewById<Toolbar>(R.id.media_fragment_toolbar)
 
         // ниже - отдельный адаптер для ViewPager'а!

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.musicapp.Creator
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.useCases.tracks.GetTracksListUseCase
 import com.example.musicapp.presentation.ui.search.SearchUIState
@@ -12,7 +11,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
 class SearchViewModel @Inject constructor(
-    usecase: GetTracksListUseCase
+    private val getTracksListUseCase: GetTracksListUseCase
 ) : ViewModel() {
 
     val searchUiState: LiveData<SearchUIState<Int>>
@@ -31,7 +30,7 @@ class SearchViewModel @Inject constructor(
 
         _searchUiState.postValue(SearchUIState.Loading)
 
-        Creator.getTracksListUseCase.getSearchResults(queryText)
+        getTracksListUseCase.getSearchResults(queryText)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
                 if (result == null) {

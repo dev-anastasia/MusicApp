@@ -17,7 +17,7 @@ import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.application.component
 import com.example.musicapp.presentation.OnTrackClickListener
-import com.example.musicapp.presentation.presenters.SearchVMFactory
+import com.example.musicapp.presentation.presenters.factories.SearchVMFactory
 import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.player.PlayerFragment
 import com.example.musicapp.presentation.ui.trackAdapter.TrackAdapter

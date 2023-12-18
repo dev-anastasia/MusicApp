@@ -4,13 +4,22 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.musicapp.Creator
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.domain.entities.PlaylistInfo
+import com.example.musicapp.domain.useCases.playlists.DeletePlaylistUseCase
+import com.example.musicapp.domain.useCases.playlists.GetPlaylistInfoUseCase
+import com.example.musicapp.domain.useCases.playlists.GetPlaylistsUseCase
+import com.example.musicapp.domain.useCases.playlists.InsertPlaylistUseCase
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
-class PlaylistViewModel() : ViewModel() {
+class PlaylistsViewModel @Inject constructor(
+    private val getPlaylistsUseCase: GetPlaylistsUseCase,
+    private val insertPlaylistUseCase: InsertPlaylistUseCase,
+    private val deletePlaylistUseCase: DeletePlaylistUseCase,
+    private val getPlaylistInfoUseCase: GetPlaylistInfoUseCase
+) : ViewModel() {
 
     val addPlaylistFragmentIsOpen: LiveData<Boolean> // Открыт ли фрагмент с добавлением плейлиста
         get() {
@@ -25,7 +34,7 @@ class PlaylistViewModel() : ViewModel() {
     private val _allPlaylists = MutableLiveData<List<Playlist>>(emptyList())
 
     fun addPlaylist(playlist: Playlist) {
-        Creator.insertPlaylistUseCase.insertPlaylist(playlist)
+        insertPlaylistUseCase.insertPlaylist(playlist)
             .subscribeOn(Schedulers.io())
             .subscribe(
                 {
@@ -38,14 +47,14 @@ class PlaylistViewModel() : ViewModel() {
 
     fun deletePlaylist(id: Int) {
         Executors.newSingleThreadExecutor().execute {
-            Creator.deletePlaylistUseCase.deletePlaylist(id)
+            deletePlaylistUseCase.deletePlaylist(id)
             getListOfUsersPlaylists()
         }
     }
 
     fun getListOfUsersPlaylists() {
         Executors.newSingleThreadExecutor().execute {
-            Creator.getPlaylistsUseCase.getAllPlaylists {
+            getPlaylistsUseCase.getAllPlaylists {
                 updateList(it)
             }
         }
@@ -56,8 +65,8 @@ class PlaylistViewModel() : ViewModel() {
         callback: (PlaylistInfo) -> Unit
     ) {
         Executors.newSingleThreadExecutor().execute {
-            val playlistCover = Creator.getPlaylistInfoUseCase.getPlaylistCover(playlistId)
-            val tracksCount = Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId)
+            val playlistCover = getPlaylistInfoUseCase.getPlaylistCover(playlistId)
+            val tracksCount = getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId)
             callback(PlaylistInfo(playlistCover, tracksCount.size))
         }
     }

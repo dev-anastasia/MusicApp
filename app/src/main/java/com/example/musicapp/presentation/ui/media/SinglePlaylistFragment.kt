@@ -7,23 +7,35 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.Creator
 import com.example.musicapp.R
+import com.example.musicapp.application.component
 import com.example.musicapp.presentation.OnTrackClickListener
 import com.example.musicapp.presentation.presenters.TracksViewModel
+import com.example.musicapp.presentation.presenters.factories.TracksVMFactory
 import com.example.musicapp.presentation.ui.media.viewpager.TracksListUiState
 import com.example.musicapp.presentation.ui.player.PlayerFragment
 import com.example.musicapp.presentation.ui.trackAdapter.TrackAdapter
+import javax.inject.Inject
 
 class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     OnTrackClickListener {
 
     private lateinit var trackAdapter: TrackAdapter
-    private val vm: TracksViewModel by viewModels()
+    @Inject
+    lateinit var vmFactory: TracksVMFactory
+    private lateinit var vm: TracksViewModel
     private lateinit var recyclerView: RecyclerView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        requireActivity().applicationContext.component.inject(this)
+        vm = ViewModelProvider(this, vmFactory)[TracksViewModel::class.java]
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

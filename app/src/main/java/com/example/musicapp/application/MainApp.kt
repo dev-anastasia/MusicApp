@@ -9,7 +9,7 @@ import com.example.musicapp.domain.database.PlaylistDatabase
 
 class MainApp : Application() {
 
-    lateinit var appComponent: AppComponent // объект интерфейса с inject-методами
+    lateinit var appComponent: AppComponent // объект интерфейса AppComponent с inject-методами
         private set
 
     override fun onCreate() {

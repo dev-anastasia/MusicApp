@@ -1,7 +1,7 @@
 package com.example.musicapp.dagger
 
 import com.example.musicapp.domain.useCases.tracks.GetTracksListUseCase
-import com.example.musicapp.presentation.presenters.SearchVMFactory
+import com.example.musicapp.presentation.presenters.factories.SearchVMFactory
 import dagger.Module
 import dagger.Provides
 
