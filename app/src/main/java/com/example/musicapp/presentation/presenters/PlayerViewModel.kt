@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
+import com.example.musicapp.domain.useCases.playlists.GetPlaylistsUseCase
 import com.example.musicapp.presentation.ui.player.PlayerUIState
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
 class PlayerViewModel : ViewModel() {
 

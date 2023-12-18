@@ -13,6 +13,7 @@ import com.example.musicapp.presentation.ui.media.viewpager.AddPlaylistFragment
 import com.example.musicapp.presentation.ui.media.viewpager.viewPagerAdapter.PlaylistsPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import javax.inject.Inject
 
 // Содержит ViewPager
 
@@ -20,7 +21,8 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
 
     private lateinit var adapter: PlaylistsPagerAdapter
     private lateinit var viewPager: ViewPager2
-    private lateinit var vm: PlaylistViewModel  // владелец - MediaActivity
+    @Inject
+    lateinit var vm: PlaylistViewModel  // владелец - MediaActivity
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 

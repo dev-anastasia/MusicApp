@@ -10,12 +10,14 @@ import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.Creator
 import com.example.musicapp.R
+import com.example.musicapp.application.component
 import com.example.musicapp.presentation.OnTrackClickListener
+import com.example.musicapp.presentation.presenters.SearchVMFactory
 import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.ui.player.PlayerFragment
 import com.example.musicapp.presentation.ui.trackAdapter.TrackAdapter
@@ -24,20 +26,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchFragment : Fragment(R.layout.fragment_search),
-    OnTrackClickListener {
+class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener {
 
-    private val vm: SearchViewModel by viewModels()
+    @Inject
+    lateinit var vmFactory: SearchVMFactory
+    private lateinit var vm: SearchViewModel
     private var currentQueryText: String? = ""  // текущий текст запроса
     private lateinit var searchQueryRunnable: Runnable
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var uiHandler: Handler
     private lateinit var recyclerView: RecyclerView
-
-    var corChange: Job? = null
+    private var coroutineChangeText: Job? = null
 
     // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        requireActivity().applicationContext.component.inject(this)
+        vm = ViewModelProvider(this, vmFactory)[SearchViewModel::class.java]
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -108,7 +118,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),
                 object : SearchView.OnQueryTextListener {     // тот самый требуемый listener
 
                     override fun onQueryTextSubmit(query: String?): Boolean {
-                        corChange?.cancel()
+                        coroutineChangeText?.cancel()
                         CoroutineScope(Dispatchers.Main).launch() {
                             searchQueryRunnable.run()
                         }
@@ -118,8 +128,8 @@ class SearchFragment : Fragment(R.layout.fragment_search),
 
                     override fun onQueryTextChange(newText: String?): Boolean {
                         currentQueryText = newText
-                        corChange?.cancel()
-                        corChange = CoroutineScope(Dispatchers.Main).launch {
+                        coroutineChangeText?.cancel()
+                        coroutineChangeText = CoroutineScope(Dispatchers.Main).launch {
                             delay(TIMER)
                             searchQueryRunnable.run()
                         }

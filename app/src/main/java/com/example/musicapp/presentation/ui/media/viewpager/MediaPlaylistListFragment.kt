@@ -12,7 +12,6 @@ import com.example.musicapp.presentation.OnPlaylistClickListener
 import com.example.musicapp.presentation.presenters.PlaylistViewModel
 import com.example.musicapp.presentation.ui.media.SinglePlaylistFragment
 import com.example.musicapp.presentation.ui.playlistAdapter.PlaylistAdapter
-import java.util.concurrent.Executors
 
 class MediaPlaylistListFragment :
     Fragment(R.layout.fragment_playlists),
@@ -75,11 +74,7 @@ class MediaPlaylistListFragment :
         playlistId: Int,
         callback: (PlaylistInfo) -> Unit
     ) {
-        Executors.newSingleThreadExecutor().execute {
-            val playlistCover = vm.getPlaylistCover(playlistId)
-            val tracksCount = vm.getPlaylistTracksCount(playlistId)
-            callback(PlaylistInfo(playlistCover, tracksCount.size))
-        }
+        vm.getPlaylistInfo(playlistId, callback)
     }
 
     private companion object {

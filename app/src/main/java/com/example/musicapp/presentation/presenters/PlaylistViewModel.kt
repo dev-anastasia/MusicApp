@@ -6,10 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.entities.Playlist
+import com.example.musicapp.domain.entities.PlaylistInfo
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Executors
 
-class PlaylistViewModel : ViewModel() {
+class PlaylistViewModel() : ViewModel() {
 
     val addPlaylistFragmentIsOpen: LiveData<Boolean> // Открыт ли фрагмент с добавлением плейлиста
         get() {
@@ -50,12 +51,15 @@ class PlaylistViewModel : ViewModel() {
         }
     }
 
-    fun getPlaylistTracksCount(playlistId: Int): List<Long> {
-        return Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId)
-    }
-
-    fun getPlaylistCover(playlistId: Int): String? {
-        return Creator.getPlaylistInfoUseCase.getPlaylistCover(playlistId)
+    fun getPlaylistInfo(
+        playlistId: Int,
+        callback: (PlaylistInfo) -> Unit
+    ) {
+        Executors.newSingleThreadExecutor().execute {
+            val playlistCover = Creator.getPlaylistInfoUseCase.getPlaylistCover(playlistId)
+            val tracksCount = Creator.getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId)
+            callback(PlaylistInfo(playlistCover, tracksCount.size))
+        }
     }
 
     fun changeAddPlaylistFragmentIsOpen(value: Boolean) {

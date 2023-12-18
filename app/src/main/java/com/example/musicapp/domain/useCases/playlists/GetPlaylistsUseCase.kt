@@ -1,11 +1,12 @@
 package com.example.musicapp.domain.useCases.playlists
 
-import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.domain.PlaylistsRepo
+import com.example.musicapp.domain.entities.Playlist
+import javax.inject.Inject
 
-class GetPlaylistsUseCase(private var repo: PlaylistsRepo) {
+class GetPlaylistsUseCase(val repo: PlaylistsRepo) {
 
-    fun getAllPlaylists(callback: (List<Playlist>) -> Unit)  {
+    fun getAllPlaylists(callback: (List<Playlist>) -> Unit) {
         repo.getAllPlaylists(callback)
     }
 }

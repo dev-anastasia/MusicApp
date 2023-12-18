@@ -4,23 +4,16 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.musicapp.Creator
 import com.example.musicapp.domain.entities.MusicTrack
+import com.example.musicapp.domain.useCases.tracks.GetTracksListUseCase
 import com.example.musicapp.presentation.ui.search.SearchUIState
 import io.reactivex.android.schedulers.AndroidSchedulers
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel @Inject constructor(
+    usecase: GetTracksListUseCase
+) : ViewModel() {
 
     val searchUiState: LiveData<SearchUIState<Int>>
         get() {
@@ -39,7 +32,8 @@ class SearchViewModel : ViewModel() {
         _searchUiState.postValue(SearchUIState.Loading)
 
         Creator.getTracksListUseCase.getSearchResults(queryText)
-            .observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ result ->
                 if (result == null) {
                     _searchUiState.postValue(SearchUIState.Error)
                     return@subscribe

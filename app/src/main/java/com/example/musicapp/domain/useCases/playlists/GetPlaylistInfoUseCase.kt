@@ -2,7 +2,7 @@ package com.example.musicapp.domain.useCases.playlists
 
 import com.example.musicapp.domain.PlaylistsRepo
 
-class GetPlaylistInfoUseCase(private var repo: PlaylistsRepo) {
+class GetPlaylistInfoUseCase(val repo: PlaylistsRepo) {
 
     fun getPlaylistTrackCount(playlistId: Int): List<Long> {
         return repo.getPlaylistTracksCount(playlistId)

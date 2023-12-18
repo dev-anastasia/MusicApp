@@ -7,7 +7,7 @@ import com.example.musicapp.domain.entities.MusicTrack
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
-class GetTracksListUseCase(private val repo: TracksRepo) {
+class GetTracksListUseCase(val repo: TracksRepo) {
 
     fun getPlaylistTracksList(
         playlistId: Int,
