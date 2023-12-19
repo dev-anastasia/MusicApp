@@ -2,6 +2,7 @@ package com.example.musicapp.presentation.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.musicapp.MyObject
 import com.example.musicapp.R
 import com.example.musicapp.application.MainApp
 

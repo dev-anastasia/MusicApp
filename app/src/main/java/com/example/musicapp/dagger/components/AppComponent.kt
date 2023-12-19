@@ -22,4 +22,6 @@ interface AppComponent {
     fun mediaSubcomponent(): MediaSubcomponent.Factory
 
     fun searchSubcomponent(): SearchSubcomponent.Factory
+
+    fun playerSubcomponent(): PlayerSubcomponent.Factory
 }

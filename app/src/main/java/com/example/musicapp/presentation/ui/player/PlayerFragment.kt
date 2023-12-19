@@ -32,6 +32,7 @@ class PlayerFragment :
     @Inject
     lateinit var vmFactory: PlayerVMFactory
     private lateinit var vm: PlayerViewModel
+
     @Inject
     lateinit var playerClass: PlayerClass
     private lateinit var setCurrentTimeRunnable: Runnable
@@ -42,7 +43,9 @@ class PlayerFragment :
     // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
 
     override fun onAttach(context: Context) {
-        requireActivity().applicationContext.component
+        val playerSubcomponent =
+            requireActivity().applicationContext.component.playerSubcomponent().create()
+        playerSubcomponent.inject(this)
         vm = ViewModelProvider(this, vmFactory)[PlayerViewModel::class.java]
         super.onAttach(context)
     }
