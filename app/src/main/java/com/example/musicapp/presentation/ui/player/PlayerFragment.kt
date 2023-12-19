@@ -31,7 +31,6 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
     private lateinit var setCurrentTimeRunnable: Runnable
     private lateinit var setCurrentSeekBarPosition: Runnable
     private lateinit var uiHandler: Handler
-
     @Inject
     lateinit var vmFactory: PlayerVMFactory
     private lateinit var vm: PlayerViewModel
@@ -53,8 +52,12 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
         val likeIcon: ImageButton = view.findViewById(R.id.player_fragment_iv_icon_fav)
         val seekbar: SeekBar = view.findViewById(R.id.player_fragment_seekbar)
         val songName: TextView = view.findViewById(R.id.player_fragment_tv_song_name)
-        val artistName: TextView = view.findViewById<TextView>(R.id.player_fragment_tv_artist_name)
-        val durationString: TextView = view.findViewById<TextView>(R.id.player_fragment_tv_duration)
+        val artistName: TextView = view.findViewById(R.id.player_fragment_tv_artist_name)
+        val durationString: TextView = view.findViewById(R.id.player_fragment_tv_duration)
+        requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play).apply {
+            isClickable = false
+            setBackgroundResource(R.drawable.icon_play_disabled)
+        }
 
         // Инициализируем lateinit vars
         uiHandler = Handler(Looper.getMainLooper())
@@ -215,8 +218,7 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
     }
 
     private fun playPlayer() {
-        val playBtn =
-            requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
+        val playBtn = requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
 
         playerClass.playPlayer {
             uiHandler.post { // Нужен uiHandler, т.к. музыка проигрывается в другом потоке

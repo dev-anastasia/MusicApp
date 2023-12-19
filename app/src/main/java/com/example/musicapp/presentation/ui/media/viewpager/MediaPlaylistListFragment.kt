@@ -3,6 +3,7 @@ package com.example.musicapp.presentation.ui.media.viewpager
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,13 +24,13 @@ class MediaPlaylistListFragment :
     private lateinit var mediaAdapter: PlaylistAdapter
     @Inject
     lateinit var vmFactory: PlaylistsVMFactory
-    private lateinit var vm: PlaylistsViewModel  // владелец - MediaActivity
+    private val vm: PlaylistsViewModel by activityViewModels { vmFactory } // владелец - MediaActivity
     private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         requireActivity().applicationContext.component.inject(this)
-        vm = ViewModelProvider(requireActivity(), vmFactory)[PlaylistsViewModel::class.java]
+        //vm = ViewModelProvider(requireActivity(), vmFactory)[PlaylistsViewModel::class.java]
         super.onCreate(savedInstanceState)
     }
 
@@ -46,8 +47,6 @@ class MediaPlaylistListFragment :
         // Адаптер и ViewModel
         mediaAdapter = PlaylistAdapter(this)
         recyclerView.adapter = mediaAdapter
-
-        vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
 
         vm.allPlaylists.observe(viewLifecycleOwner) { list ->
             mediaAdapter.updateList(list)

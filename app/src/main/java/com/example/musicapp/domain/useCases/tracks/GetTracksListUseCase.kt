@@ -6,8 +6,9 @@ import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicTrack
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class GetTracksListUseCase(val repo: TracksRepo) {
+class GetTracksListUseCase @Inject constructor(val repo: TracksRepo) {
 
     fun getPlaylistTracksList(
         playlistId: Int,

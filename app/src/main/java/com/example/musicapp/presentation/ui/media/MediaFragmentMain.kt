@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageButton
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.example.musicapp.R
@@ -25,20 +26,19 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
     private lateinit var viewPager: ViewPager2
     @Inject
     lateinit var vmFactory: PlaylistsVMFactory
-    private lateinit var vm: PlaylistsViewModel
+    private val vm: PlaylistsViewModel by activityViewModels { vmFactory }
 
     // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         requireActivity().applicationContext.component.inject(this)
-        vm = ViewModelProvider(requireActivity(), vmFactory)[PlaylistsViewModel::class.java]
+        //vm = ViewModelProvider(requireActivity(), vmFactory)[PlaylistsViewModel::class.java]
         super.onCreate(savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
         val toolbar = view.findViewById<Toolbar>(R.id.media_fragment_toolbar)
 
         // ниже - отдельный адаптер для ViewPager'а!

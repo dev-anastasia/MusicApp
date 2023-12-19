@@ -7,6 +7,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.example.musicapp.R
 import com.example.musicapp.application.component
@@ -19,20 +20,19 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
     @Inject
     lateinit var vmFactory: PlaylistsVMFactory
-    private lateinit var vm: PlaylistsViewModel  // владелец - MediaActivity
+    private val vm: PlaylistsViewModel by activityViewModels { vmFactory }  // владелец - MediaActivity
     private lateinit var editText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         requireActivity().applicationContext.component.inject(this)
-        vm = ViewModelProvider(requireActivity(), vmFactory)[PlaylistsViewModel::class.java]
+        //vm = ViewModelProvider(requireActivity(), vmFactory)[PlaylistsViewModel::class.java]
         super.onCreate(savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        vm = ViewModelProvider(requireActivity())[PlaylistsViewModel::class.java]
         vm.changeAddPlaylistFragmentIsOpen(true)
 
         editText = view.findViewById(R.id.et_new_playlist_name)

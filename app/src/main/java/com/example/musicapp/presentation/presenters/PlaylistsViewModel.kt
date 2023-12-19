@@ -78,4 +78,9 @@ class PlaylistsViewModel @Inject constructor(
     private fun updateList(list: List<Playlist>) {
         _allPlaylists.postValue(list)
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("TAG", "PlaylistsVM onCleared")
+    }
 }

@@ -1,8 +1,9 @@
 package com.example.musicapp.domain.useCases.playlists
 
 import com.example.musicapp.domain.PlaylistsRepo
+import javax.inject.Inject
 
-class GetPlaylistInfoUseCase(val repo: PlaylistsRepo) {
+class GetPlaylistInfoUseCase @Inject constructor(val repo: PlaylistsRepo) {
 
     fun getPlaylistTrackCount(playlistId: Int): List<Long> {
         return repo.getPlaylistTracksCount(playlistId)

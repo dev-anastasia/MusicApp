@@ -10,8 +10,9 @@ import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.TracksList
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class TracksRepoImpl : TracksRepo {
+class TracksRepoImpl @Inject constructor() : TracksRepo {
 
     private val mapper = Mapper()
 

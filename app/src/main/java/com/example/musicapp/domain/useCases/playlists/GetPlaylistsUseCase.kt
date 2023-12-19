@@ -4,7 +4,7 @@ import com.example.musicapp.domain.PlaylistsRepo
 import com.example.musicapp.domain.entities.Playlist
 import javax.inject.Inject
 
-class GetPlaylistsUseCase(val repo: PlaylistsRepo) {
+class GetPlaylistsUseCase @Inject constructor(val repo: PlaylistsRepo) {
 
     fun getAllPlaylists(callback: (List<Playlist>) -> Unit) {
         repo.getAllPlaylists(callback)

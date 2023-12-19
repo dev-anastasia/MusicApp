@@ -6,8 +6,9 @@ import com.example.musicapp.data.Mapper
 import com.example.musicapp.domain.PlaylistsRepo
 import com.example.musicapp.domain.entities.Playlist
 import io.reactivex.Completable
+import javax.inject.Inject
 
-class PlaylistsRepoImpl : PlaylistsRepo {
+class PlaylistsRepoImpl @Inject constructor() : PlaylistsRepo {
 
     private val mapper = Mapper()
 
