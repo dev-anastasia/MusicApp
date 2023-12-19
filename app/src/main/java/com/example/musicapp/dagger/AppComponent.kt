@@ -10,6 +10,7 @@ import com.example.musicapp.presentation.ui.media.SinglePlaylistFragment
 import com.example.musicapp.presentation.ui.media.viewpager.AddPlaylistFragment
 import com.example.musicapp.presentation.ui.media.viewpager.FavsFragment
 import com.example.musicapp.presentation.ui.media.viewpager.MediaPlaylistListFragment
+import com.example.musicapp.presentation.ui.player.PlayerFragment
 import com.example.musicapp.presentation.ui.search.SearchFragment
 import dagger.Component
 
@@ -27,6 +28,8 @@ interface AppComponent {
     fun inject(fr: FavsFragment)
 
     fun inject(fr: SinglePlaylistFragment)
+
+    fun inject(fr: PlayerFragment)
 
     fun getTracksListUseCase(): GetTracksListUseCase
 

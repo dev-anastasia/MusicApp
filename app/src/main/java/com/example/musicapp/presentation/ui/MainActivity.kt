@@ -2,11 +2,8 @@ package com.example.musicapp.presentation.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.musicapp.application.MainApp
 import com.example.musicapp.R
-import com.example.musicapp.application.component
-import com.example.musicapp.domain.useCases.playlists.GetPlaylistsUseCase
-import javax.inject.Inject
+import com.example.musicapp.application.MainApp
 
 class MainActivity : AppCompatActivity() {
 

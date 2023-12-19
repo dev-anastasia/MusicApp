@@ -1,7 +1,6 @@
 package com.example.musicapp.presentation.ui.player
 
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,13 +14,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import com.example.musicapp.Creator.mediaPlayer
+import androidx.lifecycle.ViewModelProvider
 import com.example.musicapp.R
+import com.example.musicapp.SingletonObjects.mediaPlayer
+import com.example.musicapp.application.component
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.PlayerClass
 import com.example.musicapp.presentation.presenters.PlayerViewModel
+import com.example.musicapp.presentation.presenters.factories.PlayerVMFactory
 import com.squareup.picasso.Picasso
+import javax.inject.Inject
 
 class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.fragment_player),
     PopupMenu.OnMenuItemClickListener {
@@ -29,10 +31,20 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
     private lateinit var setCurrentTimeRunnable: Runnable
     private lateinit var setCurrentSeekBarPosition: Runnable
     private lateinit var uiHandler: Handler
-    private val vm: PlayerViewModel by viewModels()
+
+    @Inject
+    lateinit var vmFactory: PlayerVMFactory
+    private lateinit var vm: PlayerViewModel
     private val playlistsList = mutableListOf<Playlist>()
 
     // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        requireActivity().applicationContext.component.inject(this)
+        vm = ViewModelProvider(this, vmFactory)[PlayerViewModel::class.java]
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,13 +52,16 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
         val currentTime: TextView = view.findViewById(R.id.player_fragment_tv_current_time)
         val likeIcon: ImageButton = view.findViewById(R.id.player_fragment_iv_icon_fav)
         val seekbar: SeekBar = view.findViewById(R.id.player_fragment_seekbar)
+        val songName: TextView = view.findViewById(R.id.player_fragment_tv_song_name)
+        val artistName: TextView = view.findViewById<TextView>(R.id.player_fragment_tv_artist_name)
+        val durationString: TextView = view.findViewById<TextView>(R.id.player_fragment_tv_duration)
 
         // Инициализируем lateinit vars
         uiHandler = Handler(Looper.getMainLooper())
 
         setCurrentTimeRunnable = Runnable {     // Runnable для установки текущего времени:
-            if (vm.trackInfoLiveData.value?.durationString!!.value == DURATION_DEFAULT) {
-                currentTime.text = vm.trackInfoLiveData.value?.durationString!!.value
+            if (vm.viewState.value?.durationString == DURATION_DEFAULT) {
+                currentTime.text = vm.viewState.value?.durationString
             } else {
                 val currTimeInMinutes = mediaPlayer.currentPosition / 1000 / 60
                 var currTimeInSeconds = (mediaPlayer.currentPosition / 1000 % 60).toString()
@@ -59,7 +74,7 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
         }
 
         setCurrentSeekBarPosition = Runnable {     // Runnable для установки прогресса seekbar'a:
-            if (vm.trackInfoLiveData.value?.durationString!!.value != "0:00") {
+            if (vm.viewState.value!!.durationString != "0:00") {
                 seekbar.progress = mediaPlayer.currentPosition * 100 / mediaPlayer.duration
             } else {
                 seekbar.progress = 0
@@ -86,33 +101,25 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
                 }
             }
 
-            trackInfoLiveData.observe(viewLifecycleOwner) {
-                view.findViewById<TextView>(R.id.player_fragment_tv_song_name).text =
-                    it.trackName.value
+            viewState.observe(viewLifecycleOwner) {
 
-                view.findViewById<TextView>(R.id.player_fragment_tv_artist_name).text =
-                    it.artistName.value
-
-                view.findViewById<TextView>(R.id.player_fragment_tv_duration).text =
-                    it.durationString.value
+                songName.text = it.trackName
+                artistName.text = it.artistName
+                durationString.text = it.durationString
 
                 Picasso.get()
-                    .load(it.artworkUrl100.value)
+                    .load(it.artworkUrl100.ifEmpty { null })
                     .placeholder(R.drawable.note_placeholder)
                     .into(view.findViewById<ImageView>(R.id.player_fragment_iv_cover))
             }
 
-            isLikedLiveData.observe(viewLifecycleOwner) {
+            vm.isLikedLiveData.observe(viewLifecycleOwner) {
                 if (it == true) {
                     likeIcon.setBackgroundResource(R.drawable.icon_fav_liked)
                 } else {
                     likeIcon.setBackgroundResource(R.drawable.icon_fav_empty)
                 }
             }
-        }
-
-        PlayerUIState.Success.data.observe(viewLifecycleOwner) {
-
         }
     }
 
@@ -160,7 +167,7 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
         return true
     }
 
-    // ЧАСТНЫЕ МЕТОДЫ ФРАГМЕНТА:
+// ЧАСТНЫЕ МЕТОДЫ ФРАГМЕНТА:
 
     private fun updateUI() {
         setPlayer()
@@ -174,8 +181,12 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
 
     private fun setPlayer() {
 
-        val link = vm.trackInfoLiveData.value?.audioPreview?.value!!
-        playerClass.setPlayer(link)
+        val link = vm.viewState.value!!.audioPreview
+        try {
+            playerClass.setPlayer(link)
+        } catch (e: Exception) {
+            throw java.lang.Exception("private fun setPlayer(link) problem: $e")
+        }
 
         // Кнопка play
         requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play).apply {
@@ -204,7 +215,8 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
     }
 
     private fun playPlayer() {
-        val playBtn = requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
+        val playBtn =
+            requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
 
         playerClass.playPlayer {
             uiHandler.post { // Нужен uiHandler, т.к. музыка проигрывается в другом потоке
@@ -249,7 +261,9 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
             setOnClickListener {
                 if (playlistsList.isEmpty()) {
                     Toast.makeText(
-                        context, "Медиатека пуста. Создайте первый плейлист!", Toast.LENGTH_SHORT
+                        context,
+                        "Медиатека пуста. Создайте первый плейлист!",
+                        Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     showMenu(it)
@@ -258,13 +272,10 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
         }
 
         // Для автопрокрутки текста:
-        requireView().findViewById<TextView>(R.id.player_fragment_tv_song_name).isSelected = true
-        requireView().findViewById<TextView>(R.id.player_fragment_tv_artist_name).isSelected = true
-
-        vm.trackInfoLiveData.value!!.artworkUrl100.observe(viewLifecycleOwner) { cover ->
-            Picasso.get().load(Uri.parse(cover)).placeholder(R.drawable.note_placeholder)
-                .into(requireView().findViewById<ImageView>(R.id.player_fragment_iv_cover))
-        }
+        requireView().findViewById<TextView>(R.id.player_fragment_tv_song_name).isSelected =
+            true
+        requireView().findViewById<TextView>(R.id.player_fragment_tv_artist_name).isSelected =
+            true
     }
 
     private fun setPrevAndNextBtns(id: Int) {
@@ -280,33 +291,35 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
             }
 
             if (currentTrackPosition > 0) {    // Доступна кнопка "пред"
-                requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_prev).apply {
+                requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_prev)
+                    .apply {
 
-                    isClickable = true
+                        isClickable = true
 
-                    setBackgroundResource(R.drawable.icon_prev_active)
+                        setBackgroundResource(R.drawable.icon_prev_active)
 
-                    setOnClickListener {
-                        val prevTrackId =
-                            vm.tracksInThisPlaylistList.value!![currentTrackPosition - 1].trackId
-                        openNewTrackPlayerFragment(prevTrackId)
+                        setOnClickListener {
+                            val prevTrackId =
+                                vm.tracksInThisPlaylistList.value!![currentTrackPosition - 1].trackId
+                            openNewTrackPlayerFragment(prevTrackId)
+                        }
                     }
-                }
             }
 
             if (currentTrackPosition < vm.tracksInThisPlaylistList.value!!.size - 1) {  // Доступна кнопка "след"
-                requireView().findViewById<ImageView>(R.id.player_fragment_iv_icon_next).apply {
+                requireView().findViewById<ImageView>(R.id.player_fragment_iv_icon_next)
+                    .apply {
 
-                    isClickable = true
+                        isClickable = true
 
-                    setBackgroundResource(R.drawable.icon_next_active)
+                        setBackgroundResource(R.drawable.icon_next_active)
 
-                    setOnClickListener {
-                        val nextTrackId =
-                            vm.tracksInThisPlaylistList.value!![currentTrackPosition + 1].trackId
-                        openNewTrackPlayerFragment(nextTrackId)
+                        setOnClickListener {
+                            val nextTrackId =
+                                vm.tracksInThisPlaylistList.value!![currentTrackPosition + 1].trackId
+                            openNewTrackPlayerFragment(nextTrackId)
+                        }
                     }
-                }
             }
         }
     }
@@ -361,7 +374,7 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
 
     private fun covertTrackDurationMillisToString() {
 
-        val duration = vm.trackInfoLiveData.value!!.durationString.value
+        val duration = vm.viewState.value!!.durationString
         if (duration == DURATION_DEFAULT) {
 
             val dur = mediaPlayer.duration.toLong()
@@ -373,9 +386,7 @@ class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.f
                 durationInSeconds = "0$durationInSeconds"
             }
 
-            vm.trackInfoLiveData.value!!.durationString.postValue(
-                "$durationInMinutes:$durationInSeconds"
-            )
+            "$durationInMinutes:$durationInSeconds"
         }
     }
 

@@ -4,15 +4,28 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.musicapp.Creator
+import com.example.musicapp.SingletonObjects.dao
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
+import com.example.musicapp.domain.entities.TrackInfo
 import com.example.musicapp.domain.useCases.playlists.GetPlaylistsUseCase
+import com.example.musicapp.domain.useCases.tracks.DeleteTrackUseCase
+import com.example.musicapp.domain.useCases.tracks.GetTrackInfoUseCase
+import com.example.musicapp.domain.useCases.tracks.GetTracksListUseCase
+import com.example.musicapp.domain.useCases.tracks.InsertTrackUseCase
 import com.example.musicapp.presentation.ui.player.PlayerUIState
+import com.example.musicapp.presentation.ui.player.ViewState
+import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
-class PlayerViewModel : ViewModel() {
+class PlayerViewModel @Inject constructor(
+    private val getPlaylistsUseCase: GetPlaylistsUseCase,
+    private val getTracksListUseCase: GetTracksListUseCase,
+    private val insertTrackUseCase: InsertTrackUseCase,
+    private val deleteTrackUseCase: DeleteTrackUseCase,
+    private val getTrackInfoUseCase: GetTrackInfoUseCase
+) : ViewModel() {
 
     private var trackId: Long = 0
 
@@ -22,11 +35,11 @@ class PlayerViewModel : ViewModel() {
         }
     private val _playerUiState = MutableLiveData<PlayerUIState<Int>>()
 
-    val trackInfoLiveData: LiveData<PlayerUIState.Success.SuccessTrackInfo>
+    val viewState: LiveData<ViewState>
         get() {
-            return _trackInfoLiveData
+            return _viewState
         }
-    private val _trackInfoLiveData = MutableLiveData<PlayerUIState.Success.SuccessTrackInfo>()
+    private val _viewState = MutableLiveData(ViewState())
 
     val isLikedLiveData: LiveData<Boolean>
         get() {
@@ -40,16 +53,19 @@ class PlayerViewModel : ViewModel() {
         }
     private val _tracksInThisPlaylistList = MutableLiveData<List<MusicTrack>>(emptyList())
 
+    private fun currentViewState(): ViewState = viewState.value!!
+
     fun getTrackInfoFromServer(currentId: Long) {
 
         trackId = currentId
 
-        Creator.getTrackInfoUseCase.getTrackInfo(trackId)
+        getTrackInfoUseCase.getTrackInfo(trackId)
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { response ->
-                    val res = response.results[0]
-                    PlayerUIState.Success.updateData(res)
-                    if (playerUiState.value != PlayerUIState.Success) {
+                    updateViewStateInfo(response.results[0])
+
+                    if (playerUiState.value != PlayerUIState.Success) {     // УДАЛИТЬ?
                         _playerUiState.postValue(PlayerUIState.Success)
                     }
                 },
@@ -62,8 +78,8 @@ class PlayerViewModel : ViewModel() {
 
     //Проверка статуса "Нравится"/"Не нравится" (иконка с сердечком)
     fun checkIfFavourite() {
-        Creator.getTracksListUseCase.lookForTrackInPlaylist(
-            trackId, Creator.dao.favsPlaylistId()
+        getTracksListUseCase.lookForTrackInPlaylist(
+            trackId, dao!!.favsPlaylistId()
         )
             .subscribe(
                 { list ->
@@ -80,23 +96,23 @@ class PlayerViewModel : ViewModel() {
         Executors.newSingleThreadExecutor().execute {
             if (isLikedLiveData.value == false) {
                 // Добавляем в избранное:
-                val ld = trackInfoLiveData.value!!
+                val viewStateInfo = viewState.value!!
                 val track = MusicTrack(
                     trackId = trackId,
-                    trackName = ld.trackName.value!!,
-                    artistName = ld.artistName.value!!,
-                    previewUrl = ld.audioPreview.value,
-                    artworkUrl100 = ld.artworkUrl100.value,
-                    artworkUrl60 = ld.artworkUrl60.value
+                    trackName = viewStateInfo.trackName,
+                    artistName = viewStateInfo.artistName,
+                    previewUrl = viewStateInfo.audioPreview,
+                    artworkUrl100 = viewStateInfo.artworkUrl100,
+                    artworkUrl60 = viewStateInfo.artworkUrl60
                 )
-                Creator.insertTrackUseCase.addTrackToPlaylist(
-                    track, Creator.dao.favsPlaylistId()
+                insertTrackUseCase.addTrackToPlaylist(
+                    track, dao!!.favsPlaylistId()
                 )
                 _isLikedLiveData.postValue(true)
             } else {
                 // Удаляем из избранного:
-                Creator.deleteTrackUseCase.deleteTrackFromPlaylist(
-                    trackId, Creator.dao.favsPlaylistId()
+                deleteTrackUseCase.deleteTrackFromPlaylist(
+                    trackId, dao!!.favsPlaylistId()
                 )
                 _isLikedLiveData.postValue(false)
             }
@@ -106,7 +122,7 @@ class PlayerViewModel : ViewModel() {
     // Логика нажатия на иконку "Медиа"
     fun mediaIconClicked(playlistId: Int) {
         // Ищем: есть ли уже трек в выбранном плейлисте? (по аналогии с Яндекс.Музыкой)
-        Creator.getTracksListUseCase.lookForTrackInPlaylist(
+        getTracksListUseCase.lookForTrackInPlaylist(
             trackId, playlistId
         ).subscribe({ list ->
             if (list.isEmpty()) {         // Если трека нет в этом плейлисте - добавляем
@@ -121,13 +137,13 @@ class PlayerViewModel : ViewModel() {
 
     fun getListOfUsersPlaylists(callback: (List<Playlist>) -> Unit) {
         Executors.newSingleThreadExecutor().execute {
-            Creator.getPlaylistsUseCase.getAllPlaylists(callback)
+            getPlaylistsUseCase.getAllPlaylists(callback)
         }
     }
 
     fun getTracksList(playlistId: Int) {
         Executors.newSingleThreadExecutor().execute {
-            Creator.getTracksListUseCase.getPlaylistTracksList(playlistId) {
+            getTracksListUseCase.getPlaylistTracksList(playlistId) {
                 updateList(it)
             }
         }
@@ -135,26 +151,47 @@ class PlayerViewModel : ViewModel() {
 
     // Запускается из fun mediaIconClicked уже в io-потоке!
     private fun addToMedia(playlistId: Int) {
-        val ld = trackInfoLiveData.value!!
+        val ld = viewState.value!!
         val track = MusicTrack(
             trackId = trackId,
-            trackName = ld.trackName.value!!,
-            artistName = ld.artistName.value!!,
-            previewUrl = ld.audioPreview.value,
-            artworkUrl100 = ld.artworkUrl100.value,
-            artworkUrl60 = ld.artworkUrl60.value
+            trackName = ld.trackName,
+            artistName = ld.artistName,
+            previewUrl = ld.audioPreview,
+            artworkUrl100 = ld.artworkUrl100,
+            artworkUrl60 = ld.artworkUrl60
         )
-        Creator.insertTrackUseCase.addTrackToPlaylist(track, playlistId)
+        insertTrackUseCase.addTrackToPlaylist(track, playlistId)
     }
 
     // Запускается из fun mediaIconClicked уже в io-потоке!
     private fun deleteFromMedia(playlistId: Int) {
-        Creator.deleteTrackUseCase.deleteTrackFromPlaylist(trackId, playlistId)
-        // Обновляем иконку "Медиа" (проверяем, есть ли все еще трек в медиатеке)
-        Creator.getTracksListUseCase.lookForTrackInMedia(trackId)
+        deleteTrackUseCase.deleteTrackFromPlaylist(trackId, playlistId)
+        getTracksListUseCase.lookForTrackInMedia(trackId)
     }
 
     private fun updateList(list: List<MusicTrack>) {
         _tracksInThisPlaylistList.postValue(list)
+    }
+
+    private fun updateViewStateInfo(res: TrackInfo) {
+        if (_viewState.value?.trackName != res.trackName) {
+            _viewState.value = currentViewState().copy(trackName = res.trackName)
+        }
+        if (_viewState.value?.artistName != res.artistName) {
+            _viewState.value = currentViewState().copy(artistName = res.artistName)
+        }
+        if (_viewState.value?.audioPreview != res.previewUrl) {
+            _viewState.value = currentViewState().copy(audioPreview = res.previewUrl)
+        }
+        if (_viewState.value?.artworkUrl60 != res.artworkUrl60) {
+            _viewState.value = currentViewState().copy(artworkUrl60 = res.artworkUrl60)
+        }
+        if (_viewState.value?.artworkUrl100 != res.artworkUrl100) {
+            _viewState.value = currentViewState().copy(artworkUrl100 = res.artworkUrl100)
+        }
+    }
+
+    private companion object {
+        const val DURATION_DEFAULT = "0:00"
     }
 }

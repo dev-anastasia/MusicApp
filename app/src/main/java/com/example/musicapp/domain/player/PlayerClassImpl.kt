@@ -1,6 +1,6 @@
 package com.example.musicapp.domain.player
 
-import com.example.musicapp.Creator.mediaPlayer
+import com.example.musicapp.SingletonObjects.mediaPlayer
 import com.example.musicapp.presentation.PlayerClass
 import java.util.concurrent.Executors
 

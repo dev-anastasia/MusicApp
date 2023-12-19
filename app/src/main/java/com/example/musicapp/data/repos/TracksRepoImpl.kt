@@ -1,6 +1,6 @@
 package com.example.musicapp.data.repos
 
-import com.example.musicapp.Creator
+import com.example.musicapp.SingletonObjects.dao
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.TracksRepo
@@ -10,7 +10,6 @@ import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.TracksList
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
 
 class TracksRepoImpl : TracksRepo {
 
@@ -26,7 +25,7 @@ class TracksRepoImpl : TracksRepo {
     override fun getTracksIdsInSinglePlaylist(
         playlistId: Int
     ): Single<List<Long>> {
-        return Creator.dao.getTracksIdsSingle(playlistId)
+        return dao!!.getTracksIdsSingle(playlistId)
     }
 
     override fun getTracksList(
@@ -34,7 +33,7 @@ class TracksRepoImpl : TracksRepo {
     ) {
         val list = mutableListOf<TrackEntity>()
         for (i in trackIdsList) {
-            list.add(Creator.dao.getAllTracksListById(i))
+            list.add(dao!!.getAllTracksListById(i))
         }
 
         val result = mapper.trackEntityListToMusicTrackList(list)
@@ -52,34 +51,34 @@ class TracksRepoImpl : TracksRepo {
         track: MusicTrack, playlistId: Int
     ) {
         val trackTable = mapper.musicTrackToTrackEntity(track)
-        Creator.dao.addTrackToPlaylist(trackTable, playlistId)
+        dao!!.addTrackToPlaylist(trackTable, playlistId)
     }
 
     override fun findTrackInSinglePlaylist(
         trackId: Long, playlistId: Int
     ): Single<List<Long>> {
-        return Creator.dao.findTrackInSinglePlaylist(playlistId, trackId)
+        return dao!!.findTrackInSinglePlaylist(playlistId, trackId)
             .subscribeOn(Schedulers.io())
     }
 
     override fun getPlaylistsOfThisTrack(
         trackId: Long, callback: (List<Int>) -> Unit
     ) {
-        val res = Creator.dao.getPlaylistsOfThisTrack(trackId)
+        val res = dao!!.getPlaylistsOfThisTrack(trackId)
         callback(res)
     }
 
     override fun lookForTrackInMedia(
         trackId: Long
     ): Single<List<Long>> {
-        return Creator.dao.lookForTrackInPlaylists(trackId)
+        return dao!!.lookForTrackInPlaylists(trackId)
             .subscribeOn(Schedulers.io())
     }
 
     override fun deleteTrackFromPlaylist(
         trackId: Long, playlistId: Int
     ) {
-        Creator.dao.deleteTrackFromPlaylist(playlistId, trackId)
+        dao!!.deleteTrackFromPlaylist(playlistId, trackId)
     }
 
     private companion object {
