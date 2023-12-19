@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.application.component
 import com.example.musicapp.presentation.OnTrackClickListener
@@ -153,7 +152,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
 
     override fun onItemClick(id: Long) {
 
-        val playerFragment = PlayerFragment(Creator.playerClass)
+        val playerFragment = PlayerFragment()
         val bundle = Bundle()
         bundle.putLong(TRACK_ID, id)
         playerFragment.arguments = bundle

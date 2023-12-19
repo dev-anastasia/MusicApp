@@ -1,9 +1,10 @@
 package com.example.musicapp.data.repos
 
-import com.example.musicapp.Creator.dao
+import com.example.musicapp.MyObject
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.TracksRepo
+import com.example.musicapp.domain.database.MyDao
 import com.example.musicapp.domain.database.TrackEntity
 import com.example.musicapp.domain.entities.Music
 import com.example.musicapp.domain.entities.MusicTrack
@@ -14,6 +15,7 @@ import javax.inject.Inject
 
 class TracksRepoImpl @Inject constructor() : TracksRepo {
 
+    var dao: MyDao? = MyObject.dao
     private val mapper = Mapper()
 
     override fun getTrackInfo(

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.musicapp.Creator.dao
+import com.example.musicapp.MyObject.FAVS_PLAYLIST_ID
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.domain.entities.TrackInfo
@@ -79,7 +79,7 @@ class PlayerViewModel @Inject constructor(
     //Проверка статуса "Нравится"/"Не нравится" (иконка с сердечком)
     fun checkIfFavourite() {
         getTracksListUseCase.lookForTrackInPlaylist(
-            trackId, dao!!.favsPlaylistId()
+            trackId, FAVS_PLAYLIST_ID
         )
             .subscribe(
                 { list ->
@@ -106,13 +106,13 @@ class PlayerViewModel @Inject constructor(
                     artworkUrl60 = viewStateInfo.artworkUrl60
                 )
                 insertTrackUseCase.addTrackToPlaylist(
-                    track, dao!!.favsPlaylistId()
+                    track, FAVS_PLAYLIST_ID
                 )
                 _isLikedLiveData.postValue(true)
             } else {
                 // Удаляем из избранного:
                 deleteTrackUseCase.deleteTrackFromPlaylist(
-                    trackId, dao!!.favsPlaylistId()
+                    trackId, FAVS_PLAYLIST_ID
                 )
                 _isLikedLiveData.postValue(false)
             }

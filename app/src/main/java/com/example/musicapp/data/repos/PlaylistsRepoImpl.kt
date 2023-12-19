@@ -1,15 +1,17 @@
 package com.example.musicapp.data.repos
 
 import android.util.Log
-import com.example.musicapp.Creator.dao
+import com.example.musicapp.MyObject
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.domain.PlaylistsRepo
+import com.example.musicapp.domain.database.MyDao
 import com.example.musicapp.domain.entities.Playlist
 import io.reactivex.Completable
 import javax.inject.Inject
 
 class PlaylistsRepoImpl @Inject constructor() : PlaylistsRepo {
 
+    private val dao: MyDao? = MyObject.dao
     private val mapper = Mapper()
 
     override fun getPlaylistTracksCount(

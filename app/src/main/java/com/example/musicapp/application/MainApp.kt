@@ -2,7 +2,7 @@ package com.example.musicapp.application
 
 import android.app.Application
 import android.content.Context
-import com.example.musicapp.Creator
+import com.example.musicapp.MyObject
 import com.example.musicapp.dagger.components.AppComponent
 import com.example.musicapp.dagger.components.DaggerAppComponent
 import com.example.musicapp.domain.database.PlaylistDatabase
@@ -18,6 +18,6 @@ class MainApp : Application() {
     }
 
     fun initDatabase(context: Context) {
-        Creator.dao = PlaylistDatabase.getDatabase(context).dao()
+        MyObject.dao = PlaylistDatabase.getDatabase(context).dao()
     }
 }

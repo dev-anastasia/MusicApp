@@ -10,8 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.Creator
-import com.example.musicapp.Creator.dao
+import com.example.musicapp.MyObject.FAVS_PLAYLIST_ID
 import com.example.musicapp.R
 import com.example.musicapp.application.component
 import com.example.musicapp.presentation.OnTrackClickListener
@@ -80,7 +79,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
     }
 
     override fun onResume() {
-        vm.getTracksList(dao!!.favsPlaylistId()) // Получаем список треков
+        vm.getTracksList(FAVS_PLAYLIST_ID) // Получаем список треков
         super.onResume()
     }
 
@@ -91,10 +90,10 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
     override fun onItemClick(id: Long) {
         // Открытие фрагмента со списком треков плейлиста, id передаётся адаптером
-        val playerFragment = PlayerFragment(Creator.playerClass)
+        val playerFragment = PlayerFragment()
         val bundle = Bundle()
         bundle.putLong(TRACK_ID, id)
-        bundle.putInt(PLAYLIST_ID, dao!!.favsPlaylistId())
+        bundle.putInt(PLAYLIST_ID, FAVS_PLAYLIST_ID)
         playerFragment.arguments = bundle
 
         activity?.supportFragmentManager!!.beginTransaction()

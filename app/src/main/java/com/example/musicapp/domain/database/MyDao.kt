@@ -6,13 +6,14 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import dagger.Provides
+import dagger.assisted.AssistedInject
 import io.reactivex.Completable
 import io.reactivex.Single
+import javax.inject.Inject
 
 @Dao
 interface MyDao {
-
-    fun favsPlaylistId() = -1
 
     // Получить список всех плейлистов
     @Query("SELECT * FROM playlists_table ORDER BY systemTimeMillis desc")

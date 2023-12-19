@@ -16,7 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.musicapp.Creator.mediaPlayer
+import com.example.musicapp.MyObject.mediaPlayer
 import com.example.musicapp.R
 import com.example.musicapp.application.component
 import com.example.musicapp.domain.entities.Playlist
@@ -26,12 +26,14 @@ import com.example.musicapp.presentation.presenters.factories.PlayerVMFactory
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class PlayerFragment @Inject constructor(private val playerClass: PlayerClass) :
+class PlayerFragment :
     Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemClickListener {
 
     @Inject
     lateinit var vmFactory: PlayerVMFactory
     private lateinit var vm: PlayerViewModel
+    @Inject
+    lateinit var playerClass: PlayerClass
     private lateinit var setCurrentTimeRunnable: Runnable
     private lateinit var setCurrentSeekBarPosition: Runnable
     private lateinit var uiHandler: Handler
@@ -40,7 +42,7 @@ class PlayerFragment @Inject constructor(private val playerClass: PlayerClass) :
     // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
 
     override fun onAttach(context: Context) {
-        requireActivity().applicationContext.component.inject(this)
+        requireActivity().applicationContext.component
         vm = ViewModelProvider(this, vmFactory)[PlayerViewModel::class.java]
         super.onAttach(context)
     }
@@ -186,7 +188,7 @@ class PlayerFragment @Inject constructor(private val playerClass: PlayerClass) :
 
         val link = vm.viewState.value!!.audioPreview
         try {
-            playerClass.setPlayer(link)
+            playerClass?.setPlayer(link)
         } catch (e: Exception) {
             throw java.lang.Exception("private fun setPlayer(link) problem: $e")
         }
@@ -220,7 +222,7 @@ class PlayerFragment @Inject constructor(private val playerClass: PlayerClass) :
     private fun playPlayer() {
         val playBtn = requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
 
-        playerClass.playPlayer {
+        playerClass?.playPlayer {
             uiHandler.post { // Нужен uiHandler, т.к. музыка проигрывается в другом потоке
                 playBtn.setBackgroundResource(R.drawable.icon_play_active)
             }
@@ -235,13 +237,13 @@ class PlayerFragment @Inject constructor(private val playerClass: PlayerClass) :
     }
 
     private fun pausePlayer() {
-        playerClass.pausePlayer()
+        playerClass?.pausePlayer()
         requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
             .setBackgroundResource(R.drawable.icon_play_active)
     }
 
     private fun stopPlayer() {
-        playerClass.stopPlayer()
+        playerClass?.stopPlayer()
         uiHandler.apply {
             removeCallbacks(setCurrentTimeRunnable)
             removeCallbacks(setCurrentSeekBarPosition)
@@ -393,7 +395,7 @@ class PlayerFragment @Inject constructor(private val playerClass: PlayerClass) :
     }
 
     private fun openNewTrackPlayerFragment(trackId: Long) {
-        val playerFragment = PlayerFragment(playerClass)
+        val playerFragment = PlayerFragment()
         val bundle = Bundle()
         bundle.putLong(TRACK_ID, trackId)
         bundle.putInt(PLAYLIST_ID, this.requireArguments().getInt(PLAYLIST_ID))

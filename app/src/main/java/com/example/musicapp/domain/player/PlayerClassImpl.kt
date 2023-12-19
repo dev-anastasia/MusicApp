@@ -1,10 +1,11 @@
 package com.example.musicapp.domain.player
 
-import com.example.musicapp.Creator.mediaPlayer
+import com.example.musicapp.MyObject.mediaPlayer
 import com.example.musicapp.presentation.PlayerClass
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
-class PlayerClassImpl : PlayerClass {
+class PlayerClassImpl @Inject constructor() : PlayerClass {
 
     override fun setPlayer(dataSource: String) {
 
