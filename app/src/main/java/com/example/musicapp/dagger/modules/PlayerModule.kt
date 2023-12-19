@@ -1,4 +1,4 @@
-package com.example.musicapp.dagger
+package com.example.musicapp.dagger.modules
 
 import com.example.musicapp.domain.player.PlayerClassImpl
 import com.example.musicapp.presentation.PlayerClass

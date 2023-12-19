@@ -1,7 +1,7 @@
 package com.example.musicapp.data.repos
 
 import android.util.Log
-import com.example.musicapp.SingletonObjects.dao
+import com.example.musicapp.Creator.dao
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.domain.PlaylistsRepo
 import com.example.musicapp.domain.entities.Playlist

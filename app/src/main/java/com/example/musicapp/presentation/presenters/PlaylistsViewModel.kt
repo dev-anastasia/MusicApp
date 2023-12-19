@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.musicapp.dagger.scopes.MediaScope
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.domain.entities.PlaylistInfo
 import com.example.musicapp.domain.useCases.playlists.DeletePlaylistUseCase
@@ -14,6 +15,7 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
+@MediaScope
 class PlaylistsViewModel @Inject constructor(
     private val getPlaylistsUseCase: GetPlaylistsUseCase,
     private val insertPlaylistUseCase: InsertPlaylistUseCase,

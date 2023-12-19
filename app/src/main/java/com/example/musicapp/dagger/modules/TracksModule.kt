@@ -1,4 +1,4 @@
-package com.example.musicapp.dagger
+package com.example.musicapp.dagger.modules
 
 import com.example.musicapp.data.repos.TracksRepoImpl
 import com.example.musicapp.domain.TracksRepo

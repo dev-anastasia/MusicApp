@@ -5,7 +5,7 @@ import com.example.musicapp.domain.database.MyDao
 import com.example.musicapp.domain.player.PlayerClassImpl
 import com.example.musicapp.presentation.PlayerClass
 
-object SingletonObjects {
+object Creator {
 
     var dao: MyDao? = null  // Объект создаётся при входе в приложение, в MainActivity
 

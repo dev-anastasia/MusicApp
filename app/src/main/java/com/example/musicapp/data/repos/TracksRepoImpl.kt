@@ -1,6 +1,6 @@
 package com.example.musicapp.data.repos
 
-import com.example.musicapp.SingletonObjects.dao
+import com.example.musicapp.Creator.dao
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.TracksRepo

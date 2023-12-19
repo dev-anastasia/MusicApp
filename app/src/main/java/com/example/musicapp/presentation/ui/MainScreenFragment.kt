@@ -9,7 +9,7 @@ import com.example.musicapp.presentation.ui.media.MediaFragmentMain
 import com.example.musicapp.presentation.ui.search.SearchFragment
 import com.example.musicapp.presentation.ui.settings.SettingsFragment
 
-class MainScreenFragment: Fragment(R.layout.fragment_main_screen) {
+class MainScreenFragment : Fragment(R.layout.fragment_main_screen) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

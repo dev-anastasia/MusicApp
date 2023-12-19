@@ -1,5 +1,6 @@
 package com.example.musicapp.presentation.ui.search
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,12 +14,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.SingletonObjects
+import com.example.musicapp.Creator
 import com.example.musicapp.R
 import com.example.musicapp.application.component
 import com.example.musicapp.presentation.OnTrackClickListener
-import com.example.musicapp.presentation.presenters.factories.SearchVMFactory
 import com.example.musicapp.presentation.presenters.SearchViewModel
+import com.example.musicapp.presentation.presenters.factories.SearchVMFactory
 import com.example.musicapp.presentation.ui.player.PlayerFragment
 import com.example.musicapp.presentation.ui.trackAdapter.TrackAdapter
 import kotlinx.coroutines.CoroutineScope
@@ -33,20 +34,19 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
     @Inject
     lateinit var vmFactory: SearchVMFactory
     private lateinit var vm: SearchViewModel
-    private var currentQueryText: String? = ""  // текущий текст запроса
     private lateinit var searchQueryRunnable: Runnable
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var uiHandler: Handler
     private lateinit var recyclerView: RecyclerView
     private var coroutineChangeText: Job? = null
+    private var currentQueryText: String? = ""  // текущий текст запроса
 
-    // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-
-        requireActivity().applicationContext.component.inject(this)
+    override fun onAttach(context: Context) {
+        val searchSubcomponent =
+            requireActivity().applicationContext.component.searchSubcomponent().create()
+        searchSubcomponent.inject(this)
         vm = ViewModelProvider(this, vmFactory)[SearchViewModel::class.java]
-        super.onCreate(savedInstanceState)
+        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -153,7 +153,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
 
     override fun onItemClick(id: Long) {
 
-        val playerFragment = PlayerFragment(SingletonObjects.playerClass)
+        val playerFragment = PlayerFragment(Creator.playerClass)
         val bundle = Bundle()
         bundle.putLong(TRACK_ID, id)
         playerFragment.arguments = bundle

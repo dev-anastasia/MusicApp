@@ -2,9 +2,9 @@ package com.example.musicapp.application
 
 import android.app.Application
 import android.content.Context
-import com.example.musicapp.SingletonObjects
-import com.example.musicapp.dagger.AppComponent
-import com.example.musicapp.dagger.DaggerAppComponent
+import com.example.musicapp.Creator
+import com.example.musicapp.dagger.components.AppComponent
+import com.example.musicapp.dagger.components.DaggerAppComponent
 import com.example.musicapp.domain.database.PlaylistDatabase
 
 class MainApp : Application() {
@@ -18,6 +18,6 @@ class MainApp : Application() {
     }
 
     fun initDatabase(context: Context) {
-        SingletonObjects.dao = PlaylistDatabase.getDatabase(context).dao()
+        Creator.dao = PlaylistDatabase.getDatabase(context).dao()
     }
 }

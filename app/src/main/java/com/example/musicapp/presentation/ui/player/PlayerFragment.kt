@@ -1,5 +1,6 @@
 package com.example.musicapp.presentation.ui.player
 
+import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
@@ -15,8 +16,8 @@ import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.musicapp.Creator.mediaPlayer
 import com.example.musicapp.R
-import com.example.musicapp.SingletonObjects.mediaPlayer
 import com.example.musicapp.application.component
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.PlayerClass
@@ -25,24 +26,23 @@ import com.example.musicapp.presentation.presenters.factories.PlayerVMFactory
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class PlayerFragment(private val playerClass: PlayerClass) : Fragment(R.layout.fragment_player),
-    PopupMenu.OnMenuItemClickListener {
+class PlayerFragment @Inject constructor(private val playerClass: PlayerClass) :
+    Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemClickListener {
 
-    private lateinit var setCurrentTimeRunnable: Runnable
-    private lateinit var setCurrentSeekBarPosition: Runnable
-    private lateinit var uiHandler: Handler
     @Inject
     lateinit var vmFactory: PlayerVMFactory
     private lateinit var vm: PlayerViewModel
+    private lateinit var setCurrentTimeRunnable: Runnable
+    private lateinit var setCurrentSeekBarPosition: Runnable
+    private lateinit var uiHandler: Handler
     private val playlistsList = mutableListOf<Playlist>()
 
     // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-
+    override fun onAttach(context: Context) {
         requireActivity().applicationContext.component.inject(this)
         vm = ViewModelProvider(this, vmFactory)[PlayerViewModel::class.java]
-        super.onCreate(savedInstanceState)
+        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

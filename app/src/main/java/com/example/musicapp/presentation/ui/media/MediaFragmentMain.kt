@@ -1,17 +1,17 @@
 package com.example.musicapp.presentation.ui.media
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.example.musicapp.R
 import com.example.musicapp.application.component
-import com.example.musicapp.presentation.presenters.factories.PlaylistsVMFactory
 import com.example.musicapp.presentation.presenters.PlaylistsViewModel
+import com.example.musicapp.presentation.presenters.factories.PlaylistsVMFactory
 import com.example.musicapp.presentation.ui.media.viewpager.AddPlaylistFragment
 import com.example.musicapp.presentation.ui.media.viewpager.viewPagerAdapter.PlaylistsPagerAdapter
 import com.google.android.material.tabs.TabLayout
@@ -22,19 +22,17 @@ import javax.inject.Inject
 
 class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
 
-    private lateinit var adapter: PlaylistsPagerAdapter
-    private lateinit var viewPager: ViewPager2
     @Inject
     lateinit var vmFactory: PlaylistsVMFactory
-    private val vm: PlaylistsViewModel by activityViewModels { vmFactory }
+    private val vm: PlaylistsViewModel by activityViewModels { vmFactory } // Владелец - MainActivity
+    private lateinit var adapter: PlaylistsPagerAdapter
+    private lateinit var viewPager: ViewPager2
 
-    // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-
-        requireActivity().applicationContext.component.inject(this)
-        //vm = ViewModelProvider(requireActivity(), vmFactory)[PlaylistsViewModel::class.java]
-        super.onCreate(savedInstanceState)
+    override fun onAttach(context: Context) {
+        val mediaSubcomponent =
+            requireActivity().applicationContext.component.mediaSubcomponent().create()
+        mediaSubcomponent.inject(this)
+        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

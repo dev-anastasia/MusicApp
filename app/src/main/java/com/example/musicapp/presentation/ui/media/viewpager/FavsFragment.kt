@@ -1,5 +1,6 @@
 package com.example.musicapp.presentation.ui.media.viewpager
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,8 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicapp.SingletonObjects
-import com.example.musicapp.SingletonObjects.dao
+import com.example.musicapp.Creator
+import com.example.musicapp.Creator.dao
 import com.example.musicapp.R
 import com.example.musicapp.application.component
 import com.example.musicapp.presentation.OnTrackClickListener
@@ -22,17 +23,18 @@ import javax.inject.Inject
 
 class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
-    private lateinit var trackAdapter: TrackAdapter
     @Inject
     lateinit var vmFactory: TracksVMFactory
     private lateinit var vm: TracksViewModel
+    private lateinit var trackAdapter: TrackAdapter
     private lateinit var recyclerView: RecyclerView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-
-        requireActivity().applicationContext.component.inject(this)
+    override fun onAttach(context: Context) {
+        val mediaSubcomponent =
+            requireActivity().applicationContext.component.mediaSubcomponent().create()
+        mediaSubcomponent.inject(this)
         vm = ViewModelProvider(this, vmFactory)[TracksViewModel::class.java]
-        super.onCreate(savedInstanceState)
+        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,7 +91,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
     override fun onItemClick(id: Long) {
         // Открытие фрагмента со списком треков плейлиста, id передаётся адаптером
-        val playerFragment = PlayerFragment(SingletonObjects.playerClass)
+        val playerFragment = PlayerFragment(Creator.playerClass)
         val bundle = Bundle()
         bundle.putLong(TRACK_ID, id)
         bundle.putInt(PLAYLIST_ID, dao!!.favsPlaylistId())

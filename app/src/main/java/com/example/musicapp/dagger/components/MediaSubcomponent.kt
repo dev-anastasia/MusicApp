@@ -1,23 +1,21 @@
-package com.example.musicapp.dagger
+package com.example.musicapp.dagger.components
 
+import com.example.musicapp.dagger.scopes.MediaScope
 import com.example.musicapp.presentation.ui.media.MediaFragmentMain
 import com.example.musicapp.presentation.ui.media.SinglePlaylistFragment
 import com.example.musicapp.presentation.ui.media.viewpager.AddPlaylistFragment
 import com.example.musicapp.presentation.ui.media.viewpager.FavsFragment
 import com.example.musicapp.presentation.ui.media.viewpager.MediaPlaylistListFragment
-import com.example.musicapp.presentation.ui.player.PlayerFragment
-import com.example.musicapp.presentation.ui.search.SearchFragment
-import dagger.Component
+import dagger.Subcomponent
 
-@Component(
-    modules = [
-        PlaylistsModule::class,
-        TracksModule::class,
-        PlayerModule::class]
-)
-interface AppComponent {
+@MediaScope
+@Subcomponent
+interface MediaSubcomponent {
 
-    fun inject(fr: SearchFragment)
+    @Subcomponent.Factory
+    interface Factory {
+        fun create(): MediaSubcomponent
+    }
 
     fun inject(fr: MediaFragmentMain)
 
@@ -25,9 +23,7 @@ interface AppComponent {
 
     fun inject(fr: MediaPlaylistListFragment)
 
-    fun inject(fr: FavsFragment)
-
     fun inject(fr: SinglePlaylistFragment)
 
-    fun inject(fr: PlayerFragment)
+    fun inject(fr: FavsFragment)
 }
