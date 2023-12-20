@@ -27,8 +27,6 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     @Inject
     lateinit var vmFactory: TracksVMFactory
     private lateinit var vm: TracksViewModel
-    private lateinit var trackAdapter: TrackAdapter
-    private lateinit var recyclerView: RecyclerView
 
     override fun onAttach(context: Context) {
         val mediaSubcomponent =
@@ -44,14 +42,15 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         val emptyPlaylistMessage: LinearLayout =
             view.findViewById(R.id.ll_single_playlist_fragment_empty_playlist)
 
-        recyclerView = view.findViewById(R.id.single_playlist_fragment_recycler_view)
+        val recyclerView =
+            view.findViewById<RecyclerView>(R.id.single_playlist_fragment_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
             false
         )
         // Адаптер и ViewModel (observers)
-        trackAdapter = TrackAdapter(this)
+        val trackAdapter = TrackAdapter(this)
         recyclerView.adapter = trackAdapter
 
         vm.tracksList.observe(viewLifecycleOwner) {
@@ -89,11 +88,6 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
             }
 
         super.onResume()
-    }
-
-    override fun onDestroy() {
-        recyclerView.adapter = null
-        super.onDestroy()
     }
 
     override fun onItemClick(id: Long) {

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.musicapp.MyObject
 import com.example.musicapp.MyObject.FAVS_PLAYLIST_ID
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
@@ -54,6 +55,13 @@ class PlayerViewModel @Inject constructor(
     private val _tracksInThisPlaylistList = MutableLiveData<List<MusicTrack>>(emptyList())
 
     private fun currentViewState(): ViewState = viewState.value!!
+
+    fun setPlayerUiState(state: String) {
+        when (state) {
+            "IsPlaying" -> _playerUiState.postValue(PlayerUIState.IsPlaying)
+            "Success" -> _playerUiState.postValue(PlayerUIState.Success)
+        }
+    }
 
     fun getTrackInfoFromServer(currentId: Long) {
 
@@ -135,6 +143,15 @@ class PlayerViewModel @Inject constructor(
         })
     }
 
+    fun countCurrentTime(): String {
+        val currTimeInMinutes = MyObject.mediaPlayer.currentPosition / 1000 / 60
+        var currTimeInSeconds = (MyObject.mediaPlayer.currentPosition / 1000 % 60).toString()
+        if (currTimeInSeconds.length < 2) {
+            currTimeInSeconds = "0$currTimeInSeconds"     // вместо "1:7" -> "1:07"
+        }
+        return "$currTimeInMinutes:$currTimeInSeconds"
+    }
+
     fun getListOfUsersPlaylists(callback: (List<Playlist>) -> Unit) {
         Executors.newSingleThreadExecutor().execute {
             getPlaylistsUseCase.getAllPlaylists(callback)
@@ -191,7 +208,8 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val DURATION_DEFAULT = "0:00"
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("TAG", "PlayerVM onCleared")
     }
 }

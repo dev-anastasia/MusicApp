@@ -24,8 +24,6 @@ class MediaPlaylistListFragment :
     @Inject
     lateinit var vmFactory: PlaylistsVMFactory
     private val vm: PlaylistsViewModel by activityViewModels { vmFactory } // владелец - MediaActivity
-    private lateinit var mediaAdapter: PlaylistAdapter
-    private lateinit var recyclerView: RecyclerView
 
     override fun onAttach(context: Context) {
         val mediaSubcomponent =
@@ -37,30 +35,22 @@ class MediaPlaylistListFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView =
-            view.findViewById(R.id.media_fragment_playlists_recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(
+        val recyclerView =
+            view.findViewById<RecyclerView>(R.id.media_fragment_playlists_recycler_view)
+        recyclerView!!.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
             false
         )
         // Адаптер и ViewModel
-        mediaAdapter = PlaylistAdapter(this)
+        val mediaAdapter = PlaylistAdapter(this)
         recyclerView.adapter = mediaAdapter
 
         vm.allPlaylists.observe(viewLifecycleOwner) { list ->
             mediaAdapter.updateList(list)
         }
-    }
 
-    override fun onResume() {
         vm.getListOfUsersPlaylists()
-        super.onResume()
-    }
-
-    override fun onDestroy() {
-        recyclerView.adapter = null
-        super.onDestroy()
     }
 
     override fun openPlaylistClicked(id: Int) {

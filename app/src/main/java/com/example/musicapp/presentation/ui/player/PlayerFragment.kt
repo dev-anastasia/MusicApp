@@ -58,33 +58,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
         val artistName: TextView = view.findViewById(R.id.player_fragment_tv_artist_name)
         val durationString: TextView = view.findViewById(R.id.player_fragment_tv_duration)
 
-        uiHandler = Handler(Looper.getMainLooper())
-
-        setCurrentTimeRunnable = Runnable {     // Runnable для установки текущего времени:
-            if (vm.viewState.value?.durationString == DURATION_DEFAULT) {
-                currentTime.text = vm.viewState.value?.durationString
-            } else {
-                val currTimeInMinutes = mediaPlayer.currentPosition / 1000 / 60
-                var currTimeInSeconds = (mediaPlayer.currentPosition / 1000 % 60).toString()
-                if (currTimeInSeconds.length < 2) {
-                    currTimeInSeconds = "0$currTimeInSeconds"     // вместо "1:7" -> "1:07"
-                }
-                currentTime.text = "$currTimeInMinutes:$currTimeInSeconds"
-                uiHandler.postDelayed(setCurrentTimeRunnable, CURRENT_TIME_CHECK_TIMER)
-            }
-        }
-
-        setCurrentSeekBarPosition = Runnable {     // Runnable для установки прогресса seekbar'a:
-            if (vm.viewState.value!!.durationString != "0:00") {
-                seekbar.progress = mediaPlayer.currentPosition * 100 / mediaPlayer.duration
-            } else {
-                seekbar.progress = 0
-            }
-            uiHandler.postDelayed(setCurrentSeekBarPosition, CURRENT_SEEKBAR_CHECK_TIMER)
-        }
-
         // Устанавливаем observers
-
         vm.apply {  // устанавливаем observers:
 
             if (playerUiState.value != PlayerUIState.IsPlaying
@@ -134,14 +108,36 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
             }
         }
 
-        view.findViewById<ImageButton>(R.id.player_fragment_iv_icon_play).isClickable =
-            false       // До загрузки трека кнопка play не кликабельна
-        view.findViewById<TextView>(R.id.player_fragment_tv_top_info).setText(
-            R.string.player_is_loading_text
-        )
+        // Инициализируем lateinit vars
+
+        uiHandler = Handler(Looper.getMainLooper())
+
+        setCurrentTimeRunnable = Runnable {     // Runnable для установки текущего времени:
+            if (vm.viewState.value?.durationString == DURATION_DEFAULT) {
+                currentTime.text = vm.viewState.value?.durationString
+            } else {
+                currentTime.text = vm.countCurrentTime()
+                uiHandler.postDelayed(setCurrentTimeRunnable, CURRENT_TIME_CHECK_TIMER)
+            }
+        }
+
+        setCurrentSeekBarPosition = Runnable {     // Runnable для установки прогресса seekbar'a:
+            if (vm.viewState.value!!.durationString != DURATION_DEFAULT) {
+                seekbar.progress = mediaPlayer.currentPosition * 100 / mediaPlayer.duration
+            } else {
+                seekbar.progress = 0
+            }
+            uiHandler.postDelayed(setCurrentSeekBarPosition, CURRENT_SEEKBAR_CHECK_TIMER)
+        }
     }
 
     override fun onResume() {
+
+        requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play).isClickable =
+            false       // До загрузки трека кнопка play не кликабельна
+        requireView().findViewById<TextView>(R.id.player_fragment_tv_top_info).setText(
+            R.string.player_is_loading_text
+        )
         // Получение списка доступных плейлистов (для работы с Медиатекой)
         getListOfUsersPlaylists()
 
@@ -156,20 +152,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
 
     override fun onPause() {
         pausePlayer()
-
-        uiHandler.apply {
-            removeCallbacks(setCurrentTimeRunnable)
-            removeCallbacks(setCurrentSeekBarPosition)
-        }
         super.onPause()
     }
 
-    override fun onDestroy() {
+    override fun onStop() {
         uiHandler.apply {
-            removeCallbacks(setCurrentSeekBarPosition)
             removeCallbacks(setCurrentTimeRunnable)
+            removeCallbacks(setCurrentSeekBarPosition)
         }
-        super.onDestroy()
+        super.onStop()
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
@@ -199,11 +190,23 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
         if (vm.playerUiState.value != PlayerUIState.IsPlaying) {
             val link = vm.viewState.value!!.audioPreview
             playerClass.setPlayer(link) {
+
+                vm.setPlayerUiState(IS_PLAYING_STATE)
+
                 requireView().findViewById<TextView>(R.id.player_fragment_tv_top_info).setText(
                     R.string.player_is_ready_text
                 )
+
+                requireView().findViewById<TextView>(R.id.player_fragment_tv_current_time).text =
+                    DURATION_DEFAULT
+
                 playBtn.setBackgroundResource(R.drawable.icon_play_active)
                 playBtn.isClickable = true
+
+                requireView().findViewById<TextView>(R.id.player_fragment_tv_duration).text =
+                    countDuration()
+
+                covertTrackDurationMillisToString()
             }
         }
 
@@ -216,11 +219,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
                 it.setBackgroundResource(R.drawable.icon_pause)
             }
         }
-
-        requireView().findViewById<TextView>(R.id.player_fragment_tv_duration).text =
-            countDuration()
-
-        covertTrackDurationMillisToString()
     }
 
     private fun playPlayer() {
@@ -228,10 +226,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
             requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
                 .setBackgroundResource(R.drawable.icon_play_active)
         }
-        uiHandler.apply {
-            post(setCurrentTimeRunnable)
-            post(setCurrentSeekBarPosition)
-        }
+        setCurrentTimeRunnable.run()
+        setCurrentSeekBarPosition.run()
     }
 
     private fun pausePlayer() {
@@ -430,5 +426,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
         const val TRACK_ID = "track id key"
         const val PLAYLIST_ID = "playlist id key"
         const val DURATION_DEFAULT = "0:00"
+        const val IS_PLAYING_STATE = "IsPlaying"
+        const val SUCCESS_STATE = "SUCCESS"
     }
 }

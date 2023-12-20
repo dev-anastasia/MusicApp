@@ -31,8 +31,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
     @Inject
     lateinit var vmFactory: SearchVMFactory
     private lateinit var vm: SearchViewModel
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var searchQueryRunnable: Runnable
+    private var searchQueryRunnable: Runnable? = null
     private var queryCoroutine: Job? = null
     private var currentQueryText: String = ""  // текущий текст запроса
 
@@ -48,7 +47,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
         super.onViewCreated(view, savedInstanceState)
 
         // Recycler View
-        recyclerView = view.findViewById(R.id.search_fragment_recycler_view)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.search_fragment_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
@@ -77,7 +76,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
                         hideMessageLayout()
                         hideKeyboard()
                         showLoadingIcon()
-                        recyclerView.visibility = View.GONE
+                        recyclerView!!.visibility = View.GONE
                     }
 
                     SearchUIState.Error -> {
@@ -88,7 +87,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
                     SearchUIState.Success -> {
                         hideMessageLayout()
                         hideLoadingIcon()
-                        recyclerView.visibility = View.VISIBLE
+                        recyclerView!!.visibility = View.VISIBLE
                     }
 
                     SearchUIState.NoResults -> {
@@ -109,7 +108,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
                     override fun onQueryTextSubmit(query: String?): Boolean {
                         queryCoroutine?.cancel()
                         CoroutineScope(Dispatchers.Main).launch {
-                            searchQueryRunnable.run()
+                            searchQueryRunnable?.run()
                         }
                         return true
                     }
@@ -119,7 +118,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
                         queryCoroutine?.cancel()
                         queryCoroutine = CoroutineScope(Dispatchers.Main).launch {
                             delay(DELAY_TIMER)
-                            searchQueryRunnable.run()
+                            searchQueryRunnable?.run()
                         }
                         return true
                     }
@@ -134,7 +133,9 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
     }
 
     override fun onDestroy() {
-        recyclerView.adapter = null
+        searchQueryRunnable = null
+        queryCoroutine?.cancel()
+        queryCoroutine = null
         super.onDestroy()
     }
 

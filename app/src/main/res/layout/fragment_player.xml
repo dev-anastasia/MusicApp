@@ -95,7 +95,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="8dp"
-        android:text="@string/zero_time"
+        tools:text="@string/zero_time"
         app:layout_constraintEnd_toStartOf="@id/player_fragment_seekbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/player_fragment_tv_artist_name" />

@@ -16,10 +16,12 @@ class MainActivity : AppCompatActivity() {
         app.initDatabase(applicationContext)
 
         val mainScreenFragment = MainScreenFragment()
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.main_container, mainScreenFragment)
-            .setReorderingAllowed(true)
-            .commit()
+        if (savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.main_container, mainScreenFragment)
+                .setReorderingAllowed(true)
+                .commit()
+        }
     }
 }

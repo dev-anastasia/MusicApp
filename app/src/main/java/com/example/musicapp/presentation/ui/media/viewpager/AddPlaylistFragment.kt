@@ -21,7 +21,6 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
     @Inject
     lateinit var vmFactory: PlaylistsVMFactory
     private val vm: PlaylistsViewModel by activityViewModels { vmFactory }  // владелец - MediaActivity
-    private lateinit var editText: EditText
 
     override fun onAttach(context: Context) {
         val mediaSubcomponent =
@@ -35,7 +34,7 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
 
         vm.changeAddPlaylistFragmentIsOpen(true)
 
-        editText = view.findViewById(R.id.et_new_playlist_name)
+        val editText: EditText = view.findViewById(R.id.et_new_playlist_name)
 
         val commitBtn: ImageButton = view.findViewById(R.id.btn_add_playlist)
         val cancelBtn: ImageButton = view.findViewById(R.id.btn_cancel_adding)
@@ -74,10 +73,10 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
     private fun addPlaylist() {
 
         val playlistName =
-            if (editText.text.isEmpty()) {
+            if (requireView().findViewById<EditText>(R.id.et_new_playlist_name).text.isEmpty()) {
                 R.string.new_playlist_default_name.toString()
             } else {
-                editText.text.toString()
+                requireView().findViewById<EditText>(R.id.et_new_playlist_name).text.toString()
             }
         val newPlaylist = Playlist(
             0,

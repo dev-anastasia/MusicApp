@@ -25,8 +25,6 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
     @Inject
     lateinit var vmFactory: PlaylistsVMFactory
     private val vm: PlaylistsViewModel by activityViewModels { vmFactory } // Владелец - MainActivity
-    private lateinit var adapter: PlaylistsPagerAdapter
-    private lateinit var viewPager: ViewPager2
 
     override fun onAttach(context: Context) {
         val mediaSubcomponent =
@@ -37,11 +35,9 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val toolbar = view.findViewById<Toolbar>(R.id.media_fragment_toolbar)
-
         // ниже - отдельный адаптер для ViewPager'а!
-        adapter = PlaylistsPagerAdapter(this)
-        viewPager = view.findViewById(R.id.fragment_media_pager)
+        val adapter = PlaylistsPagerAdapter(this)
+        val viewPager = view.findViewById<ViewPager2>(R.id.fragment_media_pager)
         viewPager.adapter = adapter
 
         val tabLayout = view.findViewById<TabLayout>(R.id.fragment_media_tab_layout)
@@ -54,7 +50,7 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
         }.attach() // так мы соединяем tabLayout и viewPager
 
         // Кнопка добавления плейлиста
-        toolbar.setOnClickListener {
+        view.findViewById<Toolbar>(R.id.media_fragment_toolbar).setOnClickListener {
             if (vm.addPlaylistFragmentIsOpen.value!!.not())
                 requireActivity().supportFragmentManager.beginTransaction()
                     .add(R.id.main_container, AddPlaylistFragment())

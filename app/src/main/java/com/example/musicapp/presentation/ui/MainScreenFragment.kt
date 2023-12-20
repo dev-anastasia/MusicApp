@@ -16,38 +16,32 @@ class MainScreenFragment : Fragment(R.layout.fragment_main_screen) {
 
         view.findViewById<FrameLayout>(R.id.activity_main_fl_search).setOnClickListener {
             val searchFr = SearchFragment()
-            if (savedInstanceState == null) {
-                requireActivity().supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.main_container, searchFr)
-                    .addToBackStack("added SearchFragment")
-                    .setReorderingAllowed(true)
-                    .commit()
-            }
+            requireActivity().supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.main_container, searchFr)
+                .addToBackStack("added SearchFragment")
+                .setReorderingAllowed(true)
+                .commit()
         }
 
         view.findViewById<FrameLayout>(R.id.activity_main_fl_media).setOnClickListener {
             val mediaFr = MediaFragmentMain()
-            if (savedInstanceState == null) {
-                requireActivity().supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.main_container, mediaFr)
-                    .addToBackStack("added MediaFragment")
-                    .setReorderingAllowed(true)
-                    .commit()
-            }
+            requireActivity().supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.main_container, mediaFr)
+                .addToBackStack("added MediaFragment")
+                .setReorderingAllowed(true)
+                .commit()
         }
 
         view.findViewById<FrameLayout>(R.id.activity_main_fl_settings).setOnClickListener {
             val settingsFr = SettingsFragment()
-            if (savedInstanceState == null) {
-                requireActivity().supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.main_container, settingsFr)
-                    .addToBackStack("added SettingsFragment")
-                    .setReorderingAllowed(true)
-                    .commit()
-            }
+            requireActivity().supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.main_container, settingsFr)
+                .addToBackStack("added SettingsFragment")
+                .setReorderingAllowed(true)
+                .commit()
         }
     }
 }
