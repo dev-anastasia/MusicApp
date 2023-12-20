@@ -138,7 +138,7 @@
         app:layout_constraintTop_toBottomOf="@id/player_fragment_seekbar" />
 
     <ImageButton
-        android:id="@+id/player_fragment_iv_icon_play"
+        android:id="@+id/player_fragment_ib_icon_play"
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:layout_marginTop="40dp"

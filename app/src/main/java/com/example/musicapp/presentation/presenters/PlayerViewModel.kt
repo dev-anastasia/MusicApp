@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.musicapp.MyObject
 import com.example.musicapp.MyObject.FAVS_PLAYLIST_ID
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
@@ -58,12 +57,22 @@ class PlayerViewModel @Inject constructor(
 
     fun setPlayerUiState(state: String) {
         when (state) {
-            "IsPlaying" -> _playerUiState.postValue(PlayerUIState.IsPlaying)
-            "Success" -> _playerUiState.postValue(PlayerUIState.Success)
+            "DataReady" -> _playerUiState.postValue(PlayerUIState.DataReady)
+            else -> throw Exception("setPlayerUiState problem: Wrong PlayerUiState!")
         }
     }
 
+    fun setDurationString(dur: String) {
+        _viewState.value = currentViewState().copy(durationString = dur)
+    }
+
+    fun setCurrentTimeString(time: String) {
+        _viewState.value = currentViewState().copy(currentTimeString = time)
+    }
+
     fun getTrackInfoFromServer(currentId: Long) {
+
+        _playerUiState.postValue(PlayerUIState.Loading)
 
         trackId = currentId
 
@@ -72,10 +81,7 @@ class PlayerViewModel @Inject constructor(
             .subscribe(
                 { response ->
                     updateViewStateInfo(response.results[0])
-
-                    if (playerUiState.value != PlayerUIState.Success) {     // УДАЛИТЬ?
-                        _playerUiState.postValue(PlayerUIState.Success)
-                    }
+                    _playerUiState.postValue(PlayerUIState.Success)
                 },
                 { error ->
                     Log.e("RxJava", "getTrackInfo fun problem: $error")
@@ -141,15 +147,6 @@ class PlayerViewModel @Inject constructor(
         }, { error ->
             Log.e("RxJava", "mediaIconClicked fun problem: $error")
         })
-    }
-
-    fun countCurrentTime(): String {
-        val currTimeInMinutes = MyObject.mediaPlayer.currentPosition / 1000 / 60
-        var currTimeInSeconds = (MyObject.mediaPlayer.currentPosition / 1000 % 60).toString()
-        if (currTimeInSeconds.length < 2) {
-            currTimeInSeconds = "0$currTimeInSeconds"     // вместо "1:7" -> "1:07"
-        }
-        return "$currTimeInMinutes:$currTimeInSeconds"
     }
 
     fun getListOfUsersPlaylists(callback: (List<Playlist>) -> Unit) {

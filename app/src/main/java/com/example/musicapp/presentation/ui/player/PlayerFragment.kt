@@ -1,7 +1,6 @@
 package com.example.musicapp.presentation.ui.player
 
 import android.content.Context
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -57,34 +56,47 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
         val songName: TextView = view.findViewById(R.id.player_fragment_tv_song_name)
         val artistName: TextView = view.findViewById(R.id.player_fragment_tv_artist_name)
         val durationString: TextView = view.findViewById(R.id.player_fragment_tv_duration)
+        val playBtn: ImageButton = view.findViewById(R.id.player_fragment_ib_icon_play)
+        val topInfo: TextView = view.findViewById(R.id.player_fragment_tv_top_info)
 
         // Устанавливаем observers
         vm.apply {  // устанавливаем observers:
 
-            if (playerUiState.value != PlayerUIState.IsPlaying
-                &&
+            if (playerUiState.value != PlayerUIState.DataReady &&
+                playerUiState.value != PlayerUIState.Loading &&
                 playerUiState.value != PlayerUIState.Success
             ) {
-                getTrackInfoFromServer(requireArguments().getLong(TRACK_ID)) // Получаем трек с сервера
+                // Делаем запрос только(!) если ещё его не делали, либо если PlayerUiState.Error
+                getTrackInfoFromServer(requireArguments().getLong(TRACK_ID))
             }
 
             // Устанавливаем observers:
             playerUiState.observe(viewLifecycleOwner) {
                 when (it) {
+
+                    PlayerUIState.Loading -> {
+                        playBtn.apply {
+                            isClickable = false
+                            setBackgroundResource(R.drawable.icon_play_disabled)
+                        }
+                        topInfo.setText(R.string.player_is_loading_text)
+                    }
+
                     PlayerUIState.Success -> {
+                        setPlayer()
+                    }
+
+                    PlayerUIState.DataReady -> {
+                        topInfo.setText(R.string.player_is_ready_text)
                         updateUI()
                     }
 
-                    PlayerUIState.IsPlaying -> {
-                        updateUI()      // В этом состоянии трек не будет загружен повторно в плеер
-                    }
-
                     PlayerUIState.Error -> {
+                        topInfo.visibility = View.GONE
                         Toast.makeText(
                             activity, "Ошибка: не удалось связаться с сервером", Toast.LENGTH_SHORT
                         ).show()
                     }
-
                 }
             }
 
@@ -93,8 +105,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
                 songName.text = it.trackName
                 artistName.text = it.artistName
                 durationString.text = it.durationString
+                currentTime.text = it.currentTimeString
 
-                Picasso.get().load(it.artworkUrl100.ifEmpty { null })
+                Picasso.get()
+                    .load(it.artworkUrl100.ifEmpty { null })
                     .placeholder(R.drawable.note_placeholder)
                     .into(view.findViewById<ImageView>(R.id.player_fragment_iv_cover))
             }
@@ -112,34 +126,41 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
 
         uiHandler = Handler(Looper.getMainLooper())
 
-        setCurrentTimeRunnable = Runnable {     // Runnable для установки текущего времени:
-            if (vm.viewState.value?.durationString == DURATION_DEFAULT) {
-                currentTime.text = vm.viewState.value?.durationString
-            } else {
-                currentTime.text = vm.countCurrentTime()
+        setCurrentTimeRunnable = Runnable {
+            if (vm.viewState.value!!.durationString != ZERO_TIME) {  // Если трек не пустой
+                val time = playerClass.countCurrentTime()
+                currentTime.text = time
+                vm.setCurrentTimeString(time)
                 uiHandler.postDelayed(setCurrentTimeRunnable, CURRENT_TIME_CHECK_TIMER)
             }
         }
 
-        setCurrentSeekBarPosition = Runnable {     // Runnable для установки прогресса seekbar'a:
-            if (vm.viewState.value!!.durationString != DURATION_DEFAULT) {
+        setCurrentSeekBarPosition = Runnable {
+            if (vm.viewState.value!!.durationString != ZERO_TIME) { // Если трек не пустой
                 seekbar.progress = mediaPlayer.currentPosition * 100 / mediaPlayer.duration
             } else {
-                seekbar.progress = 0
+                seekbar.apply {
+                    isClickable = false
+                    progress = 0
+                }
             }
+
             uiHandler.postDelayed(setCurrentSeekBarPosition, CURRENT_SEEKBAR_CHECK_TIMER)
         }
     }
 
     override fun onResume() {
-
-        requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play).isClickable =
-            false       // До загрузки трека кнопка play не кликабельна
-        requireView().findViewById<TextView>(R.id.player_fragment_tv_top_info).setText(
-            R.string.player_is_loading_text
-        )
         // Получение списка доступных плейлистов (для работы с Медиатекой)
         getListOfUsersPlaylists()
+
+        if (mediaPlayer.isPlaying) {
+            setCurrentTimeRunnable.run()
+            setCurrentSeekBarPosition.run()
+            mediaPlayer.setOnCompletionListener {
+                requireView().findViewById<ImageButton>(R.id.player_fragment_ib_icon_play)
+                    .setBackgroundResource(R.drawable.icon_play_active)
+            }
+        }
 
         // Иконка "Вернуться назад"
         requireView().findViewById<ImageButton>(R.id.player_fragment_btn_go_back)
@@ -147,12 +168,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
                 releasePlayer()
                 requireActivity().supportFragmentManager.popBackStack()
             }
-        super.onResume()
-    }
 
-    override fun onPause() {
-        pausePlayer()
-        super.onPause()
+        super.onResume()
     }
 
     override fun onStop() {
@@ -160,6 +177,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
             removeCallbacks(setCurrentTimeRunnable)
             removeCallbacks(setCurrentSeekBarPosition)
         }
+        mediaPlayer.setOnCompletionListener { }
         super.onStop()
     }
 
@@ -174,7 +192,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
     // ЧАСТНЫЕ МЕТОДЫ ФРАГМЕНТА:
 
     private fun updateUI() {
-        setPlayer()
+        setPlayButton()
         setSeekbar()
         setIcons()
         val playlistId = this.arguments?.getInt(PLAYLIST_ID)
@@ -185,29 +203,35 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
 
     private fun setPlayer() {
 
-        val playBtn = requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
+        val link = vm.viewState.value!!.audioPreview
+        playerClass.setPlayer(link) {
+            // callback - что нужно делать при полной загрузке трека в MediaPlayer:
+            requireView().findViewById<ImageButton>(R.id.player_fragment_ib_icon_play)
+                .isClickable = true
+            requireView().findViewById<TextView>(R.id.player_fragment_tv_top_info)
+                .setText(R.string.player_is_ready_text)
+            requireView().findViewById<TextView>(R.id.player_fragment_tv_current_time)
+                .text = ZERO_TIME
 
-        if (vm.playerUiState.value != PlayerUIState.IsPlaying) {
-            val link = vm.viewState.value!!.audioPreview
-            playerClass.setPlayer(link) {
-
-                vm.setPlayerUiState(IS_PLAYING_STATE)
-
-                requireView().findViewById<TextView>(R.id.player_fragment_tv_top_info).setText(
-                    R.string.player_is_ready_text
-                )
-
-                requireView().findViewById<TextView>(R.id.player_fragment_tv_current_time).text =
-                    DURATION_DEFAULT
-
-                playBtn.setBackgroundResource(R.drawable.icon_play_active)
-                playBtn.isClickable = true
-
-                requireView().findViewById<TextView>(R.id.player_fragment_tv_duration).text =
-                    countDuration()
-
-                covertTrackDurationMillisToString()
+            val duration: String = playerClass.countDuration()
+            requireView().findViewById<TextView>(R.id.player_fragment_tv_duration)
+                .text = duration
+            vm.apply {
+                setDurationString(duration)
+                setCurrentTimeString(ZERO_TIME)
+                setPlayerUiState(DATA_READY_STATE)
             }
+        }
+    }
+
+    private fun setPlayButton() {
+
+        val playBtn = requireView().findViewById<ImageButton>(R.id.player_fragment_ib_icon_play)
+
+        if (mediaPlayer.isPlaying) {
+            playBtn.setBackgroundResource(R.drawable.icon_pause)
+        } else {
+            playBtn.setBackgroundResource(R.drawable.icon_play_active)
         }
 
         playBtn.setOnClickListener {
@@ -222,22 +246,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
     }
 
     private fun playPlayer() {
-        playerClass.playPlayer {
-            requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
-                .setBackgroundResource(R.drawable.icon_play_active)
-        }
+        playerClass.playPlayer()
         setCurrentTimeRunnable.run()
         setCurrentSeekBarPosition.run()
     }
 
     private fun pausePlayer() {
         playerClass.pausePlayer()
-        requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_play)
+        requireView().findViewById<ImageButton>(R.id.player_fragment_ib_icon_play)
             .setBackgroundResource(R.drawable.icon_play_active)
-    }
-
-    private fun stopPlayer() {
-        playerClass.stopPlayer()
         uiHandler.apply {
             removeCallbacks(setCurrentTimeRunnable)
             removeCallbacks(setCurrentSeekBarPosition)
@@ -342,43 +359,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
         }
     }
 
-    private fun countDuration(): String {
-        val millis = mediaPlayer.duration
-        if (millis == -1) {
-            return "0:00"
-        }
-
-        val mins = millis / 1000 / 60
-        val currSecs = millis / 1000 % 60
-        var secs = currSecs.toString()
-        if (currSecs.toString().length < 2) {
-            secs = "0$secs"
-        }
-        return "$mins:$secs"
-    }
-
     private fun getListOfUsersPlaylists() {
         playlistsList.clear()
         vm.getListOfUsersPlaylists {
             playlistsList.addAll(it)
-        }
-    }
-
-    private fun covertTrackDurationMillisToString() {
-
-        val duration = vm.viewState.value!!.durationString
-        if (duration == DURATION_DEFAULT) {
-
-            val dur = mediaPlayer.duration.toLong()
-
-            val durationInMinutes = (dur / 1000 / 60).toString()
-            var durationInSeconds = (dur / 1000 % 60).toString()
-
-            if (durationInSeconds.length < 2) {
-                durationInSeconds = "0$durationInSeconds"
-            }
-
-            "$durationInMinutes:$durationInSeconds"
         }
     }
 
@@ -389,7 +373,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
         bundle.putInt(PLAYLIST_ID, this.requireArguments().getInt(PLAYLIST_ID))
         playerFragment.arguments = bundle
 
-        releasePlayer()
+        //releasePlayer()
 
         requireActivity().supportFragmentManager.apply {
             beginTransaction().replace(R.id.main_container, playerFragment)
@@ -413,11 +397,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
             removeCallbacks(setCurrentSeekBarPosition)
             removeCallbacks(setCurrentTimeRunnable)
         }
-        mediaPlayer.apply {
-            stopPlayer()
-            release()
-        }
-        mediaPlayer = MediaPlayer()
+        playerClass.stopAndReleasePlayer()
     }
 
     private companion object {
@@ -425,8 +405,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
         const val CURRENT_SEEKBAR_CHECK_TIMER = 600L
         const val TRACK_ID = "track id key"
         const val PLAYLIST_ID = "playlist id key"
-        const val DURATION_DEFAULT = "0:00"
-        const val IS_PLAYING_STATE = "IsPlaying"
-        const val SUCCESS_STATE = "SUCCESS"
+        const val ZERO_TIME = "0:00"
+        const val DATA_READY_STATE = "DataReady"
     }
 }

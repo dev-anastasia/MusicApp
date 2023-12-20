@@ -4,9 +4,13 @@ interface PlayerClass {
 
     fun setPlayer(dataSource: String, callback: () -> Unit)
 
-    fun playPlayer(callback: () -> Unit)
+    fun playPlayer()
 
     fun pausePlayer()
 
-    fun stopPlayer()
+    fun stopAndReleasePlayer()
+
+    fun countCurrentTime(): String
+
+    fun countDuration(): String
 }
