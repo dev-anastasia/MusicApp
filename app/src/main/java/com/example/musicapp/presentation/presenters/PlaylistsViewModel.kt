@@ -11,6 +11,7 @@ import com.example.musicapp.domain.useCases.playlists.DeletePlaylistUseCase
 import com.example.musicapp.domain.useCases.playlists.GetPlaylistInfoUseCase
 import com.example.musicapp.domain.useCases.playlists.GetPlaylistsUseCase
 import com.example.musicapp.domain.useCases.playlists.InsertPlaylistUseCase
+import com.example.musicapp.presentation.ui.media.viewpager.PlaylistsListUiState
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -28,6 +29,12 @@ class PlaylistsViewModel @Inject constructor(
             return _addPlaylistFragmentIsOpen
         }
     private val _addPlaylistFragmentIsOpen = MutableLiveData(false)
+
+    val playlistsListUiState: LiveData<PlaylistsListUiState<Int>>
+        get() {
+            return _playlistsListUiState
+        }
+    private val _playlistsListUiState = MutableLiveData<PlaylistsListUiState<Int>>()
 
     val allPlaylists: LiveData<List<Playlist>> // Список плейлистов в БД
         get() {
@@ -57,7 +64,12 @@ class PlaylistsViewModel @Inject constructor(
     fun getListOfUsersPlaylists() {
         Executors.newSingleThreadExecutor().execute {
             getPlaylistsUseCase.getAllPlaylists {
-                updateList(it)
+                if (it.isEmpty()) {
+                    _playlistsListUiState.postValue(PlaylistsListUiState.NoResults)
+                } else {
+                    _playlistsListUiState.postValue(PlaylistsListUiState.Success)
+                    updateList(it)
+                }
             }
         }
     }

@@ -13,6 +13,7 @@
     <string name="add_new_playlist">Добавить новый плейлист…</string>
     <string name="empty_playlist_message">Плейлист пока пуст…</string>
     <string name="new_playlist_default_name">Новый плейлист</string>
+    <string name="no_playlists_message">У вас пока нет плейлистов. Создайте новый!</string>
 
     <string name="context_menu_delete">Удалить</string>
 

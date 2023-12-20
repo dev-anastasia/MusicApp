@@ -3,6 +3,8 @@ package com.example.musicapp.presentation.ui.media.viewpager
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,6 +37,9 @@ class MediaPlaylistListFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val loadingIcon: ImageView = view.findViewById(R.id.playlists_list_fragment_iv_loading)
+        val message: LinearLayout = view.findViewById(R.id.ll_playlists_list_is_empty_message)
+
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.media_fragment_playlists_recycler_view)
         recyclerView!!.layoutManager = LinearLayoutManager(
@@ -46,10 +51,37 @@ class MediaPlaylistListFragment :
         val mediaAdapter = PlaylistAdapter(this)
         recyclerView.adapter = mediaAdapter
 
-        vm.allPlaylists.observe(viewLifecycleOwner) { list ->
-            mediaAdapter.updateList(list)
-        }
+        vm.apply {
+            allPlaylists.observe(viewLifecycleOwner) { list ->
+                mediaAdapter.updateList(list)
+                recyclerView.scrollToPosition(0)
+            }
 
+            playlistsListUiState.observe(viewLifecycleOwner) {
+
+                when (it) {
+
+                    PlaylistsListUiState.Loading -> {
+                        loadingIcon.visibility = View.VISIBLE
+                        message.visibility = View.GONE
+                    }
+
+                    PlaylistsListUiState.Success -> {
+                        loadingIcon.visibility = View.GONE
+                        message.visibility = View.GONE
+                    }
+
+                    PlaylistsListUiState.NoResults -> {
+                        loadingIcon.visibility = View.GONE
+                        message.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
         vm.getListOfUsersPlaylists()
     }
 

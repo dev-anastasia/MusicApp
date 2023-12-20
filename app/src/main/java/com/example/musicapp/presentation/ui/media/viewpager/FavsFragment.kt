@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -39,6 +40,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
         val emptyPlaylistMessage: LinearLayout =
             view.findViewById(R.id.ll_favs_playlist_fragment_empty_playlist)
+        val loadingIcon: ImageView = view.findViewById(R.id.favs_fragment_iv_loading)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.favs_fragment_recycler_view)
         recyclerView!!.layoutManager = LinearLayoutManager(
@@ -56,11 +58,16 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
 
         vm.uiState.observe(viewLifecycleOwner) {
             when (it) {
-                TracksListUiState.Loading -> {}
+                TracksListUiState.Loading -> {
+                    loadingIcon.visibility = View.VISIBLE
+                }
 
-                TracksListUiState.Success -> {}
+                TracksListUiState.Success -> {
+                    loadingIcon.visibility = View.GONE
+                }
 
                 TracksListUiState.NoResults -> {
+                    loadingIcon.visibility = View.GONE
                     emptyPlaylistMessage.visibility = View.VISIBLE
                 }
 

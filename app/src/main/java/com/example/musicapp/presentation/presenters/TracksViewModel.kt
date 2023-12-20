@@ -15,17 +15,17 @@ class TracksViewModel @Inject constructor(private val getTracksListUseCase: GetT
 
     fun getTracksList(playlistId: Int) {
         uiState.postValue(TracksListUiState.Loading)
-        getTracksListUseCase.getPlaylistTracksList(playlistId) {
-            updateList(it)
+        getTracksListUseCase.getPlaylistTracksList(playlistId) { list ->
+            if (list.isEmpty()) {
+                uiState.postValue(TracksListUiState.NoResults)
+            } else {
+                updateList(list)
+                uiState.postValue(TracksListUiState.Success)
+            }
         }
     }
 
     private fun updateList(list: List<MusicTrack>) {
         tracksList.postValue(list)
-        if (list.isEmpty()) {
-            uiState.postValue(TracksListUiState.NoResults)
-        } else {
-            uiState.postValue(TracksListUiState.Success)
-        }
     }
 }
