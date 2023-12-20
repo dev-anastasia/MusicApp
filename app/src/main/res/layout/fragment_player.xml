@@ -23,12 +23,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="24dp"
-        android:text="@string/player_fragment_tv_top_info"
         android:textSize="14sp"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/player_fragment_tv_top_info" />
 
     <ImageView
         android:id="@+id/player_fragment_iv_cover"
@@ -143,7 +143,6 @@
         android:layout_height="52dp"
         android:layout_marginTop="40dp"
         android:background="@drawable/icon_play_disabled"
-        android:clickable="false"
         app:layout_constraintEnd_toStartOf="@id/player_fragment_iv_icon_next"
         app:layout_constraintStart_toEndOf="@id/player_fragment_iv_icon_prev"
         app:layout_constraintTop_toBottomOf="@id/player_fragment_seekbar" />

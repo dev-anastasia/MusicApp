@@ -4,6 +4,8 @@ sealed class PlayerUIState<out Int> {
 
     object Success : PlayerUIState<Nothing>()
 
+    object IsPlaying : PlayerUIState<Nothing>()
+
     object Error : PlayerUIState<Nothing>()
 }
 

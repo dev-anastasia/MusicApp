@@ -174,19 +174,19 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun updateViewStateInfo(res: TrackInfo) {
-        if (_viewState.value?.trackName != res.trackName) {
+        if (viewState.value?.trackName != res.trackName) {
             _viewState.value = currentViewState().copy(trackName = res.trackName)
         }
-        if (_viewState.value?.artistName != res.artistName) {
+        if (viewState.value?.artistName != res.artistName) {
             _viewState.value = currentViewState().copy(artistName = res.artistName)
         }
-        if (_viewState.value?.audioPreview != res.previewUrl) {
+        if (viewState.value?.audioPreview != res.previewUrl) {
             _viewState.value = currentViewState().copy(audioPreview = res.previewUrl)
         }
-        if (_viewState.value?.artworkUrl60 != res.artworkUrl60) {
+        if (viewState.value?.artworkUrl60 != res.artworkUrl60) {
             _viewState.value = currentViewState().copy(artworkUrl60 = res.artworkUrl60)
         }
-        if (_viewState.value?.artworkUrl100 != res.artworkUrl100) {
+        if (viewState.value?.artworkUrl100 != res.artworkUrl100) {
             _viewState.value = currentViewState().copy(artworkUrl100 = res.artworkUrl100)
         }
     }

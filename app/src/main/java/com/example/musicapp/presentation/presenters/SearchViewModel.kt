@@ -41,6 +41,7 @@ class SearchViewModel @Inject constructor(
                     _searchUiState.postValue(SearchUIState.NoResults)
                 } else {
                     updateResultsList(result.results)
+                    _searchUiState.postValue(SearchUIState.Success)
                 }
             }, { error ->
                 Log.e("RxJava", "getSearchResults fun problem: $error")
@@ -49,6 +50,5 @@ class SearchViewModel @Inject constructor(
 
     private fun updateResultsList(newList: List<MusicTrack>) {
         _searchResultsList.postValue(newList)
-        _searchUiState.postValue(SearchUIState.Success)
     }
 }

@@ -2,8 +2,6 @@ package com.example.musicapp.presentation.ui.search
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
@@ -33,12 +31,10 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
     @Inject
     lateinit var vmFactory: SearchVMFactory
     private lateinit var vm: SearchViewModel
-    private lateinit var searchQueryRunnable: Runnable
-    private lateinit var trackAdapter: TrackAdapter
-    private lateinit var uiHandler: Handler
     private lateinit var recyclerView: RecyclerView
-    private var coroutineChangeText: Job? = null
-    private var currentQueryText: String? = ""  // текущий текст запроса
+    private lateinit var searchQueryRunnable: Runnable
+    private var queryCoroutine: Job? = null
+    private var currentQueryText: String = ""  // текущий текст запроса
 
     override fun onAttach(context: Context) {
         val searchSubcomponent =
@@ -51,22 +47,20 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        uiHandler = Handler(Looper.getMainLooper())
-
+        // Recycler View
         recyclerView = view.findViewById(R.id.search_fragment_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
             false
         )
-        // Адаптер
-        trackAdapter = TrackAdapter(this)
+        val trackAdapter = TrackAdapter(this)
         recyclerView.adapter = trackAdapter
 
-        // Инициализируем lateinit vars
+        // Запрос в Retrofit
         searchQueryRunnable = Runnable {
             if (currentQueryText.isNullOrEmpty().not()) {
-                vm.onGetTracksListClicked(currentQueryText!!)
+                vm.onGetTracksListClicked(currentQueryText)
             }
         }
 
@@ -87,23 +81,19 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
                     }
 
                     SearchUIState.Error -> {
+                        hideLoadingIcon()
                         showSomeSearchProblem()
-                        recyclerView.visibility = View.GONE
                     }
 
                     SearchUIState.Success -> {
-                        hideKeyboard()
+                        hideMessageLayout()
                         hideLoadingIcon()
                         recyclerView.visibility = View.VISIBLE
                     }
 
                     SearchUIState.NoResults -> {
+                        hideLoadingIcon()
                         showNoSuchResult()
-                        recyclerView.visibility = View.GONE
-                    }
-
-                    else -> {
-                        throw IllegalStateException("Wrong uiState!")
                     }
                 }
             }
@@ -113,23 +103,22 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
     override fun onResume() {
 
         requireView().findViewById<SearchView>(R.id.search_fragment_search_view)
-            .setOnQueryTextListener( // требует listener
+            .setOnQueryTextListener(      // требует listener (SearchView.OnQueryTextListener)
                 object : SearchView.OnQueryTextListener {     // тот самый требуемый listener
 
                     override fun onQueryTextSubmit(query: String?): Boolean {
-                        coroutineChangeText?.cancel()
-                        CoroutineScope(Dispatchers.Main).launch() {
+                        queryCoroutine?.cancel()
+                        CoroutineScope(Dispatchers.Main).launch {
                             searchQueryRunnable.run()
                         }
                         return true
                     }
 
-
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        currentQueryText = newText
-                        coroutineChangeText?.cancel()
-                        coroutineChangeText = CoroutineScope(Dispatchers.Main).launch {
-                            delay(TIMER)
+                        currentQueryText = newText!!
+                        queryCoroutine?.cancel()
+                        queryCoroutine = CoroutineScope(Dispatchers.Main).launch {
+                            delay(DELAY_TIMER)
                             searchQueryRunnable.run()
                         }
                         return true
@@ -137,10 +126,9 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
                 }
             )
 
-        requireView().findViewById<ImageView>(R.id.search_fragment_btn_go_back)
-            .setOnClickListener {
-                onBackPressed()
-            }
+        requireView().findViewById<ImageView>(R.id.search_fragment_btn_go_back).setOnClickListener {
+            onBackPressed()
+        }
 
         super.onResume()
     }
@@ -167,13 +155,11 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
     // ПРИВАТНЫЕ МЕТОДЫ ДЛЯ ОБНОВЛЕНИЯ UI:
 
     private fun showLoadingIcon() {     // Иконка загрузки
-        hideMessageLayout()
         requireView().findViewById<ImageView>(R.id.search_fragment_iv_loading)
             .visibility = View.VISIBLE
     }
 
     private fun showSomeSearchProblem() {
-        hideLoadingIcon()
         requireView().findViewById<FrameLayout>(R.id.search_fragment_fl_error)
             .visibility = View.VISIBLE
         requireView().findViewById<TextView>(R.id.search_fragment_tv_error)
@@ -213,6 +199,6 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
 
     private companion object {
         const val TRACK_ID = "track id key"
-        const val TIMER = 2000L
+        const val DELAY_TIMER = 2000L
     }
 }

@@ -18,4 +18,8 @@
 
     <string name="unexpected_error_message">Возникла непредвиденная ошибка</string>
     <string name="nothing_found_message">Ничего не найдено :(</string>
+
+    <string name="player_is_loading_text">Трек загружается…</string>
+    <string name="player_is_ready_text">Трек готов к проигрыванию</string>
+
 </resources>
