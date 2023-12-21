@@ -50,7 +50,6 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 if (event.action == KeyEvent.ACTION_UP) {
                     addPlaylist()
-                    return@setOnKeyListener true
                 }
             }
             false
@@ -73,10 +72,13 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
     private fun addPlaylist() {
 
         val playlistName =
-            if (requireView().findViewById<EditText>(R.id.et_new_playlist_name).text.isEmpty()) {
-                R.string.new_playlist_default_name.toString()
+            if (requireView().findViewById<EditText>(R.id.et_new_playlist_name)
+                    .text.trim().isEmpty()
+            ) {
+                resources.getString(R.string.new_playlist_default_name)
             } else {
-                requireView().findViewById<EditText>(R.id.et_new_playlist_name).text.toString()
+                requireView().findViewById<EditText>(R.id.et_new_playlist_name)
+                    .text.trim().toString()
             }
         val newPlaylist = Playlist(
             0,
