@@ -27,10 +27,10 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
     private val vm: PlaylistsViewModel by activityViewModels { vmFactory } // Владелец - MainActivity
 
     override fun onAttach(context: Context) {
+        super.onAttach(context)
         val mediaSubcomponent =
             requireActivity().applicationContext.component.mediaSubcomponent().create()
         mediaSubcomponent.inject(this)
-        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

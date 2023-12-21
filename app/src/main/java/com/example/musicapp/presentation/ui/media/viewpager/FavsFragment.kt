@@ -28,11 +28,11 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
     private lateinit var vm: TracksViewModel
 
     override fun onAttach(context: Context) {
+        super.onAttach(context)
         val mediaSubcomponent =
             requireActivity().applicationContext.component.mediaSubcomponent().create()
         mediaSubcomponent.inject(this)
         vm = ViewModelProvider(this, vmFactory)[TracksViewModel::class.java]
-        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -43,7 +43,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         val loadingIcon: ImageView = view.findViewById(R.id.favs_fragment_iv_loading)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.favs_fragment_recycler_view)
-        recyclerView!!.layoutManager = LinearLayoutManager(
+        recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
             false
@@ -96,7 +96,7 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         bundle.putInt(PLAYLIST_ID, FAVS_PLAYLIST_ID)
         playerFragment.arguments = bundle
 
-        activity?.supportFragmentManager!!.beginTransaction()
+        requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.main_container, playerFragment)
             .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)

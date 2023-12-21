@@ -40,11 +40,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
     // ПЕРЕОПРЕДЕЛЁННЫЕ МЕТОДЫ + МЕТОДЫ ЖЦ:
 
     override fun onAttach(context: Context) {
+        super.onAttach(context)
         val playerSubcomponent =
             requireActivity().applicationContext.component.playerSubcomponent().create()
         playerSubcomponent.inject(this)
         vm = ViewModelProvider(this, vmFactory)[PlayerViewModel::class.java]
-        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -147,12 +147,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
 
             uiHandler.postDelayed(setCurrentSeekBarPosition, CURRENT_SEEKBAR_CHECK_TIMER)
         }
+        // Получение списка доступных плейлистов (для работы с Медиатекой)
+        getListOfUsersPlaylists()
     }
 
     override fun onResume() {
-        // Получение списка доступных плейлистов (для работы с Медиатекой)
-        getListOfUsersPlaylists()
-
         if (mediaPlayer.isPlaying) {
             setCurrentTimeRunnable.run()
             setCurrentSeekBarPosition.run()

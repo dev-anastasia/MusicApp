@@ -1,6 +1,5 @@
 package com.example.musicapp.data.repos
 
-import com.example.musicapp.MyObject
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.data.network.RetrofitUtils
 import com.example.musicapp.domain.TracksRepo
@@ -13,9 +12,8 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class TracksRepoImpl @Inject constructor() : TracksRepo {
+class TracksRepoImpl @Inject constructor(private val dao: MyDao) : TracksRepo {
 
-    var dao: MyDao? = MyObject.dao
     private val mapper = Mapper()
 
     override fun getTrackInfo(
@@ -28,7 +26,7 @@ class TracksRepoImpl @Inject constructor() : TracksRepo {
     override fun getTracksIdsInSinglePlaylist(
         playlistId: Int
     ): Single<List<Long>> {
-        return dao!!.getTracksIdsSingle(playlistId)
+        return dao.getTracksIdsSingle(playlistId)
     }
 
     override fun getTracksList(
@@ -36,7 +34,7 @@ class TracksRepoImpl @Inject constructor() : TracksRepo {
     ) {
         val list = mutableListOf<TrackEntity>()
         for (i in trackIdsList) {
-            list.add(dao!!.getAllTracksListById(i))
+            list.add(dao.getAllTracksListById(i))
         }
 
         val result = mapper.trackEntityListToMusicTrackList(list)
@@ -54,34 +52,34 @@ class TracksRepoImpl @Inject constructor() : TracksRepo {
         track: MusicTrack, playlistId: Int
     ) {
         val trackTable = mapper.musicTrackToTrackEntity(track)
-        dao!!.addTrackToPlaylist(trackTable, playlistId)
+        dao.addTrackToPlaylist(trackTable, playlistId)
     }
 
     override fun findTrackInSinglePlaylist(
         trackId: Long, playlistId: Int
     ): Single<List<Long>> {
-        return dao!!.findTrackInSinglePlaylist(playlistId, trackId)
+        return dao.findTrackInSinglePlaylist(playlistId, trackId)
             .subscribeOn(Schedulers.io())
     }
 
     override fun getPlaylistsOfThisTrack(
         trackId: Long, callback: (List<Int>) -> Unit
     ) {
-        val res = dao!!.getPlaylistsOfThisTrack(trackId)
+        val res = dao.getPlaylistsOfThisTrack(trackId)
         callback(res)
     }
 
     override fun lookForTrackInMedia(
         trackId: Long
     ): Single<List<Long>> {
-        return dao!!.lookForTrackInPlaylists(trackId)
+        return dao.lookForTrackInPlaylists(trackId)
             .subscribeOn(Schedulers.io())
     }
 
     override fun deleteTrackFromPlaylist(
         trackId: Long, playlistId: Int
     ) {
-        dao!!.deleteTrackFromPlaylist(playlistId, trackId)
+        dao.deleteTrackFromPlaylist(playlistId, trackId)
     }
 
     private companion object {

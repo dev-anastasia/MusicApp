@@ -23,10 +23,10 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
     private val vm: PlaylistsViewModel by activityViewModels { vmFactory }  // владелец - MediaActivity
 
     override fun onAttach(context: Context) {
+        super.onAttach(context)
         val mediaSubcomponent =
             requireActivity().applicationContext.component.mediaSubcomponent().create()
         mediaSubcomponent.inject(this)
-        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

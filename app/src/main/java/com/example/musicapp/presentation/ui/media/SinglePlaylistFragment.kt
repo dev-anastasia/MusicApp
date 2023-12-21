@@ -29,11 +29,11 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
     private lateinit var vm: TracksViewModel
 
     override fun onAttach(context: Context) {
+        super.onAttach(context)
         val mediaSubcomponent =
             requireActivity().applicationContext.component.mediaSubcomponent().create()
         mediaSubcomponent.inject(this)
         vm = ViewModelProvider(this, vmFactory)[TracksViewModel::class.java]
-        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,7 +98,7 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         bundle.putInt(PLAYLIST_ID, this.requireArguments().getInt(ID_KEY))
         playerFragment.arguments = bundle
 
-        activity?.supportFragmentManager!!.beginTransaction()
+        requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.main_container, playerFragment)
             .addToBackStack("added PlayerFragment")
             .setReorderingAllowed(true)

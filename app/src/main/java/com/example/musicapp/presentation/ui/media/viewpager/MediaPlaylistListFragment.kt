@@ -42,7 +42,7 @@ class MediaPlaylistListFragment :
 
         val recyclerView =
             view.findViewById<RecyclerView>(R.id.media_fragment_playlists_recycler_view)
-        recyclerView!!.layoutManager = LinearLayoutManager(
+        recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
             false
@@ -52,6 +52,9 @@ class MediaPlaylistListFragment :
         recyclerView.adapter = mediaAdapter
 
         vm.apply {
+
+            getListOfUsersPlaylists()
+
             allPlaylists.observe(viewLifecycleOwner) { list ->
                 mediaAdapter.updateList(list)
                 recyclerView.scrollToPosition(0)
@@ -78,11 +81,6 @@ class MediaPlaylistListFragment :
                 }
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        vm.getListOfUsersPlaylists()
     }
 
     override fun openPlaylistClicked(id: Int) {

@@ -21,6 +21,7 @@ class PlaylistAdapter(
 
     private val list: MutableList<Playlist> = mutableListOf()
     private var currPlaylistId = 0
+    private var currPlaylistPosition = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
@@ -43,6 +44,7 @@ class PlaylistAdapter(
 
         holder.menu.setOnClickListener {
             currPlaylistId = list[position].playlistId
+            currPlaylistPosition = holder.layoutPosition
             println(currPlaylistId)
             showMenu(holder.menu)
         }
@@ -79,9 +81,14 @@ class PlaylistAdapter(
                 newList
             )
         )
+        val oldSize = list.size
         list.clear()
         list.addAll(newList)
-        diffUtil.dispatchUpdatesTo(this)
+        if (oldSize > newList.size) {
+            notifyItemRemoved(currPlaylistPosition)
+        } else {
+            diffUtil.dispatchUpdatesTo(this)
+        }
     }
 
     private fun bindWithDatabase(holder: PlaylistViewHolder, position: Int) {

@@ -36,11 +36,11 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
     private var currentQueryText: String = ""  // текущий текст запроса
 
     override fun onAttach(context: Context) {
+        super.onAttach(context)
         val searchSubcomponent =
             requireActivity().applicationContext.component.searchSubcomponent().create()
         searchSubcomponent.inject(this)
         vm = ViewModelProvider(this, vmFactory)[SearchViewModel::class.java]
-        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -76,7 +76,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
                         hideMessageLayout()
                         hideKeyboard()
                         showLoadingIcon()
-                        recyclerView!!.visibility = View.GONE
+                        recyclerView.visibility = View.GONE
                     }
 
                     SearchUIState.Error -> {
@@ -87,7 +87,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), OnTrackClickListener 
                     SearchUIState.Success -> {
                         hideMessageLayout()
                         hideLoadingIcon()
-                        recyclerView!!.visibility = View.VISIBLE
+                        recyclerView.visibility = View.VISIBLE
                     }
 
                     SearchUIState.NoResults -> {

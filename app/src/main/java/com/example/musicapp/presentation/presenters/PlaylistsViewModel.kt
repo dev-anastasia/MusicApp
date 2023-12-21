@@ -68,8 +68,8 @@ class PlaylistsViewModel @Inject constructor(
                     _playlistsListUiState.postValue(PlaylistsListUiState.NoResults)
                 } else {
                     _playlistsListUiState.postValue(PlaylistsListUiState.Success)
-                    updateList(it)
                 }
+                updateList(it)
             }
         }
     }
