@@ -12,24 +12,20 @@ import io.reactivex.Single
 interface MyDao {
 
     // Получить список всех плейлистов
-    @Query("SELECT * FROM playlists_table ORDER BY systemTimeMillis desc") // +
+    @Query("SELECT * FROM playlists_table ORDER BY systemTimeMillis desc")
     fun getAllPlaylists(): Single<List<PlaylistEntity>>
 
     // Добавить плейлист в БД
-    @Insert(onConflict = OnConflictStrategy.IGNORE) // +
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertPlaylist(playlist: PlaylistEntity)
 
     // Получить список id треков в конкретном плейлисте
-    @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId")  // +
+    @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId")
     fun getTracksIdsList(playlistId: Int): Single<List<Long>>
 
-    // Получить обложку трека (Single)
-    @Query("SELECT artworkUrl60 FROM tracks_table WHERE trackId = :trackId") // +
-    fun getTrackCoverSingle(trackId: Long?): Single<String>
-
-    // Получить обложку трека (String)
+    // Получить обложку трека
     @Query("SELECT artworkUrl60 FROM tracks_table WHERE trackId = :trackId")
-    fun getTrackCoverString(trackId: Long): String
+    fun getTrackCoverSingle(trackId: Long?): Single<String>
 
     // Удалить плейлист из БД
     @Query("DELETE FROM playlists_table WHERE playlistId = :playlistId")
@@ -47,10 +43,6 @@ interface MyDao {
     @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId AND trackId = :trackId")
     fun findTrackInSinglePlaylist(playlistId: Int, trackId: Long): Single<List<Long>>
 
-    // Получить список плейлистов, где есть этот трек
-    @Query("SELECT trackId FROM cross_ref WHERE trackId = :trackId")
-    fun getPlaylistsOfThisTrack(trackId: Long): List<Int>
-
     // Добавить трек в плейлист и в БД
     @Transaction
     fun addTrackToPlaylist(track: TrackEntity, playlistId: Int) {
@@ -65,12 +57,11 @@ interface MyDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun addTrackToDB(track: TrackEntity)
 
-    // Удалить трек из плейлиста и из БД (при условии что его нет в других плейлистах)
+    // Удалить трек из конкретного плейлиста (и из БД, если его нет в других плейлистах)
     @Transaction
     fun deleteTrackFromPlaylist(playlistId: Int, trackId: Long) {
         val crossRef = PlaylistTrackCrossRef(playlistId, trackId)
         deletePlaylistTrackCrossRef(crossRef)
-
         // Если трека нет в других плейлистах - удаляем его из таблицы треков
         val list = lookForTrackInDatabase(trackId)
         if (list.isEmpty())

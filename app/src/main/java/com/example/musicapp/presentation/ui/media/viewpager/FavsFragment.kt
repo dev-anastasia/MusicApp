@@ -52,40 +52,40 @@ class FavsFragment : Fragment(R.layout.favs_fragment), OnTrackClickListener {
         val trackAdapter = TrackAdapter(this)
         recyclerView.adapter = trackAdapter
 
-        vm.tracksList.observe(viewLifecycleOwner) {
-            trackAdapter.updateList(it)
-        }
+        vm.apply {
 
-        vm.uiState.observe(viewLifecycleOwner) {
-            when (it) {
-                TracksListUiState.Loading -> {
-                    loadingIcon.visibility = View.VISIBLE
-                }
+            getTracksList(FAVS_PLAYLIST_ID) // Получаем список треков
 
-                TracksListUiState.Success -> {
-                    loadingIcon.visibility = View.GONE
-                }
+            tracksList.observe(viewLifecycleOwner) {
+                trackAdapter.updateList(it)
+            }
 
-                TracksListUiState.NoResults -> {
-                    loadingIcon.visibility = View.GONE
-                    emptyPlaylistMessage.visibility = View.VISIBLE
-                }
+            uiState.observe(viewLifecycleOwner) {
+                when (it) {
+                    TracksListUiState.Loading -> {
+                        loadingIcon.visibility = View.VISIBLE
+                    }
 
-                else -> {
-                    Log.e("uiState", "SinglePlaylistFragment: some uiState error")
-                    Toast.makeText(
-                        context,
-                        "Непредвиденная ошибка: не удалось получить список треков",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    TracksListUiState.Success -> {
+                        loadingIcon.visibility = View.GONE
+                    }
+
+                    TracksListUiState.NoResults -> {
+                        loadingIcon.visibility = View.GONE
+                        emptyPlaylistMessage.visibility = View.VISIBLE
+                    }
+
+                    else -> {
+                        Log.e("uiState", "SinglePlaylistFragment: some uiState error")
+                        Toast.makeText(
+                            context,
+                            "Непредвиденная ошибка: не удалось получить список треков",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
-    }
-
-    override fun onResume() {
-        vm.getTracksList(FAVS_PLAYLIST_ID) // Получаем список треков
-        super.onResume()
     }
 
     override fun onItemClick(id: Long) {

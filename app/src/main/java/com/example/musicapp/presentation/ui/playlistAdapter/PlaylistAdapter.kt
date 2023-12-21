@@ -36,15 +36,15 @@ class PlaylistAdapter(
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
 
-        bindWithDatabase(holder, position)
+        bindWithDatabase(holder, holder.adapterPosition)
 
         holder.itemView.setOnClickListener {
-            onPlaylistClick(list[position].playlistId)
+            onPlaylistClick(list[holder.adapterPosition].playlistId)
         }
 
         holder.menu.setOnClickListener {
-            currPlaylistId = list[position].playlistId
-            currPlaylistPosition = holder.layoutPosition
+            currPlaylistId = list[holder.adapterPosition].playlistId
+            currPlaylistPosition = holder.adapterPosition
             println(currPlaylistId)
             showMenu(holder.menu)
         }
@@ -56,7 +56,7 @@ class PlaylistAdapter(
         payloads: MutableList<Any>
     ) {
         if (payloads.isEmpty())
-            super.onBindViewHolder(holder, position, payloads)
+            super.onBindViewHolder(holder, holder.adapterPosition, payloads)
         else {
             val bundle = payloads.first() as Bundle
             for (key in bundle.keySet()) {
@@ -81,20 +81,15 @@ class PlaylistAdapter(
                 newList
             )
         )
-        val oldSize = list.size
         list.clear()
         list.addAll(newList)
-        if (oldSize > newList.size) {
-            notifyItemRemoved(currPlaylistPosition)
-        } else {
-            diffUtil.dispatchUpdatesTo(this)
-        }
+        diffUtil.dispatchUpdatesTo(this)
     }
 
     private fun bindWithDatabase(holder: PlaylistViewHolder, position: Int) {
-        holder.name.text = list[position].playlistName
+        holder.name.text = list[holder.adapterPosition].playlistName
 
-        itemIdListener.getPlaylistInfo(list[position].playlistId) { info ->
+        itemIdListener.getPlaylistInfo(list[holder.adapterPosition].playlistId) { info ->
             mainHandler.post {
                 holder.updatePlaylistCoverImage(info.cover)
                 holder.updateTracksCount(info.tracksCount)

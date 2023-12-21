@@ -48,7 +48,7 @@
         android:layout_height="32dp"
         android:layout_marginStart="48dp"
         android:layout_marginTop="50dp"
-        android:background="@drawable/icon_media_added"
+        android:background="@drawable/icon_media_empty"
         android:clickable="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/player_fragment_iv_cover" />

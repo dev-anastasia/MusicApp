@@ -12,9 +12,8 @@ interface TracksRepo {
     ): Single<List<Long>>
 
     fun getTracksList(
-        trackIdsList: List<Long>,
-        callback: (List<MusicTrack>) -> Unit
-    )
+        trackIdsList: List<Long>
+    ): List<MusicTrack>
 
     fun getSearchResult(
         queryText: String
@@ -24,11 +23,6 @@ interface TracksRepo {
         trackId: Long,
         playlistId: Int,
     ): Single<List<Long>>
-
-    fun getPlaylistsOfThisTrack(
-        trackId: Long,
-        callback: (List<Int>) -> Unit
-    )
 
     fun lookForTrackInMedia(
         trackId: Long

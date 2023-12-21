@@ -53,35 +53,38 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
         val trackAdapter = TrackAdapter(this)
         recyclerView.adapter = trackAdapter
 
-        vm.tracksList.observe(viewLifecycleOwner) {
-            trackAdapter.updateList(it)
-        }
+        vm.apply {
 
-        vm.uiState.observe(viewLifecycleOwner) {
-            when (it) {
-                TracksListUiState.Loading -> {}
+            getTracksList(requireArguments().getInt(ID_KEY))     // Получаем список треков
 
-                TracksListUiState.Success -> {}
+            tracksList.observe(viewLifecycleOwner) {
+                trackAdapter.updateList(it)
+            }
 
-                TracksListUiState.NoResults -> {
-                    emptyPlaylistMessage.visibility = View.VISIBLE
-                }
+            uiState.observe(viewLifecycleOwner) {
+                when (it) {
+                    TracksListUiState.Loading -> {}
 
-                else -> {
-                    Log.e("uiState", "SinglePlaylistFragment: some uiState error")
-                    Toast.makeText(
-                        context,
-                        "Непредвиденная ошибка: не удалось получить список треков",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    TracksListUiState.Success -> {}
+
+                    TracksListUiState.NoResults -> {
+                        emptyPlaylistMessage.visibility = View.VISIBLE
+                    }
+
+                    else -> {
+                        Log.e("uiState", "SinglePlaylistFragment: some uiState error")
+                        Toast.makeText(
+                            context,
+                            "Непредвиденная ошибка: не удалось получить список треков",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
     }
 
     override fun onResume() {
-        vm.getTracksList(this.requireArguments().getInt(ID_KEY))     // Получаем список треков
-
         requireView().findViewById<ImageButton>(R.id.single_playlist_fragment_btn_go_back)
             .setOnClickListener {
                 onBackPressed()

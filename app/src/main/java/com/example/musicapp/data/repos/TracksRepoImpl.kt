@@ -27,18 +27,17 @@ class TracksRepoImpl @Inject constructor(private val dao: MyDao) : TracksRepo {
         playlistId: Int
     ): Single<List<Long>> {
         return dao.getTracksIdsList(playlistId)
+            .subscribeOn(Schedulers.io())
     }
 
     override fun getTracksList(
-        trackIdsList: List<Long>, callback: (List<MusicTrack>) -> Unit
-    ) {
+        trackIdsList: List<Long>
+    ): List<MusicTrack> {
         val list = mutableListOf<TrackEntity>()
         for (i in trackIdsList) {
             list.add(dao.getAllTracksListById(i))
         }
-
-        val result = mapper.trackEntityListToMusicTrackList(list)
-        callback(result)
+        return mapper.trackEntityListToMusicTrackList(list)
     }
 
     override fun getSearchResult(
@@ -60,13 +59,6 @@ class TracksRepoImpl @Inject constructor(private val dao: MyDao) : TracksRepo {
     ): Single<List<Long>> {
         return dao.findTrackInSinglePlaylist(playlistId, trackId)
             .subscribeOn(Schedulers.io())
-    }
-
-    override fun getPlaylistsOfThisTrack(
-        trackId: Long, callback: (List<Int>) -> Unit
-    ) {
-        val res = dao.getPlaylistsOfThisTrack(trackId)
-        callback(res)
     }
 
     override fun lookForTrackInMedia(

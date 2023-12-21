@@ -35,14 +35,14 @@ class TrackAdapter(
     override fun getItemCount(): Int = list.size
 
     override fun onBindViewHolder(holder: MusicPieceViewHolder, position: Int) {
-        holder.songName.text = list[position].trackName
-        holder.author.text = list[position].artistName
+        holder.songName.text = list[holder.adapterPosition].trackName
+        holder.author.text = list[holder.adapterPosition].artistName
         Picasso.get()
-            .load(list[position].artworkUrl60)
+            .load(list[holder.adapterPosition].artworkUrl60)
             .into(holder.cover)
 
         holder.itemView.setOnClickListener {
-            itemIdListener.onItemClick(list[position].trackId)
+            itemIdListener.onItemClick(list[holder.adapterPosition].trackId)
         }
     }
 
@@ -52,7 +52,7 @@ class TrackAdapter(
         payloads: MutableList<Any>
     ) {
         if (payloads.isEmpty()) {
-            super.onBindViewHolder(holder, position, payloads)
+            super.onBindViewHolder(holder, holder.adapterPosition, payloads)
         } else {
             val bundle = payloads.first() as Bundle
             for (key in bundle.keySet()) {

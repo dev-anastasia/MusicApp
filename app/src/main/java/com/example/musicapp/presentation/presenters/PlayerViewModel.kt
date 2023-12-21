@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.musicapp.MyObject.FAVS_PLAYLIST_ID
 import com.example.musicapp.domain.entities.MusicTrack
 import com.example.musicapp.domain.entities.Playlist
@@ -17,7 +18,8 @@ import com.example.musicapp.presentation.ui.player.PlayerUIState
 import com.example.musicapp.presentation.ui.player.ViewState
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import java.util.concurrent.Executors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PlayerViewModel @Inject constructor(
@@ -79,11 +81,10 @@ class PlayerViewModel @Inject constructor(
 
         getTrackInfoUseCase.getTrackInfo(trackId)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { response ->
-                    updateViewStateInfo(response.results[0])
-                    _playerUiState.postValue(PlayerUIState.Success)
-                },
+            .subscribe({ response ->
+                updateViewStateInfo(response.results[0])
+                _playerUiState.postValue(PlayerUIState.Success)
+            },
                 { error ->
                     Log.e("RxJava", "getTrackInfo fun problem: $error")
                     _playerUiState.postValue(PlayerUIState.Error)
@@ -93,22 +94,18 @@ class PlayerViewModel @Inject constructor(
 
     //Проверка статуса "Нравится"/"Не нравится" (иконка с сердечком)
     fun checkIfFavourite() {
-        getTracksListUseCase.lookForTrackInPlaylist(
-            trackId, FAVS_PLAYLIST_ID
-        )
-            .subscribe(
-                { list ->
-                    _isLikedLiveData.postValue(list.isNotEmpty()) // список непустой = true, в избранном
-                },
+        getTracksListUseCase.lookForTrackInPlaylist(trackId, FAVS_PLAYLIST_ID)
+            .subscribe({ list ->
+                _isLikedLiveData.postValue(list.isNotEmpty()) // список непустой = true, в избранном
+            },
                 { error ->
                     Log.e("RxJava", "checkIfFavourite fun problem: $error")
                     _playerUiState.postValue(PlayerUIState.Error)
                 })
     }
 
-    // Логика нажатия на кнопку "Нравится"
     fun likeClicked() {
-        Executors.newSingleThreadExecutor().execute {
+        viewModelScope.launch(Dispatchers.IO) {
             if (isLikedLiveData.value == false) {
                 // Добавляем в избранное:
                 val viewStateInfo = viewState.value!!
@@ -120,23 +117,18 @@ class PlayerViewModel @Inject constructor(
                     artworkUrl100 = viewStateInfo.artworkUrl100,
                     artworkUrl60 = viewStateInfo.artworkUrl60
                 )
-                insertTrackUseCase.addTrackToPlaylist(
-                    track, FAVS_PLAYLIST_ID
-                )
+                insertTrackUseCase.addTrackToPlaylist(track, FAVS_PLAYLIST_ID)
                 _isLikedLiveData.postValue(true)
             } else {
                 // Удаляем из избранного:
-                deleteTrackUseCase.deleteTrackFromPlaylist(
-                    trackId, FAVS_PLAYLIST_ID
-                )
+                deleteTrackUseCase.deleteTrackFromPlaylist(trackId, FAVS_PLAYLIST_ID)
                 _isLikedLiveData.postValue(false)
             }
         }
     }
 
-    // Логика нажатия на иконку "Медиа"
     fun mediaIconClicked(playlistId: Int) {
-        // Ищем: есть ли уже трек в выбранном плейлисте? (по аналогии с Яндекс.Музыкой)
+        // Ищем: есть ли уже трек в выбранном плейлисте?
         getTracksListUseCase.lookForTrackInPlaylist(trackId, playlistId)
             .subscribe({ list ->
                 if (list.isEmpty()) {         // Если трека нет в этом плейлисте - добавляем
@@ -154,11 +146,14 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun getTracksList(playlistId: Int) {
-        Executors.newSingleThreadExecutor().execute {
-            getTracksListUseCase.getPlaylistTracksList(playlistId) {
-                updateList(it)
-            }
-        }
+        getTracksListUseCase.getPlaylistTracksList(playlistId)
+            .subscribe({ listOfTracksIds ->
+                updateList(getTracksListUseCase.getTracksList(listOfTracksIds))
+            },
+                { error ->
+                    Log.e("RxJava", "PlayerVM getTracksList fun problem: $error")
+                }
+            )
     }
 
     // Запускается из fun mediaIconClicked уже в io-потоке!

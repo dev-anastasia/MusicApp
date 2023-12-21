@@ -273,6 +273,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
 
         requireView().findViewById<ImageButton>(R.id.player_fragment_iv_icon_media).apply {
             isClickable = true
+            setBackgroundResource(R.drawable.icon_media_added)
             setOnClickListener {
                 if (playlistsList.isEmpty()) {
                     Toast.makeText(
