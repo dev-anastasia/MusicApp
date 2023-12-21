@@ -12,7 +12,7 @@ import com.example.musicapp.domain.useCases.playlists.GetPlaylistInfoUseCase
 import com.example.musicapp.domain.useCases.playlists.GetPlaylistsUseCase
 import com.example.musicapp.domain.useCases.playlists.InsertPlaylistUseCase
 import com.example.musicapp.presentation.ui.media.viewpager.PlaylistsListUiState
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
@@ -44,14 +44,6 @@ class PlaylistsViewModel @Inject constructor(
 
     fun addPlaylist(playlist: Playlist) {
         insertPlaylistUseCase.insertPlaylist(playlist)
-            .subscribeOn(Schedulers.io())
-            .subscribe(
-                {
-                    getListOfUsersPlaylists()
-                },
-                { error ->
-                    Log.e("RxJava", "mediaIconClicked fun problem: $error")
-                })
     }
 
     fun deletePlaylist(id: Int) {
@@ -62,27 +54,46 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     fun getListOfUsersPlaylists() {
-        Executors.newSingleThreadExecutor().execute {
-            getPlaylistsUseCase.getAllPlaylists {
-                if (it.isEmpty()) {
+        getPlaylistsUseCase.getAllPlaylists().subscribe({ list ->
+                if (list.isEmpty()) {
                     _playlistsListUiState.postValue(PlaylistsListUiState.NoResults)
                 } else {
                     _playlistsListUiState.postValue(PlaylistsListUiState.Success)
                 }
-                updateList(it)
-            }
-        }
+                updateList(list)
+            }, { error ->
+                Log.e("RxJava", "PlaylistsVM getListOfUsersPlaylists fun problem: $error")
+            })
     }
 
     fun getPlaylistInfo(
-        playlistId: Int,
-        callback: (PlaylistInfo) -> Unit
+        playlistId: Int, callback: (PlaylistInfo) -> Unit
     ) {
-        Executors.newSingleThreadExecutor().execute {
-            val playlistCover = getPlaylistInfoUseCase.getPlaylistCover(playlistId)
-            val tracksCount = getPlaylistInfoUseCase.getPlaylistTrackCount(playlistId)
-            callback(PlaylistInfo(playlistCover, tracksCount.size))
-        }
+        getPlaylistInfoUseCase.getPlaylistTracksCount(playlistId)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ list ->   // Получили список треков
+                if (list.isEmpty()) {
+                    val playlistInfo = PlaylistInfo(null, 0)
+                    callback(playlistInfo)
+                } else {
+                    getPlaylistInfoUseCase.getTrackIdCover(list[0])
+                        .subscribe({ string -> // Получили обложку
+                            val playlistInfo = PlaylistInfo(string, list.size)
+                            callback(playlistInfo)
+                        }, { error ->
+                            Log.e(
+                                "RxJava",
+                                "PlaylistsVM getPlaylistInfo() getTrackIdCover fun problem: $error"
+                            )
+                        })
+                }
+            }, { error ->
+                Log.e(
+                    "RxJava",
+                    "PlaylistsVM getPlaylistInfo() getPlaylistTracksCount fun problem: $error"
+                )
+            })
+
     }
 
     fun changeAddPlaylistFragmentIsOpen(value: Boolean) {

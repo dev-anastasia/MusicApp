@@ -1,12 +1,12 @@
 package com.example.musicapp.data.repos
 
 import android.util.Log
-import com.example.musicapp.MyObject
 import com.example.musicapp.data.Mapper
 import com.example.musicapp.domain.PlaylistsRepo
 import com.example.musicapp.domain.database.MyDao
 import com.example.musicapp.domain.entities.Playlist
-import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class PlaylistsRepoImpl @Inject constructor(private val dao: MyDao) : PlaylistsRepo {
@@ -15,26 +15,29 @@ class PlaylistsRepoImpl @Inject constructor(private val dao: MyDao) : PlaylistsR
 
     override fun getPlaylistTracksCount(
         playlistId: Int
-    ): List<Long> {
+    ): Single<List<Long>> {
         return dao.getTracksIdsList(playlistId)
+            .subscribeOn(Schedulers.io())
     }
 
-    override fun getPlaylistCover(playlistId: Int): String? {
-        return dao.getPlaylistCover(playlistId).ifEmpty { null }
+    override fun getTrackCover(trackId: Long): Single<String> {
+        return dao.getTrackCoverSingle(trackId)
+            .subscribeOn(Schedulers.io())
     }
 
-    override fun getAllPlaylists(callback: (List<Playlist>) -> Unit) {
-        val list = dao.getAllPlaylists()
-        callback(mapper.playlistEntityListToPlaylistList(list))
+    override fun getAllPlaylists(): Single<List<Playlist>> {
+        return dao.getAllPlaylists()
+            .subscribeOn(Schedulers.io())
+            .map { mapper.playlistEntityListToPlaylistList(it) }
     }
 
-    override fun insertPlaylist(playlist: Playlist): Completable {
+    override fun insertPlaylist(playlist: Playlist) {
         val playlistTable = mapper.playlistToPlaylistEntity(playlist)
-        return dao.insertPlaylist(playlistTable)
+        dao.insertPlaylist(playlistTable)
     }
 
     override fun deletePlaylist(id: Int) {
-        dao.getTracksIdsSingle(id)
+        dao.getTracksIdsList(id)
             .subscribe(
                 { list ->
                     for (trackId in list) {

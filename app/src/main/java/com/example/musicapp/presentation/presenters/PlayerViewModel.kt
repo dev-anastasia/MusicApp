@@ -15,6 +15,7 @@ import com.example.musicapp.domain.useCases.tracks.GetTracksListUseCase
 import com.example.musicapp.domain.useCases.tracks.InsertTrackUseCase
 import com.example.musicapp.presentation.ui.player.PlayerUIState
 import com.example.musicapp.presentation.ui.player.ViewState
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -136,23 +137,20 @@ class PlayerViewModel @Inject constructor(
     // Логика нажатия на иконку "Медиа"
     fun mediaIconClicked(playlistId: Int) {
         // Ищем: есть ли уже трек в выбранном плейлисте? (по аналогии с Яндекс.Музыкой)
-        getTracksListUseCase.lookForTrackInPlaylist(
-            trackId, playlistId
-        ).subscribe({ list ->
-            if (list.isEmpty()) {         // Если трека нет в этом плейлисте - добавляем
-                addToMedia(playlistId)
-            } else {                      // Если трек уже есть в этом плейлисте - удаляем
-                deleteFromMedia(playlistId)
-            }
-        }, { error ->
-            Log.e("RxJava", "mediaIconClicked fun problem: $error")
-        })
+        getTracksListUseCase.lookForTrackInPlaylist(trackId, playlistId)
+            .subscribe({ list ->
+                if (list.isEmpty()) {         // Если трека нет в этом плейлисте - добавляем
+                    addToMedia(playlistId)
+                } else {                      // Если трек уже есть в этом плейлисте - удаляем
+                    deleteFromMedia(playlistId)
+                }
+            }, { error ->
+                Log.e("RxJava", "PlayerVM mediaIconClicked fun problem: $error")
+            })
     }
 
-    fun getListOfUsersPlaylists(callback: (List<Playlist>) -> Unit) {
-        Executors.newSingleThreadExecutor().execute {
-            getPlaylistsUseCase.getAllPlaylists(callback)
-        }
+    fun getListOfUsersPlaylists(): Single<List<Playlist>> {
+        return getPlaylistsUseCase.getAllPlaylists()
     }
 
     fun getTracksList(playlistId: Int) {

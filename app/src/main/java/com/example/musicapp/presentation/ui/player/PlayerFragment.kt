@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.Menu.NONE
 import android.view.MenuItem
 import android.view.View
@@ -360,9 +361,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
 
     private fun getListOfUsersPlaylists() {
         playlistsList.clear()
-        vm.getListOfUsersPlaylists {
-            playlistsList.addAll(it)
-        }
+        vm.getListOfUsersPlaylists()
+            .subscribe(
+                { list ->
+                    playlistsList.addAll(list)
+                },
+                { error ->
+                    Log.e("RxJava", "getListOfUsersPlaylists fun problem: $error")
+                }
+            )
     }
 
     private fun openNewTrackPlayerFragment(trackId: Long) {
@@ -372,11 +379,13 @@ class PlayerFragment : Fragment(R.layout.fragment_player), PopupMenu.OnMenuItemC
         bundle.putInt(PLAYLIST_ID, this.requireArguments().getInt(PLAYLIST_ID))
         playerFragment.arguments = bundle
 
-        //releasePlayer()
+        releasePlayer()
 
         requireActivity().supportFragmentManager.apply {
-            beginTransaction().replace(R.id.main_container, playerFragment)
-                .setReorderingAllowed(true).commit()
+            beginTransaction()
+                .replace(R.id.main_container, playerFragment)
+                .setReorderingAllowed(true)
+                .commit()
         }
     }
 

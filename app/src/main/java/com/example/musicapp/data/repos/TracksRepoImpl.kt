@@ -26,7 +26,7 @@ class TracksRepoImpl @Inject constructor(private val dao: MyDao) : TracksRepo {
     override fun getTracksIdsInSinglePlaylist(
         playlistId: Int
     ): Single<List<Long>> {
-        return dao.getTracksIdsSingle(playlistId)
+        return dao.getTracksIdsList(playlistId)
     }
 
     override fun getTracksList(

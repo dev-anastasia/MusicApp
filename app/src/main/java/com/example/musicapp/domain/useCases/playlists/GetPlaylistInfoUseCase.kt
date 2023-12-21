@@ -1,15 +1,16 @@
 package com.example.musicapp.domain.useCases.playlists
 
 import com.example.musicapp.domain.PlaylistsRepo
+import io.reactivex.Single
 import javax.inject.Inject
 
 class GetPlaylistInfoUseCase @Inject constructor(val repo: PlaylistsRepo) {
 
-    fun getPlaylistTrackCount(playlistId: Int): List<Long> {
+    fun getPlaylistTracksCount(playlistId: Int): Single<List<Long>> {
         return repo.getPlaylistTracksCount(playlistId)
     }
 
-    fun getPlaylistCover(playlistId: Int): String? {
-        return repo.getPlaylistCover(playlistId)
+    fun getTrackIdCover(trackId: Long): Single<String> {
+        return repo.getTrackCover(trackId)
     }
 }

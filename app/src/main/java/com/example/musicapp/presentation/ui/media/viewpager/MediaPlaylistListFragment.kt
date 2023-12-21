@@ -105,7 +105,9 @@ class MediaPlaylistListFragment :
         playlistId: Int,
         callback: (PlaylistInfo) -> Unit
     ) {
-        vm.getPlaylistInfo(playlistId, callback)
+        vm.getPlaylistInfo(playlistId) {
+            callback(it)
+        }
     }
 
     private companion object {

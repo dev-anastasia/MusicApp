@@ -22,8 +22,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center"
-        android:layout_marginTop="24dp"
-        android:textSize="14sp"
+        android:layout_marginTop="26dp"
+        android:textSize="16sp"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -95,9 +95,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="150dp"
         android:layout_marginEnd="8dp"
-        tools:text="@string/zero_time"
         app:layout_constraintEnd_toStartOf="@id/player_fragment_seekbar"
-        app:layout_constraintTop_toBottomOf="@id/player_fragment_tv_artist_name" />
+        app:layout_constraintTop_toBottomOf="@id/player_fragment_tv_artist_name"
+        tools:text="@string/zero_time" />
 
     <SeekBar
         android:id="@+id/player_fragment_seekbar"

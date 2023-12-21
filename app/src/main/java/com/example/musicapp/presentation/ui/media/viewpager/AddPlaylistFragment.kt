@@ -14,6 +14,9 @@ import com.example.musicapp.application.component
 import com.example.musicapp.domain.entities.Playlist
 import com.example.musicapp.presentation.presenters.PlaylistsViewModel
 import com.example.musicapp.presentation.presenters.factories.PlaylistsVMFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
@@ -86,7 +89,13 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
             null,
             System.currentTimeMillis()
         )
-        vm.addPlaylist(newPlaylist)
+        CoroutineScope(Dispatchers.IO).launch {
+            vm.apply {
+                addPlaylist(newPlaylist)
+                getListOfUsersPlaylists()
+            }
+        }
+
         requireActivity().supportFragmentManager.popBackStack()
     }
 }

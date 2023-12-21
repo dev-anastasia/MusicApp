@@ -6,44 +6,26 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import dagger.Provides
-import dagger.assisted.AssistedInject
-import io.reactivex.Completable
 import io.reactivex.Single
-import javax.inject.Inject
 
 @Dao
 interface MyDao {
 
     // Получить список всех плейлистов
-    @Query("SELECT * FROM playlists_table ORDER BY systemTimeMillis desc")
-    fun getAllPlaylists(): List<PlaylistEntity>
+    @Query("SELECT * FROM playlists_table ORDER BY systemTimeMillis desc") // +
+    fun getAllPlaylists(): Single<List<PlaylistEntity>>
 
     // Добавить плейлист в БД
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertPlaylist(playlist: PlaylistEntity): Completable
-
-    // Получить обложку плейлиста (последний трек в коллекции)
-    fun getPlaylistCover(playlistId: Int): String {
-        var result = ""
-        val tracksIdsList = getTracksIdsList(playlistId)
-        if (tracksIdsList.isEmpty().not()) {
-            result = getTrackCoverString(tracksIdsList[0])
-        }
-        return result
-    }
+    @Insert(onConflict = OnConflictStrategy.IGNORE) // +
+    fun insertPlaylist(playlist: PlaylistEntity)
 
     // Получить список id треков в конкретном плейлисте
-    @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId")
-    fun getTracksIdsSingle(playlistId: Int): Single<List<Long>>
-
-    // Получить список id треков в конкретном плейлисте
-    @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId")
-    fun getTracksIdsList(playlistId: Int): List<Long>
+    @Query("SELECT trackId FROM cross_ref WHERE playlistId = :playlistId")  // +
+    fun getTracksIdsList(playlistId: Int): Single<List<Long>>
 
     // Получить обложку трека (Single)
-    @Query("SELECT artworkUrl60 FROM tracks_table WHERE trackId = :trackId")
-    fun getTrackCoverSingle(trackId: Long): Single<String>
+    @Query("SELECT artworkUrl60 FROM tracks_table WHERE trackId = :trackId") // +
+    fun getTrackCoverSingle(trackId: Long?): Single<String>
 
     // Получить обложку трека (String)
     @Query("SELECT artworkUrl60 FROM tracks_table WHERE trackId = :trackId")
