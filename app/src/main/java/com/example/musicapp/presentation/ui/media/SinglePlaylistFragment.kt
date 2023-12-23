@@ -63,9 +63,13 @@ class SinglePlaylistFragment : Fragment(R.layout.single_playlist_fragment),
 
             uiState.observe(viewLifecycleOwner) {
                 when (it) {
-                    TracksListUiState.Loading -> {}
+                    TracksListUiState.Loading -> {
+                        emptyPlaylistMessage.visibility = View.GONE
+                    }
 
-                    TracksListUiState.Success -> {}
+                    TracksListUiState.Success -> {
+                        emptyPlaylistMessage.visibility = View.GONE
+                    }
 
                     TracksListUiState.NoResults -> {
                         emptyPlaylistMessage.visibility = View.VISIBLE

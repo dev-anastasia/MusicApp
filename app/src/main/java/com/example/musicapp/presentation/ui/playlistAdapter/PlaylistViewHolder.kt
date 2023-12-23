@@ -10,9 +10,9 @@ import com.squareup.picasso.Picasso
 
 class PlaylistViewHolder(itemView: View) :
     RecyclerView.ViewHolder(itemView) {
-    val cover: ImageView = itemView.findViewById(R.id.playlist_item_view_iv_cover)
+    private val cover: ImageView = itemView.findViewById(R.id.playlist_item_view_iv_cover)
+    private val count: TextView = itemView.findViewById(R.id.playlist_item_view_tv_tracks_count)
     val name: TextView = itemView.findViewById(R.id.playlist_item_view_tv_album_name)
-    val count: TextView = itemView.findViewById(R.id.playlist_item_view_tv_tracks_count)
     val menu: ImageButton = itemView.findViewById(R.id.playlists_item_view_context_menu)
 
     fun updatePlaylistName(name: String) {

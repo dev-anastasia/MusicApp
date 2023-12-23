@@ -45,26 +45,10 @@ class PlayerClassImpl @Inject constructor() : PlayerClass {
         return "$currTimeInMinutes:$currTimeInSeconds"
     }
 
-//    override fun covertTrackDurationMillisToString(duration: String): String {
-//
-//        var result = ""
-//        if (duration == DURATION_DEFAULT) {
-//            val dur = mediaPlayer.duration.toLong()
-//            val durationInMinutes = (dur / 1000 / 60).toString()
-//            var durationInSeconds = (dur / 1000 % 60).toString()
-//
-//            if (durationInSeconds.length < 2) {
-//                durationInSeconds = "0$durationInSeconds"
-//            }
-//            result = "$durationInMinutes:$durationInSeconds"
-//        }
-//        return result
-//    }
-
     override fun countDuration(): String {
         val millis = mediaPlayer.duration
         if (millis == -1) {
-            return "0:00"
+            return DURATION_DEFAULT
         }
 
         val mins = millis / 1000 / 60

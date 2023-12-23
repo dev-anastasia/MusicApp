@@ -42,6 +42,6 @@ class PlaylistDiffUtilCallback(
         const val NAME = "playlist name"
         const val COUNT = "tracks count"
         const val COVER = "playlist cover"
-        const val TIME = "time millis"
+        private const val TIME = "time millis"
     }
 }

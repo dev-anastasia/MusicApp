@@ -36,11 +36,11 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         // ниже - отдельный адаптер для ViewPager'а!
-        val adapter = PlaylistsPagerAdapter(this)
         val viewPager = view.findViewById<ViewPager2>(R.id.fragment_media_pager)
-        viewPager.adapter = adapter
-
         val tabLayout = view.findViewById<TabLayout>(R.id.fragment_media_tab_layout)
+
+        viewPager.adapter = PlaylistsPagerAdapter(this)
+
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             if (position == 0) {
                 tab.text = "Плейлисты"
@@ -48,20 +48,24 @@ class MediaFragmentMain : Fragment(R.layout.fragment_media_main) {
                 tab.text = "Избранное"
             }
         }.attach() // так мы соединяем tabLayout и viewPager
+    }
 
-        // Кнопка добавления плейлиста
-        view.findViewById<Toolbar>(R.id.media_fragment_toolbar).setOnClickListener {
-            if (vm.addPlaylistFragmentIsOpen.value!!.not())
+    override fun onResume() {
+        requireView().findViewById<ImageButton>(R.id.media_main_fragment_btn_go_back)
+            .setOnClickListener {
+                onBackPressed()
+            }
+
+        requireView().findViewById<Toolbar>(R.id.media_fragment_toolbar).setOnClickListener {
+            if (vm.addPlaylistFragmentIsOpen.value!!.not()) {
                 requireActivity().supportFragmentManager.beginTransaction()
                     .add(R.id.main_container, AddPlaylistFragment())
                     .addToBackStack("AddPlaylistFragment")
                     .setReorderingAllowed(true)
                     .commit()
+            }
         }
-
-        view.findViewById<ImageButton>(R.id.media_main_fragment_btn_go_back).setOnClickListener {
-            onBackPressed()
-        }
+        super.onResume()
     }
 
     private fun onBackPressed() {

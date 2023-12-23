@@ -18,7 +18,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         val switch = view.findViewById<SwitchCompat>(R.id.theme_switch)
         val sunIcon = view.findViewById<ImageView>(R.id.iv_sun)
         val moonIcon = view.findViewById<ImageView>(R.id.iv_moon)
-        val goBackBtn = view.findViewById<ImageButton>(R.id.settings_fragment_btn_go_back)
 
         val pref = requireActivity().getSharedPreferences(SETTINGS, Context.MODE_PRIVATE)
         val editor = pref?.edit()
@@ -46,9 +45,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             editor?.apply()
         }
 
-        goBackBtn.setOnClickListener {
-            onBackPressed()
-        }
+
+    }
+
+    override fun onResume() {
+        requireView().findViewById<ImageButton>(R.id.settings_fragment_btn_go_back)
+            .setOnClickListener {
+                onBackPressed()
+            }
+        super.onResume()
     }
 
     private fun onBackPressed() {

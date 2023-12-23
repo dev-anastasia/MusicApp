@@ -38,14 +38,13 @@ class AddPlaylistFragment : Fragment(R.layout.fragment_add_playlist) {
         vm.changeAddPlaylistFragmentIsOpen(true)
 
         val editText: EditText = view.findViewById(R.id.et_new_playlist_name)
-
         val commitBtn: ImageButton = view.findViewById(R.id.btn_add_playlist)
         val cancelBtn: ImageButton = view.findViewById(R.id.btn_cancel_adding)
 
         // Открыть клавиатуру
         editText.requestFocus()
-        val v: View? = activity?.currentFocus
-        val inputMethodManager = activity?.getSystemService(InputMethodManager::class.java)
+        val v: View? = requireActivity().currentFocus
+        val inputMethodManager = requireActivity().getSystemService(InputMethodManager::class.java)
         inputMethodManager?.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT)
 
         // Обработка нажатия Enter на клавиатуре
