@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/theme_background"
+    android:orientation="vertical">
+
+    <ImageButton
+        android:id="@+id/player_fragment_btn_go_back"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/icon_go_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/player_fragment_tv_top_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="26dp"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/player_fragment_tv_top_info" />
+
+    <ImageView
+        android:id="@+id/player_fragment_iv_cover"
+        android:layout_width="145dp"
+        android:layout_height="145dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/image_cover_bg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/note_placeholder" />
+
+    <TextView
+        android:id="@+id/player_fragment_tv_song_name"
+        style="@style/PlayerFragmentText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="80dp"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toEndOf="@+id/player_fragment_iv_cover"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Billie Jean" />
+
+    <TextView
+        android:id="@+id/player_fragment_tv_artist_name"
+        style="@style/PlayerFragmentText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="6dp"
+        android:textAllCaps="true"
+        app:layout_constraintStart_toEndOf="@+id/player_fragment_iv_cover"
+        app:layout_constraintTop_toBottomOf="@+id/player_fragment_tv_song_name"
+        tools:text="Michael Jackson" />
+
+    <ImageButton
+        android:id="@+id/player_fragment_iv_icon_media"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/icon_media_empty"
+        android:clickable="false"
+        app:layout_constraintBottom_toTopOf="@id/player_fragment_tv_current_time"
+        app:layout_constraintEnd_toEndOf="@id/player_fragment_tv_current_time" />
+
+    <ImageButton
+        android:id="@+id/player_fragment_iv_icon_fav"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/icon_fav_empty"
+        android:clickable="false"
+        app:layout_constraintBottom_toTopOf="@id/player_fragment_tv_duration"
+        app:layout_constraintStart_toStartOf="@id/player_fragment_tv_duration"
+        app:layout_goneMarginStart="32dp" />
+
+    <TextView
+        android:id="@+id/player_fragment_tv_current_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@id/player_fragment_seekbar"
+        app:layout_constraintTop_toBottomOf="@id/player_fragment_tv_artist_name"
+        tools:text="@string/zero_time" />
+
+    <SeekBar
+        android:id="@+id/player_fragment_seekbar"
+        android:layout_width="395dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="150dp"
+        android:clickable="false"
+        android:progressBackgroundTint="@color/grey_dark"
+        android:progressTint="@color/yellow"
+        android:thumb="@drawable/icon_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/player_fragment_tv_artist_name" />
+
+    <TextView
+        android:id="@+id/player_fragment_tv_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="150dp"
+        android:text="@string/zero_time"
+        app:layout_constraintStart_toEndOf="@id/player_fragment_seekbar"
+        app:layout_constraintTop_toBottomOf="@id/player_fragment_tv_artist_name" />
+
+
+    <ImageButton
+        android:id="@+id/player_fragment_iv_icon_prev"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/icon_prev_disabled"
+        android:clickable="false"
+        app:layout_constraintEnd_toStartOf="@id/player_fragment_ib_icon_play"
+        app:layout_constraintTop_toBottomOf="@id/player_fragment_seekbar" />
+
+    <ImageButton
+        android:id="@+id/player_fragment_ib_icon_play"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="34dp"
+        android:background="@drawable/icon_play_disabled"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/player_fragment_seekbar" />
+
+    <ImageButton
+        android:id="@+id/player_fragment_iv_icon_next"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="32dp"
+        android:background="@drawable/icon_next_disabled"
+        android:clickable="false"
+        app:layout_constraintStart_toEndOf="@id/player_fragment_ib_icon_play"
+        app:layout_constraintTop_toBottomOf="@id/player_fragment_seekbar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
