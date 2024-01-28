@@ -1,7 +1,7 @@
 package com.example.musicapp.data.repos
 
 import com.example.musicapp.data.Mapper
-import com.example.musicapp.data.network.RetrofitUtils
+import com.example.musicapp.data.network.MyRetrofit
 import com.example.musicapp.domain.TracksRepo
 import com.example.musicapp.domain.database.MyDao
 import com.example.musicapp.domain.database.TrackEntity
@@ -19,7 +19,7 @@ class TracksRepoImpl @Inject constructor(private val dao: MyDao) : TracksRepo {
     override fun getTrackInfo(
         currentId: Long
     ): Single<TracksList> {
-        return RetrofitUtils.musicService.getTrackInfoById(currentId)
+        return MyRetrofit.musicService.getTrackInfoById(currentId)
             .subscribeOn(Schedulers.io())
     }
 
@@ -43,7 +43,7 @@ class TracksRepoImpl @Inject constructor(private val dao: MyDao) : TracksRepo {
     override fun getSearchResult(
         queryText: String
     ): Single<Music> {
-        return RetrofitUtils.musicService.getSearchResult(queryText, ENTITY)
+        return MyRetrofit.musicService.getSearchResult(queryText, ENTITY)
             .subscribeOn(Schedulers.io())
     }
 

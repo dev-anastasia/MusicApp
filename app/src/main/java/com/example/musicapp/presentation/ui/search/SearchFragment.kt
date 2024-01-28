@@ -19,6 +19,9 @@ import com.example.musicapp.presentation.presenters.SearchViewModel
 import com.example.musicapp.presentation.presenters.factories.SearchVMFactory
 import com.example.musicapp.presentation.ui.player.PlayerFragment
 import com.example.musicapp.presentation.ui.trackAdapter.TrackAdapter
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

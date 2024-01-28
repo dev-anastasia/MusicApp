@@ -73,7 +73,6 @@ dependencies {
     // Dagger
     implementation 'com.google.dagger:dagger:2.49'
     implementation 'com.google.dagger:dagger-android:2.16'
-    //implementation 'com.google.dagger:dagger-android-support:2.16'
     kapt 'com.google.dagger:dagger-android-processor:2.16'
     kapt 'com.google.dagger:dagger-compiler:2.49'
 }

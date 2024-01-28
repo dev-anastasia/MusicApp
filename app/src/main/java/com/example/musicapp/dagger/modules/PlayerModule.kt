@@ -9,8 +9,6 @@ import dagger.Module
 @Module
 interface PlayerModule {
 
-    fun inject(fr: PlayerFragment)
-
     @Binds
     fun providesPlayerClass(impl: PlayerClassImpl): PlayerClass
 }
